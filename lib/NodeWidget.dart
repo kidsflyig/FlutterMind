@@ -19,6 +19,13 @@ class NodeWidget extends StatefulWidget {
   Offset lastStartOffset=Offset(0, 0);
   NodeWidgetState state;
 
+  void moveToPostion(Offset dst) {
+    state.setState(() {
+      moveOffset=dst;
+    });
+    state.updateEdges(null);
+  }
+
   void onPanStart(detail) {
     print("NodeWidget onPanStart");
     state.setState(() {
@@ -33,7 +40,7 @@ class NodeWidget extends StatefulWidget {
     print("NodeWidget onPanUpdate");
     state.setState(() {
       moveOffset=detail.globalPosition-lastStartOffset+idleOffset;
-      moveOffset=Offset(max(0, moveOffset.dx), max(0, moveOffset.dy));
+      // moveOffset=Offset(max(0, moveOffset.dx), max(0, moveOffset.dy));
     });
     state.updateEdges(null);
   }
@@ -77,51 +84,57 @@ class NodeWidgetState extends State<NodeWidget> {
   @override
   Widget build(BuildContext context) {
     painter=TouchMovePainter();
-    return Container(
-          margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
-          color: Colors.purple,
-          height: 100,
-          width: 100,
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onPanStart: (detail) {
-              print("pan start");
-              widget.onPanStart(detail);
-            },
-            onPanUpdate: (detail) {
-              print("pan update");
-              widget.onPanUpdate(detail);
-            },
+    return Positioned(
+          //margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
+          //color: Colors.purple,
+          left: widget.moveOffset.dx,
+          top: widget.moveOffset.dy,
 
-            onPanEnd: (detail) {
-              print("pan end");
-              widget.onPanEnd(detail);
-            },
-            child: new Stack(
-              children:[
-                IconButton(
-                  icon: new Icon(Icons.star),
-                ),
+          child: Container(
+            height: 100,
+            width: 100,
+            color: Colors.purple,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onPanStart: (detail) {
+                print("pan start");
+                widget.onPanStart(detail);
+              },
+              onPanUpdate: (detail) {
+                print("pan update");
+                widget.onPanUpdate(detail);
+              },
 
-                new TextField(
-                  style: new TextStyle(color: Colors.red),
-                  enabled: editing,
-                  onChanged: (rsp) {
-                    print(rsp);
-                  },
-                  onSubmitted: (rsp) {
-                    print("editing submited");
-                    setState(() {
-                      editing = false;
-                    });
-                  },
-                ),
-              ]),
-            onDoubleTap: () {
-              setState(() {
-                editing = true;
-              });
-            },
+              onPanEnd: (detail) {
+                print("pan end");
+                widget.onPanEnd(detail);
+              },
+              child: new Stack(
+                children:[
+                  IconButton(
+                    icon: new Icon(Icons.star),
+                  ),
+
+                  new TextField(
+                    style: new TextStyle(color: Colors.red),
+                    enabled: editing,
+                    onChanged: (rsp) {
+                      print(rsp);
+                    },
+                    onSubmitted: (rsp) {
+                      print("editing submited");
+                      setState(() {
+                        editing = false;
+                      });
+                    },
+                  ),
+                ]),
+              onDoubleTap: () {
+                setState(() {
+                  editing = true;
+                });
+              },
+            ),
           ),
         );
   }

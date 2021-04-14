@@ -54,10 +54,10 @@ class EdgeWidgetState extends State<EdgeWidget> {
     Offset ll = fnw.moveOffset.translate(-l, -t);
     Offset lt = tnw.moveOffset.translate(-l, -t);
     print("edge:pos="+l.toString()+"," +t.toString()+", size="+ width.toString()+","+height.toString());
-    return Container(
-      margin: EdgeInsets.only(left: l, top: t),
-        // left: l,
-        // top: t,
+    return Positioned(
+      // margin: EdgeInsets.only(left: l, top: t),
+        left: l,
+        top: t,
         child:CustomPaint(
           painter: TouchMovePainter(this.widget, ll, lt, width, height),
           size: Size( width == 0? 50 : width, height)
