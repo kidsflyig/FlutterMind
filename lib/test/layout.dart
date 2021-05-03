@@ -12,10 +12,12 @@ import 'package:flutter/material.dart';
         appBar: AppBar(
           title: Text('Container'),
         ),
-        body: Positioned(
-          width:500,
-          height:500,
-          child: Text('Text in Container'),
+        body: Stack(
+          children: [
+            Positioned(
+              left:-10,
+              child:Text('Text in Container'),
+            )]
         ),
       );
 

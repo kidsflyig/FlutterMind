@@ -1,4 +1,4 @@
-# myapp
+# FlutterMind
 
 A new Flutter project.
 

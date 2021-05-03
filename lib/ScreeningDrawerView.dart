@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import 'Operation.dart';
+import 'operations/Operation.dart';
 import 'utils/Utils.dart';
 
 class ScreeningDrawerView extends StatefulWidget {

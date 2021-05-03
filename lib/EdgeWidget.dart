@@ -9,8 +9,11 @@ import 'utils/Utils.dart';
 class EdgeWidget extends StatefulWidget {
   final Node from;
   final Node to;
-  EdgeWidget(this.from, this.to);
-
+  EdgeWidget({
+    Key key,
+    this.from,
+    this.to
+  }) : super(key: key);
   EdgeWidgetState _state;
 
   void update(BuildContext context) {
@@ -45,14 +48,14 @@ class EdgeWidgetState extends State<EdgeWidget> {
     // );
     NodeWidget fnw = widget.from.widget();
     NodeWidget tnw = widget.to.widget();
-    var width = (fnw.moveOffset.dx - tnw.moveOffset.dx).abs();
-    var height = (fnw.moveOffset.dy - tnw.moveOffset.dy).abs();
+    var width = (fnw.drag_.moveOffset.dx - tnw.drag_.moveOffset.dx).abs();
+    var height = (fnw.drag_.moveOffset.dy - tnw.drag_.moveOffset.dy).abs();
 
-    var l = min(fnw.moveOffset.dx , tnw.moveOffset.dx);
-    var t = min(fnw.moveOffset.dy , tnw.moveOffset.dy);
+    var l = min(fnw.drag_.moveOffset.dx , tnw.drag_.moveOffset.dx);
+    var t = min(fnw.drag_.moveOffset.dy , tnw.drag_.moveOffset.dy);
 
-    Offset ll = fnw.moveOffset.translate(-l, -t);
-    Offset lt = tnw.moveOffset.translate(-l, -t);
+    Offset ll = fnw.drag_.moveOffset.translate(-l, -t);
+    Offset lt = tnw.drag_.moveOffset.translate(-l, -t);
     print("edge:pos="+l.toString()+"," +t.toString()+", size="+ width.toString()+","+height.toString());
     return Positioned(
       // margin: EdgeInsets.only(left: l, top: t),

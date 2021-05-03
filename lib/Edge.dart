@@ -10,12 +10,18 @@ class Edge {
   Node to;
   Widget _widget;
   Edge(this.from, this.to) {
-    from.addEdge(this);
-    to.addEdge(this);
+    from.addEdge(this, true);
+    to.addEdge(this, false);
   }
 
   Widget widget() {
-    _widget = _widget ?? EdgeWidget(from, to);
+    print("edge hash="+this.hashCode.toString()+", widget="+_widget.hashCode.toString());
+    if (_widget == null) {
+      var key = ObjectKey(this.hashCode);
+      print("create EdgetWidget " + key.toString());
+      _widget = EdgeWidget(key:key, from:from, to:to);
+    }
+
     return _widget;
   }
 }
