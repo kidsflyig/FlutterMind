@@ -1,49 +1,57 @@
 import 'dart:collection';
-import 'dart:html';
+// import 'dart:html';
 import 'dart:math';
 
+import 'package:FlutterMind/nodewidget/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
+import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
 
-import 'Edge.dart';
-import 'EdgeWidget.dart';
-import 'MapController.dart';
-import 'Node.dart';
+import '../Edge.dart';
+import '../EdgeWidget.dart';
+import '../MapController.dart';
+import '../Node.dart';
 
-class NodeWidget extends StatefulWidget {
-  Node node;
-  DragUtil drag_ = DragUtil();
+class NodeWidget extends NodeWidgetBase {
 
   NodeWidget({
     Key key,
-    this.node
-  }) : super(key: key);
+    Node node
+  }) : super(key: key, node:node) {
+    SetScale(0.5);
+    moveToPostion(Offset(node.left, node.top));
+  }
 
-
-  NodeWidgetState state;
+  @override
+  void SetScale(double scale) {
+    super.SetScale(scale);
+    state?.setState(() {
+    });
+  }
 
   void moveToPostion(Offset dst) {
     drag_.moveToPostion(dst);
-    state.setState(() {
+    state?.setState(() {
     });
-    state.updateEdges(null);
+    updateEdges(null);
   }
 
   void onPanStart(detail) {
     print("NodeWidget onPanStart");
     drag_.onPanStart(detail);
     state.setState(() {
-      state.painter.painterColor = Colors.green;
     });
-    state.updateEdges(null);
+    updateEdges(null);
+
   }
 
   void onPanUpdate(detail) {
     print("NodeWidget onPanUpdate");
     drag_.onPanUpdate(detail);
-    state.updateEdges(null);
+    updateEdges(null);
     state.setState(() {
-      state.offset_ = drag_.moveOffset;
+      NodeWidgetState s = state;
+      s.offset_ = drag_.moveOffset;
     });
   }
 
@@ -51,18 +59,37 @@ class NodeWidget extends StatefulWidget {
     print("NodeWidget onPanEnd");
     drag_.onPanEnd(detail);
     state.setState(() {
-      state.painter.painterColor = Colors.red;
     });
   }
 
+  @override
   void setSelected(selected) {
     if (state != null) {
       print("setSelected in nw");
       state.setState(() {
-        state.selected_ = selected;
+        NodeWidgetState s = state;
+        s.selected_ = selected;
       });
     } else {
       print("setSelected state is null");
+    }
+  }
+
+  void updateEdges(BuildContext context) {
+    HashSet<Edge> from_edges = node.from_edges;
+    if (from_edges != null) {
+      from_edges.forEach((e) {
+        EdgeWidget edge = e.widget();
+        edge.update(context);
+      });
+    }
+
+    HashSet<Edge> to_edges = node.to_edges;
+    if (to_edges != null) {
+      to_edges.forEach((e) {
+        EdgeWidget edge = e.widget();
+        edge.update(context);
+      });
     }
   }
 
@@ -74,7 +101,6 @@ class NodeWidget extends StatefulWidget {
 }
 
 class NodeWidgetState extends State<NodeWidget> {
-  TouchMovePainter painter;
   bool editing = false;
   bool selected_ = false;
   Widget node_view;
@@ -82,32 +108,11 @@ class NodeWidgetState extends State<NodeWidget> {
 
   @override
   void initState() {
-    painter = TouchMovePainter();
     super.initState();
-  }
-
-  void updateEdges(BuildContext context) {
-    HashSet<Edge> from_edges = widget.node.from_edges;
-    if (from_edges != null) {
-      from_edges.forEach((e) {
-        EdgeWidget edge = e.widget();
-        edge.update(context);
-      });
-    }
-
-    HashSet<Edge> to_edges = widget.node.to_edges;
-    if (to_edges != null) {
-      to_edges.forEach((e) {
-        EdgeWidget edge = e.widget();
-        edge.update(context);
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    painter = TouchMovePainter();
-
     return Positioned(
         //margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
         //color: Colors.purple,
@@ -116,17 +121,20 @@ class NodeWidgetState extends State<NodeWidget> {
         child: Container(
             child: new Stack(children: [
           GestureDetector(
-              behavior: HitTestBehavior.translucent,
+              behavior: HitTestBehavior.deferToChild,
               onPanStart: (detail) {
                 print("pan start");
+                if(widget.node.type == NodeType.rootNode) return false;
                 widget.onPanStart(detail);
               },
               onPanUpdate: (detail) {
                 print("pan update");
+                if(widget.node.type == NodeType.rootNode) return false;
                 widget.onPanUpdate(detail);
               },
               onPanEnd: (detail) {
                 print("pan end");
+                if(widget.node.type == NodeType.rootNode) return false;
                 widget.onPanEnd(detail);
               },
               onDoubleTap: () {
@@ -142,27 +150,40 @@ class NodeWidgetState extends State<NodeWidget> {
                 MapController().selectNode(widget);
               },
               child: Container(
-                height: 100,
-                width: 100,
+                height: widget.width,
+                width: widget.height,
                 color: Colors.purple,
                 child: IconButton(
                   icon: new Icon(Icons.star),
                 ),
               )),
           Visibility(
-              child: Container(
-                  margin: EdgeInsets.only(left: 50),
-                  color: Colors.red,
-                  height: 40,
-                  width: 40,
-                  child: IconButton(
-                    color: Colors.red,
-                    icon: new Icon(Icons.access_alarms),
-                    onPressed: () {
-                      print("click functio icon");
-                      MapController().addNode(widget.node);
-                    },
-                  )),
+              child: Expanded(
+                  // margin: EdgeInsets.only(left: 0),
+                  // color: Colors.black,
+                  // height: 40,
+                  // width: double.infinity,
+                  child: Row(
+                  children: [
+                    IconButton(
+
+                      color: Colors.red,
+                      icon: new Icon(Icons.cached),
+                      onPressed: () {
+                        print("click functio icon1");
+                        MapController().addNode(widget.node);
+                      },
+                    ),
+                    IconButton(
+                      color: Colors.green,
+                      icon: new Icon(Icons.access_alarms),
+                      onPressed: () {
+                        print("click functio icon2");
+                        MapController().removeNode(widget.node);
+                      },
+                    )]
+                  )
+                ),
               visible: selected_),
           Container(
               width: 50,
@@ -170,11 +191,15 @@ class NodeWidgetState extends State<NodeWidget> {
               child: IgnorePointer(
                   ignoring: !editing,
                   child: new TextField(
-                    style: new TextStyle(color: Colors.red),
+                    style: new TextStyle(
+                      color: Colors.red,
+                      fontSize: ScreenUtil.getDp(plain_text_node_font_size_100p) * widget.scale_,
+                    ),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                     ),
                     enabled: editing,
+
                     onChanged: (rsp) {
                       print(rsp);
                     },
@@ -186,22 +211,5 @@ class NodeWidgetState extends State<NodeWidget> {
                     },
                   ))),
         ])));
-  }
-}
-
-class TouchMovePainter extends CustomPainter {
-  var painter = Paint();
-  var painterColor = Colors.red;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    painter.color = painterColor;
-    canvas.drawCircle(Offset(size.width / 2, size.height / 2),
-        min(size.height, size.width) / 2, painter);
-  }
-
-  @override
-  bool shouldRepaint(TouchMovePainter oldDelegate) {
-    return oldDelegate.painterColor != painterColor;
   }
 }

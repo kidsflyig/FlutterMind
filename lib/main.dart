@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:FlutterMind/utils/ScreenUtil.dart';
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 import 'MindMapView.dart';
 
 main() {
@@ -10,6 +14,16 @@ class Data {
 }
 
 class MyApp extends StatelessWidget {
+  MyApp() {
+    // WidgetsFlutterBinding.ensureInitialized();
+    // // 全屏
+    // if (Platform.isAndroid) {
+    //   SystemChrome.setEnabledSystemUIOverlays ([]);
+    // }
+    // initialize
+    ScreenUtil.initScreen();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

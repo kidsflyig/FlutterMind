@@ -1,12 +1,14 @@
 import 'dart:collection';
 
+import 'package:FlutterMind/nodewidget/RootNodeWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'Layout.dart';
 import 'MindMap.dart';
 import 'Edge.dart';
 import 'MapController.dart';
-import 'NodeWidget.dart';
+import 'nodewidget/NodeWidget.dart';
 
 enum NodeType {
   rootNode,
@@ -15,7 +17,9 @@ enum NodeType {
 }
 
 class Node {
+  int id;
   NodeType type;
+  Layout layout;
   HashSet<Node> children;
   HashSet<Edge> from_edges;
   HashSet<Edge> to_edges;
@@ -25,7 +29,19 @@ class Node {
   double top;
   GlobalKey key;
   Widget _widget;
-  Node(this.type);
+  Node(this.type) {
+    id = nextID();
+    layout = new Layout(this);
+  }
+
+  Node.fromId(this.type, int id) {
+    this.id = id;
+  }
+
+  static int _next_id = 0;
+  static int nextID() {
+    return ++_next_id;
+  }
 
   addChild(Node node) {
     print("Node addChild");
@@ -38,8 +54,27 @@ class Node {
       node.map = map;
     }
     children.add(node);
-
+    layout.layout(node);
     new Edge(this, node);
+  }
+
+  void removeNode(Node node) {
+    print("removeNode1");
+    if (children == null)
+      return;
+
+    print("removeNode2");
+    if (from_edges != null) {
+      from_edges.removeWhere((e) => (e.to == node));
+    }
+  }
+
+  void removeFromParent() {
+    print("removeFromParent1");
+    if (parent == null)
+      return;
+    print("removeFromParent2");
+    parent.removeNode(this);
   }
 
   void addEdge(Edge e, bool from) {
@@ -64,7 +99,14 @@ class Node {
     if (_widget == null) {
       var key = ObjectKey(this);
       print("create NodeWidget " + key.toString());
-      _widget = NodeWidget(key:key, node:this);
+      if (type == NodeType.rootNode) {
+        _widget = RootNodeWidget(key:key, node:this);
+        RootNodeWidget w = _widget;
+        w.width = 200;
+        w.height = 100;
+      } else if (type == NodeType.plainText) {
+        _widget = NodeWidget(key:key, node:this);
+      }
     }
     // key = GlobalKey();
     return _widget;
@@ -87,5 +129,6 @@ class Node {
 }
 
 class TextNode extends Node {
+  String data;
   TextNode():super(NodeType.plainText);
 }

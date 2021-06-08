@@ -1,8 +1,10 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 
 import 'Edge.dart';
+import 'MapController.dart';
 import 'Node.dart';
 
 class MindMap {
@@ -19,8 +21,19 @@ class MindMap {
 
   Node root;
 
-  fromJson(json) {
+  fromJson(data) {
+    print("NodeWidget fromJson " + data);
+    Map<String, dynamic> user = json.decode(data);
 
+    root = MapController().addNodeFromJson(user , null);
+    MapController().rebuild();
+  }
+
+  String toJson() {
+    Map<String, dynamic> result = MapController().createJsonFromNode(root);
+    print(result.toString());
+    dynamic data = json.encode(result);
+    return data.toString();
   }
 
   GenerateNodes() {

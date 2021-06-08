@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'Node.dart';
-import 'NodeWidget.dart';
+import 'nodewidget/NodeWidgetBase.dart';
 import 'utils/Utils.dart';
 
 class EdgeWidget extends StatefulWidget {
@@ -46,16 +46,17 @@ class EdgeWidgetState extends State<EdgeWidget> {
     //   width: 20,
     //   height:20
     // );
-    NodeWidget fnw = widget.from.widget();
-    NodeWidget tnw = widget.to.widget();
+    NodeWidgetBase fnw = widget.from.widget();
+    NodeWidgetBase tnw = widget.to.widget();
+
     var width = (fnw.drag_.moveOffset.dx - tnw.drag_.moveOffset.dx).abs();
     var height = (fnw.drag_.moveOffset.dy - tnw.drag_.moveOffset.dy).abs();
 
     var l = min(fnw.drag_.moveOffset.dx , tnw.drag_.moveOffset.dx);
     var t = min(fnw.drag_.moveOffset.dy , tnw.drag_.moveOffset.dy);
 
-    Offset ll = fnw.drag_.moveOffset.translate(-l, -t);
-    Offset lt = tnw.drag_.moveOffset.translate(-l, -t);
+    Offset ll = fnw.center().translate(-l, -t);
+    Offset lt = tnw.center().translate(-l, -t);
     print("edge:pos="+l.toString()+"," +t.toString()+", size="+ width.toString()+","+height.toString());
     return Positioned(
       // margin: EdgeInsets.only(left: l, top: t),
