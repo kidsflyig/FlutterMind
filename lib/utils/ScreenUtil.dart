@@ -17,7 +17,7 @@ class ScreenUtil {
     } else if (width <= 1048) {
       initScreenlt1048();
     } else if (width <= 1366) {
-      initScreenlt366();
+      initScreenlt1366();
     } else {
       print("no fitfull size config"+width.toString());
     }
@@ -32,13 +32,13 @@ class ScreenUtil {
   static void initScreenlt1048() {
     screen[main_menu_padding_left] = 50;
     screen[plain_text_node_width] = 100;
-    screen[plain_text_node_font_size_100p] = 10;
+    screen[plain_text_node_font_size_100p] = 20;
   }
 
-  static void initScreenlt366() {
+  static void initScreenlt1366() {
     screen[main_menu_padding_left] = 50;
     screen[plain_text_node_width] = 100;
-    screen[plain_text_node_font_size_100p] = 10;
+    screen[plain_text_node_font_size_100p] = 30;
   }
 
   static double getDp(int id) {

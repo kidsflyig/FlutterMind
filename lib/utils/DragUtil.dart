@@ -13,26 +13,54 @@ class DragUtil {
   Offset lastEndOffset = Offset(0, 0);
   Offset delta = Offset(0, 0);
 
-  void moveToPostion(Offset diff) {
+  DragUtil clone() {
+    DragUtil drag = new DragUtil();
+    drag.idleOffset = idleOffset;
+    drag.moveOffset = moveOffset;
+    drag.lastStartOffset = lastStartOffset;
+    drag.lastEndOffset = lastEndOffset;
+    drag.delta = delta;
+    return drag;
+  }
+
+  void moveToPosition(Offset dst) {
+    print("DragUtil move to position" + dst.dx.toString()+","+dst.dy.toString());
+    moveOffset = dst;
+    idleOffset = moveOffset;
+  }
+
+  void moveByOffset(Offset diff) {
     print("DragUtil moveByDIff" + diff.dx.toString()+","+diff.dy.toString());
     moveOffset = moveOffset + diff;
     idleOffset = moveOffset;
   }
 
   void onPanStart(detail) {
-    print("Drag onPanStart");
-    lastStartOffset = detail.globalPosition;
+    Offset offset;
+    if (detail is DragStartDetails) {
+      offset = detail.globalPosition;
+    } else {
+      offset = detail;
+    }
+    print("Drag onPanStart " + offset.toString());
+    lastStartOffset = offset;
     lastEndOffset = lastStartOffset;
   }
 
   void onPanUpdate(detail) {
-    print("Drag onPanUpdate");
-    moveOffset = detail.globalPosition - lastStartOffset + idleOffset;
-    delta = detail.globalPosition - lastEndOffset;
-    lastEndOffset = detail.globalPosition;
+    Offset offset;
+    if (detail is DragUpdateDetails) {
+      offset = detail.globalPosition;
+    } else {
+      offset = detail;
+    }
+    print("Drag onPanUpdate " + offset.toString());
+    moveOffset = offset - lastStartOffset + idleOffset;
+    delta = offset - lastEndOffset;
+    lastEndOffset = offset;
   }
 
-  void onPanEnd(detail) {
+  void onPanEnd(DragEndDetails detail) {
     print("Drag onPanEnd");
     idleOffset = moveOffset;
   }

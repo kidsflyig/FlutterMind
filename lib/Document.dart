@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'Settings.dart';
+
 class Document {
   Document._privateConstructor();
 
+  Settings s = Settings();
   static Document _instance = null;
 
   factory Document() {

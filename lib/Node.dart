@@ -1,14 +1,19 @@
 import 'dart:collection';
 
-import 'package:FlutterMind/nodewidget/RootNodeWidget.dart';
+import 'package:FlutterMind/utils/HitTestResult.dart';
+import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
+import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'Layout.dart';
+import 'MindMapView.dart';
+import 'layout/Layout.dart';
 import 'MindMap.dart';
 import 'Edge.dart';
 import 'MapController.dart';
-import 'nodewidget/NodeWidget.dart';
+import 'widgets/NodeWidget.dart';
 
 enum NodeType {
   rootNode,
@@ -20,18 +25,31 @@ class Node {
   int id;
   NodeType type;
   Layout layout;
-  HashSet<Node> children;
+
+  List<Node> children;
   HashSet<Edge> from_edges;
   HashSet<Edge> to_edges;
   MindMap map;
   Node parent;
-  double left;
-  double top;
+  // double left = 0;
+  // double top = 0;
   GlobalKey key;
-  Widget _widget;
+  NodeWidgetBase _widget;
   Node(this.type) {
     id = nextID();
-    layout = new Layout(this);
+  }
+
+  static Node create(type) {
+    if (type == NodeType.plainText) {
+      return TextNode();
+    } else {
+      return Node(NodeType.rootNode);
+    }
+  }
+
+  Node clone() {
+    Node n = Node.create(type);
+    return n;
   }
 
   Node.fromId(this.type, int id) {
@@ -43,19 +61,41 @@ class Node {
     return ++_next_id;
   }
 
-  addChild(Node node) {
+  addChild(Node node, {Direction direction = Direction.auto}) {
     print("Node addChild");
     node.parent = this;
     if (children == null) {
-      children = HashSet();
+      children = List();
     }
 
     if (node.map == null && map != null) {
       node.map = map;
     }
     children.add(node);
-    layout.layout(node);
     new Edge(this, node);
+
+     widget(); // createWidget
+    _widget.addChild(node, direction:direction);
+  }
+
+  void insertBefore(Node n, Node target) {
+    n.parent = this;
+
+    Log.e("Node insertChild "+n.id.toString()+" , " + target.id.toString());
+    int idx = children.indexOf(target);
+    children.insert(idx, n);
+    new Edge(n.parent, n);
+    _widget.insertBefore(n, target);
+  }
+
+  void insertAfter(Node n, Node target) {
+    n.parent = this;
+
+    Log.e("Node insertAfter "+n.id.toString()+" , " + target.id.toString());
+    int idx = children.indexOf(target);
+    children.insert(idx + 1, n);
+    new Edge(n.parent, n);
+    _widget.insertAfter(n, target);
   }
 
   void removeNode(Node node) {
@@ -63,6 +103,7 @@ class Node {
     if (children == null)
       return;
 
+    children.remove(node);
     print("removeNode2");
     if (from_edges != null) {
       from_edges.removeWhere((e) => (e.to == node));
@@ -74,10 +115,12 @@ class Node {
     if (parent == null)
       return;
     print("removeFromParent2");
+    _widget.removeFromParent();
     parent.removeNode(this);
   }
 
   void addEdge(Edge e, bool from) {
+    Log.i("Node addEdge");
     if (from) {
       if (from_edges == null) {
         from_edges = HashSet();
@@ -97,35 +140,36 @@ class Node {
 
   Widget widget() {
     if (_widget == null) {
-      var key = ObjectKey(this);
-      print("create NodeWidget " + key.toString());
+      _widget = NodeWidgetBase.create(this);
       if (type == NodeType.rootNode) {
-        _widget = RootNodeWidget(key:key, node:this);
+        print("create NodeWidget2 ");
         RootNodeWidget w = _widget;
-        w.width = 200;
-        w.height = 100;
-      } else if (type == NodeType.plainText) {
-        _widget = NodeWidget(key:key, node:this);
+        w.moveToPostion(MindMapView.Center());
       }
     }
-    // key = GlobalKey();
-    return _widget;
-    // return NodeWidget(key:key);
-    // return Positioned(
-    //   left: this.left,
-    //   top: this.top,
-    //   child: new IconButton(
-    //   icon: new Icon(Icons.star),
 
-    //   onPressed: () {  },
-    //   )
-    // );
+    return _widget;
+  }
+
+  Node root() {
+    if (map == null) {
+      map = MindMap();
+    }
+    return map.root;
   }
 
   void selected(selected) {
     // Node prev = map.selectedNode();
     // prev.selected()
   }
+
+  // void moveToPosition(Offset offset) {
+  //   left = offset.dx;
+  //   top = offset.dy;
+  //   if (_widget is NodeWidgetBase) {
+  //     (_widget as NodeWidgetBase).moveToPosition(offset);
+  //   }
+  // }
 }
 
 class TextNode extends Node {

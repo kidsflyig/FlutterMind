@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/widgets.dart';
 
 import 'Edge.dart';
@@ -39,23 +41,22 @@ class MindMap {
   GenerateNodes() {
     root = new Node(NodeType.rootNode);
     root.map = this;
-    root.left = 100;
-    root.top = 100;
-    var textNode = new TextNode();
-    textNode.left = 200;
-    textNode.top = 200;
+    // root.left = 100;
+    // root.top = 100;
+    var textNode = Node.create(NodeType.plainText);
+    // textNode.left = 200;
+    // textNode.top = 200;
     root.addChild(textNode);
 
-    var textNode1 = new TextNode();
-    textNode1.left = 300;
-    textNode1.top = 300;
+    var textNode1 = Node.create(NodeType.plainText);
+    // textNode1.left = 300;
+    // textNode1.top = 300;
     root.addChild(textNode1);
   }
 
   GatherNodeWidgets(Node node, List<Widget> list) {
-    print("GatherNodeWidgets1");
     list.add(node.widget());
-    print("GatherNodeWidgets2");
+    Log.e("GatherNodeWidgets " + node.id.toString()+", " + node.parent?.id.toString());
     if (node.children != null) {
       node.children.forEach((e) => GatherNodeWidgets(e, list));
     }

@@ -1,12 +1,16 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:FlutterMind/utils/HitTestResult.dart';
+import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/widgets/PlaceHolderWidget.dart';
 import 'package:flutter/material.dart';
 import 'Edge.dart';
-import 'nodewidget/NodeWidget.dart';
+import 'Node.dart';
+import 'widgets/NodeWidget.dart';
 
 import 'MindMap.dart';
-import 'nodewidget/NodeWidgetBase.dart';
+import 'widgets/NodeWidgetBase.dart';
 import 'operations/OpCenterlize.dart';
 import 'operations/OpLoadFromFile.dart';
 import 'operations/OpWriteToFile.dart';
@@ -23,6 +27,10 @@ class Foreground extends StatefulWidget {
   double top_;
   double scale;
   DragUtil drag_ = DragUtil();
+  bool editing = false;
+  double edit_box_x = 0;
+  double edit_box_y = 0;
+  Function editing_cb;
 
   Foreground() {
     this.scale = 1.0;
@@ -37,16 +45,10 @@ class Foreground extends StatefulWidget {
   }
 
   void centerlize() {
-    // MindMap map = MindMap();
-    // NodeWidget nw = map.root.widget();
-
-    // Offset dst = Offset(Utils.screenSize().width/2, Utils.screenSize().height/2);
-    // Offset diff = dst - nw.moveOffset;
-
-    // node_widget_list.forEach((e) {
-    //   NodeWidget nw = e;
-    //   nw.moveToPostion(nw.moveOffset + diff);
-    // });
+    state_.pl=-Utils.screenSize().width;
+    state_.pt=-Utils.screenSize().height;
+    state_?.setState(() {
+    });
   }
 
   List<Operation> operations() {
@@ -95,14 +97,27 @@ class Foreground extends StatefulWidget {
     // });
 
     drag_.clear();
+
+    editing = false;
+    state_?.setState(() {});
   }
 
   void _toggleFavorite() {
     print("testtesttest");
   }
 
+  void addWidget(w) {
+    node_widget_list.add(w);
+    state_?.setState(() {});
+  }
+
+  void removeWidget(w) {
+    node_widget_list.remove(w);
+    state_?.setState(() {});
+  }
+
   void addNode(node) {
-    print("Foreground: addNode");
+    Log.v("Foreground: addNode");
     node_widget_list.add(node.widget());
     // state_.widget_list.add(node.widget());
 
@@ -113,20 +128,17 @@ class Foreground extends StatefulWidget {
         // state_.widget_list.insert(0, e.widget());
       });
     }
-    if (state_ != null) {
-      state_.setState(() {});
-    }
+    state_?.setState(() {});
   }
 
   void removeNode(node) {
-    print("Foreground: removeNode1");
+    Log.v("Foreground: removeNode");
     if (node.children != null) {
       node.children.forEach((e) {
         removeNode(e);
       });
     }
 
-    print("Foreground: removeNode2 " + node_widget_list.length.toString());
     node_widget_list.remove(node.widget());
     HashSet<Edge> edges = node.to_edges;
     if (edges != null) {
@@ -134,17 +146,30 @@ class Foreground extends StatefulWidget {
         edge_widget_list.remove(e.widget());
       });
     }
-    print("Foreground: removeNode3 " + node_widget_list.length.toString());
-    print("Foreground: removeNode4");
+
     state_?.setState(() {});
+  }
+
+  void showInput(double x, double y, Function cb) {
+    editing = true;
+    edit_box_x = x;
+    edit_box_y = y;
+    this.editing_cb = cb;
+    state_?.setState(() {
+    });
   }
 
   void rebuild() {
     MindMap map = MindMap();
-    print("createState1");
+    node_widget_list.clear();
+    edge_widget_list.clear();
     map.GatherNodeWidgets(map.root, node_widget_list);
     map.GatherEdgeWidgets(map.root, edge_widget_list);
-    state_?.setState(() {});
+    dynamic w = map.root.widget();
+    w.relayout();
+
+    Log.e("rebuild finished");
+    state_.setState(() {});
   }
 
   void test() {
@@ -186,6 +211,40 @@ class ForegroundState extends State<Foreground> {
             ),
             Stack(
               children:widget.node_widget_list
+            ),
+            Positioned(
+              left: widget.edit_box_x,
+              top: widget.edit_box_y,
+              width: 500,
+              height: 100,
+            child: Visibility(
+              visible: widget.editing,
+              child:
+                  new TextField(
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    autofocus: true,
+                    maxLines: 10,
+                    style: new TextStyle(
+                      color: Colors.red,
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (rsp) {
+                      print(rsp);
+                      if (widget.editing_cb != null) {
+                        print("editing_cb type " + widget.editing_cb.runtimeType.toString());
+                        widget.editing_cb(rsp);
+                      }
+                    },
+                    onSubmitted: (msg) {
+                      widget.editing = false;
+                      setState(() { });
+                    },
+                  )
+            )
             )
           ]
         )

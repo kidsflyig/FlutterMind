@@ -43,6 +43,7 @@ class OperationDialogState extends State <OperationDialog> {
           children: [
             TableRow(
               children: [
+                Text("背景颜色"),
                 IconButton(color: Colors.red, icon: new Icon(Icons.center_focus_strong),
                   tooltip: '居中显示',
                   onPressed: () {
@@ -50,6 +51,7 @@ class OperationDialogState extends State <OperationDialog> {
                     Navigator.pop(context);
                   },
                 ),
+                Text("111"),
                 IconButton(color: Colors.red, icon: new Icon(Icons.access_time),
                   tooltip: '其他',
                   onPressed: () {

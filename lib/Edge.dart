@@ -2,7 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import 'EdgeWidget.dart';
+import 'widgets/BezierEdgetWidget.dart';
+import 'widgets/EdgeWidget.dart';
 import 'Node.dart';
 
 class Edge {
@@ -19,7 +20,7 @@ class Edge {
     if (_widget == null) {
       var key = ObjectKey(this.hashCode);
       print("create EdgetWidget " + key.toString());
-      _widget = EdgeWidget(key:key, from:from, to:to);
+      _widget = BezierEdgeWidget(key:key, from:from, to:to);
     }
 
     return _widget;
