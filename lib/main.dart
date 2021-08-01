@@ -4,7 +4,9 @@ import 'package:FlutterMind/MindMapView.dart';
 import 'package:FlutterMind/TestView.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
+import 'package:FlutterMind/utils/localization.dart';
 import "package:flutter/material.dart";
+import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:flutter/services.dart';
 // import 'MindMapView.dart';
 // import 'Splash.dart';
@@ -32,6 +34,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        FMLocalizationsDelegate.delegate,
+      ],
+      supportedLocales: [
+        Locale("en"),
+        Locale("zh")
+      ],
       // home: Splash()
       home: MindMapView()
       // home: TestView()

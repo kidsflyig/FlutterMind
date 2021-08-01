@@ -16,22 +16,31 @@ class RootNodeWidget extends NodeWidgetBase {
   RootNodeWidget({Key key, Node node}) : super(key: key, node: node) {
     // SetScale(0.5);
     // moveToPosition(Offset(node.left, node.top));
-    SetSize(Size(200, 100));
+
   }
 
   @override
   void SetScale(double scale) {
     super.SetScale(scale);
-    state?.setState(() {});
+    _update();
   }
 
   @override
   void SetSize(Size size) {
     width = size.width;
     height = size.height;
-    state?.setState(() {
-    });
-    updateEdges(null);
+    _update();
+    updateEdges();
+  }
+
+  void _update() {
+    if (state == null) {
+      return;
+    }
+    if (state.mounted) {
+      state.setState(() {
+      });
+    }
   }
 
   Offset center() {
@@ -41,49 +50,48 @@ class RootNodeWidget extends NodeWidgetBase {
   @override
   void moveToPostion(Offset dst) {
     super.moveToPosition(dst);
-    state?.setState(() {});
-    updateEdges(null);
+    _update();
+    updateEdges();
   }
 
   void onPanStart(detail) {
     print("NodeWidget onPanStart");
     super.onPanStart(detail);
-    state.setState(() {});
-    updateEdges(null);
+    _update();
+    updateEdges();
   }
 
   void onPanUpdate(detail) {
     print("NodeWidget onPanUpdate");
     super.onPanUpdate(detail);
-    updateEdges(null);
-    state.setState(() {});
+    updateEdges();
+    _update();
   }
 
   void onPanEnd(detail) {
     print("NodeWidget onPanEnd");
     super.onPanEnd(detail);
-    state.setState(() {});
+    _update();
   }
 
   @override
   void setSelected(selected) {
     if (state != null) {
       print("setSelected in nw");
-      state.setState(() {
-        RootNodeWidgetState s = state;
-        s.selected_ = selected;
-      });
+      RootNodeWidgetState s = state;
+      s.selected_ = selected;
+      _update();
     } else {
       print("setSelected state is null");
     }
   }
 
-  void updateEdges(BuildContext context) {
+  void updateEdges() {
     HashSet<Edge> from_edges = node.from_edges;
     if (from_edges != null) {
       from_edges.forEach((e) {
         EdgeWidgetBase edge = e.widget();
-        edge.update();
+        edge.update(null);
       });
     }
 
@@ -91,7 +99,7 @@ class RootNodeWidget extends NodeWidgetBase {
     if (to_edges != null) {
       to_edges.forEach((e) {
         EdgeWidgetBase edge = e.widget();
-        edge.update();
+        edge.update(null);
       });
     }
   }
@@ -99,6 +107,7 @@ class RootNodeWidget extends NodeWidgetBase {
   @override
   State<StatefulWidget> createState() {
     state = RootNodeWidgetState();
+    SetSize(Size(200, 100));
     return state;
   }
 }

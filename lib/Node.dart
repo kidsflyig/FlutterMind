@@ -36,6 +36,9 @@ class Node {
   GlobalKey key;
   NodeWidgetBase _widget;
   Node(this.type) {
+    children = List();
+    from_edges = HashSet();
+    to_edges = HashSet();
     id = nextID();
   }
 
@@ -63,42 +66,56 @@ class Node {
 
   addChild(Node node, {Direction direction = Direction.auto}) {
     print("Node addChild");
-    node.parent = this;
-    if (children == null) {
-      children = List();
+    if (node.parent != null) {
+      if(node.parent != this) {
+        node.removeFromParent(cb:(e) {
+          e.update(this, node);
+          Log.e("modify edge " + this.id.toString()+":"+node.id.toString());
+        });
+      } else {
+        node.removeFromParent();
+      }
+    } else {
+      new Edge(this, node);
     }
+    node.parent = this;
 
     if (node.map == null && map != null) {
       node.map = map;
     }
     children.add(node);
-    new Edge(this, node);
 
      widget(); // createWidget
     _widget.addChild(node, direction:direction);
   }
 
   void insertBefore(Node n, Node target) {
+    n.removeFromParent(cb:(e) {
+      e.update(this, n);
+      Log.e("insertBefore modify edge " + this.id.toString()+":"+n.id.toString());
+    });
     n.parent = this;
 
-    Log.e("Node insertChild "+n.id.toString()+" , " + target.id.toString());
     int idx = children.indexOf(target);
+    Log.e("Node insertBefore "+n.id.toString()+" , " + target.id.toString()+", idx="+idx.toString());
     children.insert(idx, n);
-    new Edge(n.parent, n);
     _widget.insertBefore(n, target);
   }
 
   void insertAfter(Node n, Node target) {
+    n.removeFromParent(cb:(e) {
+      e.update(this, n);
+      Log.e("insertAfter modify edge " + this.id.toString()+":"+n.id.toString());
+    });
     n.parent = this;
 
-    Log.e("Node insertAfter "+n.id.toString()+" , " + target.id.toString());
     int idx = children.indexOf(target);
+    Log.e("Node insertAfter "+n.id.toString()+" , " + target.id.toString()+", idx="+idx.toString());
     children.insert(idx + 1, n);
-    new Edge(n.parent, n);
     _widget.insertAfter(n, target);
   }
 
-  void removeNode(Node node) {
+  void removeNode(Node node, {cb:null}) {
     print("removeNode1");
     if (children == null)
       return;
@@ -106,32 +123,28 @@ class Node {
     children.remove(node);
     print("removeNode2");
     if (from_edges != null) {
-      from_edges.removeWhere((e) => (e.to == node));
+      Edge e = from_edges.firstWhere((e) => (e.to == node), orElse: () => null);
+      if (e != null) {
+        from_edges.remove(e);
+        if (cb != null) cb(e);
+      }
     }
   }
 
-  void removeFromParent() {
+  void removeFromParent({cb:null}) {
     print("removeFromParent1");
     if (parent == null)
       return;
     print("removeFromParent2");
     _widget.removeFromParent();
-    parent.removeNode(this);
+    parent.removeNode(this, cb:cb);
   }
 
   void addEdge(Edge e, bool from) {
     Log.i("Node addEdge");
     if (from) {
-      if (from_edges == null) {
-        from_edges = HashSet();
-      }
-
       from_edges.add(e);
     } else {
-      if (to_edges == null) {
-        to_edges = HashSet();
-      }
-
       to_edges.add(e);
     }
 

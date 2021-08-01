@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/BezierEdgetWidget.dart';
@@ -15,12 +16,21 @@ class Edge {
     to.addEdge(this, false);
   }
 
+  void update(Node from, Node to) {
+    Log.e("edge update");
+    this.from = from;
+    this.to = to;
+    from.addEdge(this, true);
+    to.addEdge(this, false);
+    dynamic w = widget();
+    w.update(this);
+  }
+
   Widget widget() {
-    print("edge hash="+this.hashCode.toString()+", widget="+_widget.hashCode.toString());
     if (_widget == null) {
       var key = ObjectKey(this.hashCode);
       print("create EdgetWidget " + key.toString());
-      _widget = BezierEdgeWidget(key:key, from:from, to:to);
+      _widget = BezierEdgeWidget(key:key, edge:this);
     }
 
     return _widget;

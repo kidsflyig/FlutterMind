@@ -1,3 +1,4 @@
+import 'package:FlutterMind/dialogs/single_page.dart';
 import 'package:FlutterMind/operations/OpCenterlize.dart';
 import 'package:FlutterMind/operations/OpLoadFromFile.dart';
 import 'package:FlutterMind/operations/OpWriteToFile.dart';
@@ -17,7 +18,7 @@ class OperationDialog extends StatefulWidget {
                       content: OperationDialog(foreground)
                       );
         });
-    print("result   -- >  " + result);
+
     return result;
   }
 
@@ -35,34 +36,35 @@ class OperationDialogState extends State <OperationDialog> {
     return Container(
         // height:50,
         // width:100,
-        child: Table(
-          columnWidths: {
-            0:FixedColumnWidth(50),
-            1:FixedColumnWidth(50),
-          },
-          children: [
-            TableRow(
-              children: [
-                Text("背景颜色"),
-                IconButton(color: Colors.red, icon: new Icon(Icons.center_focus_strong),
-                  tooltip: '居中显示',
-                  onPressed: () {
-                    OpCenterlize(widget._foreground, "居中").doAction();
-                    Navigator.pop(context);
-                  },
-                ),
-                Text("111"),
-                IconButton(color: Colors.red, icon: new Icon(Icons.access_time),
-                  tooltip: '其他',
-                  onPressed: () {
-                    // OpWriteToFile("Save").doAction();
-                    Navigator.pop(context);
-                  },
-                ),
-              ]
-            ),
-          ],
-        )
+        child: FeaturesSinglePage()
+        // Table(
+        //   columnWidths: {
+        //     0:FixedColumnWidth(50),
+        //     1:FixedColumnWidth(50),
+        //   },
+        //   children: [
+        //     TableRow(
+        //       children: [
+        //         Text("背景颜色"),
+        //         IconButton(color: Colors.red, icon: new Icon(Icons.center_focus_strong),
+        //           tooltip: '居中显示',
+        //           onPressed: () {
+        //             OpCenterlize(widget._foreground, "居中").doAction();
+        //             Navigator.pop(context);
+        //           },
+        //         ),
+        //         Text("111"),
+        //         IconButton(color: Colors.red, icon: new Icon(Icons.access_time),
+        //           tooltip: '其他',
+        //           onPressed: () {
+        //             // OpWriteToFile("Save").doAction();
+        //             Navigator.pop(context);
+        //           },
+        //         ),
+        //       ]
+        //     ),
+        //   ],
+        // )
         // painter: MyPainter(data),
       );
   }

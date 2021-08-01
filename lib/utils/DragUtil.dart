@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/material.dart';
 
 class DragUtil {
@@ -24,13 +25,11 @@ class DragUtil {
   }
 
   void moveToPosition(Offset dst) {
-    print("DragUtil move to position" + dst.dx.toString()+","+dst.dy.toString());
     moveOffset = dst;
     idleOffset = moveOffset;
   }
 
   void moveByOffset(Offset diff) {
-    print("DragUtil moveByDIff" + diff.dx.toString()+","+diff.dy.toString());
     moveOffset = moveOffset + diff;
     idleOffset = moveOffset;
   }
@@ -54,14 +53,14 @@ class DragUtil {
     } else {
       offset = detail;
     }
-    print("Drag onPanUpdate " + offset.toString());
+
     moveOffset = offset - lastStartOffset + idleOffset;
     delta = offset - lastEndOffset;
     lastEndOffset = offset;
   }
 
   void onPanEnd(DragEndDetails detail) {
-    print("Drag onPanEnd");
+    Log.e("Drag onPanEnd");
     idleOffset = moveOffset;
   }
 

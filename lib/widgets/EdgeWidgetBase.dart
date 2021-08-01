@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:FlutterMind/Edge.dart';
 import 'package:flutter/material.dart';
 
 import '../Node.dart';
@@ -7,15 +8,13 @@ import 'NodeWidgetBase.dart';
 import '../utils/Utils.dart';
 
 class EdgeWidgetBase extends StatefulWidget {
-  final Node from;
-  final Node to;
+  Edge edge;
   EdgeWidgetBase({
     Key key,
-    this.from,
-    this.to
+    this.edge,
   }) : super(key: key);
 
-  void update() {
+  void update(Edge e) {
 
   }
 

@@ -58,7 +58,7 @@ class SplashState extends State<Splash> {
               width: Utils.screenSize().width,
               height: Utils.screenSize().height,
               // fit:BoxFit.none,
-              image: new AssetImage('images/test.jpg'),
+              image: new AssetImage('assets/images/test.jpg'),
               alignment: Alignment.center,
             ),
             Container(

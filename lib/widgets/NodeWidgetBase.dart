@@ -122,6 +122,17 @@ class NodeWidgetBase extends StatefulWidget {
     return s.default_font_size;
   }
 
+  FontWeight fontWeight() {
+    Settings s = Settings();
+    return s.default_font_weight ? FontWeight.bold : FontWeight.normal;
+  }
+
+  String fontFamily() {
+    Settings s = Settings();
+    Log.e("s.default_font_family = " + s.default_font_family);
+    return s.default_font_family;
+  }
+
   void onPanStart(detail) {
     Log.i("NodeWidgetBase onPanStart");
     layout.onPanStart(detail);
@@ -135,16 +146,19 @@ class NodeWidgetBase extends StatefulWidget {
     layout.onPanEnd(detail);
   }
 
+  void updateEdges() {}
   void addChild(Node node, {Direction direction = Direction.auto}) {
     dynamic w = node.widget();
     Layout l = w.layout;
     layout.addChild(l, direction:direction);
+    updateEdges();
   }
 
   void removeChild(Node node) {
     dynamic w = node.widget();
     Layout l = w.layout;
     layout.removeChild(l);
+    updateEdges();
   }
 
   void removeFromParent() {
@@ -154,6 +168,7 @@ class NodeWidgetBase extends StatefulWidget {
     }
 
     layout.removeFromParent();
+    updateEdges();
   }
 
   void insertBefore(node, target) {
@@ -169,6 +184,7 @@ class NodeWidgetBase extends StatefulWidget {
     dynamic w2 = target.widget();
     Layout l2 = w2.layout;
     layout.insertBefore(l1, l2);
+    updateEdges();
   }
 
   void insertAfter(node, target) {
@@ -184,13 +200,13 @@ class NodeWidgetBase extends StatefulWidget {
     dynamic w2 = target.widget();
     Layout l2 = w2.layout;
     layout.insertAfter(l1, l2);
+    updateEdges();
   }
 
-  void updateStatus() {
-    state?.setState(() {
-
-        });
+  void repaint() {
+    state?.setState(() {});
   }
+
   void relayout() {
     layout.relayout();
   }

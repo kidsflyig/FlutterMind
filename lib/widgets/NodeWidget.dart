@@ -61,6 +61,10 @@ class NodeWidget extends NodeWidgetBase {
 
   @override
   void SetSize(Size size) {
+    if (width == size.width && height == size.height) {
+      Log.i("no need to update size");
+      return;
+    }
     width = size.width;
     height = size.height;
     // _update();
@@ -91,8 +95,6 @@ class NodeWidget extends NodeWidgetBase {
 
   @override
   void onPanUpdate(detail) {
-    Log.i("NodeWidget onPanUpdate");
-    Log.e("moveTo w  onPanUpdate " + this.hashCode.toString());
     super.onPanUpdate(detail);
 
     _update();
@@ -134,7 +136,7 @@ class NodeWidget extends NodeWidgetBase {
     if (from_edges != null) {
       from_edges.forEach((e) {
         EdgeWidgetBase edge = e.widget();
-        edge.update();
+        edge.update(null);
       });
     } else {
       Log.e("NodeWidget updateEdges from_edges is null");
@@ -144,7 +146,7 @@ class NodeWidget extends NodeWidgetBase {
     if (to_edges != null) {
       to_edges.forEach((e) {
         EdgeWidgetBase edge = e.widget();
-        edge.update();
+        edge.update(null);
       });
     } else {
       Log.e("NodeWidget updateEdges to_edges is null");
@@ -176,6 +178,7 @@ class NodeWidgetState extends State<NodeWidget> {
        widget.SetSize(box.size);
     });
 
+    Log.e("node widget repaint");
     return Positioned(
         //margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
         //color: Colors.purple,
@@ -202,13 +205,10 @@ class NodeWidgetState extends State<NodeWidget> {
               onDoubleTap: () {
                 MapController().input(widget.x, widget.y, (msg) {
                   widget.label = msg;
-                  print("update test1: " + widget.label);
-                  setState(() {
-                  });
+                  widget.repaint();
                 });
               },
               onSecondaryTap: () {
-                print("secondary tapped");
                 return true;
               },
               onTap: () {
@@ -220,12 +220,21 @@ class NodeWidgetState extends State<NodeWidget> {
                   color: widget.bgColor,
                   border: selected_
                       ? Border.all(color: Colors.red, width: 1)
-                      : null, //边框
+                      : Border.all(color: Colors.transparent, width: 1), //边框
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 ),
                 // height: widget.height,
                 // width: widget.width,
-                child: Text(widget.label)
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: widget.fontSize(),
+                    fontWeight: widget.fontWeight(),
+                    fontFamily: widget.fontFamily(),
+                    // fontStyle: FontStyle.italic,
+                    // fontFamily:
+                  ),
+                )
               )),
         ));
   }

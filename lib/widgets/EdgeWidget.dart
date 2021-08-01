@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:FlutterMind/Edge.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/material.dart';
 
@@ -11,13 +12,12 @@ import '../utils/Utils.dart';
 class EdgeWidget extends EdgeWidgetBase {
   EdgeWidget({
     Key key,
-    Node from,
-    Node to
-  }) : super(key: key, from:from, to:to);
+    Edge edge
+  }) : super(key: key, edge:edge);
   EdgeWidgetState _state;
 
   @override
-  void update() {
+  void update(Edge e) {
     Log.i("In EdgeWidget update " + this.hashCode.toString()+" , state="+_state.toString());
     _state?.setState(() {});
   }
@@ -38,8 +38,8 @@ class EdgeWidgetState extends State<EdgeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    NodeWidgetBase fnw = widget.from.widget();
-    NodeWidgetBase tnw = widget.to.widget();
+    NodeWidgetBase fnw = widget.edge.from.widget();
+    NodeWidgetBase tnw = widget.edge.to.widget();
 
     var width = (fnw.x - tnw.x).abs();
     var height = (fnw.y - tnw.y).abs();

@@ -27,6 +27,7 @@ class BidiLayout extends Layout {
   double distance = 200;
   Side direction;
   double layout_height = 0;
+  double children_layout_height = 0;
   double right_layout_height = 0;
   double left_layout_height = 0;
   bool is_floating = false;
@@ -48,38 +49,49 @@ class BidiLayout extends Layout {
 
   void relayout() {
     resize();
+    Log.e("relayout begin...");
     if (parent == null) {
       relayoutByDirection(Side.left, left, left_layout_height);
       relayoutByDirection(Side.right, right, right_layout_height);
     } else {
       relayoutByDirection(direction, children, layout_height);
     }
+    Log.e("relayout end...");
   }
 
   void relayoutByDirection(Side direction, List<Layout> layout_list, double layout_height) {
-    Log.e("relayoutByDirection " + direction.toString());
     if (layout_list == null) {
       print("relayoutByDirection layout_list is null");
       return;
     }
+    Log.e("relayoutByDirection " + direction.toString());
     Offset offset = NodeWidgetBase.ToNodeWidgetBase(widget).center();
     offset = offset.translate( direction == Side.right ? distance : -distance, -layout_height/2);
+
+    Log.e("relayoutByDirection  init layoutheight: " + layout_height.toString());
 
     layout_list.forEach((layout) {
       BidiLayout l = layout;
       double h = (l.layout_height - layout.height) / 2;
-      layout.moveToPosition(offset.translate(0, h));
+
+      // offset = offset.translate(direction == Side.right ? 0 : l.width, 0);
+      layout.moveToPosition(offset.translate(direction == Side.right ? 0 : -l.width, h));
       MapController().update(layout.widget.node);
 
-      Log.e("relayoutByDirection " + h.toString()+"," + l.layout_height.toString()+" , "+layout.height.toString());
-      offset = offset.translate(direction == Side.right ? 0 : l.width, l.layout_height);
+      Log.e("relayoutByDirection next, child layout: "
+      + l.layout_height.toString()+", child id:"+ l.widget.node.id.toString()
+      +", self height:" + height.toString() +" ,  self id = " + widget.node.id.toString());
+
+      offset = offset.translate(0, l.layout_height);
       // layout children
-      l.relayoutByDirection(direction, l.children, l.layout_height);
+      l.relayoutByDirection(direction, l.children, l.children_layout_height);
+      // offset = offset.translate(direction == Side.right ? 0 : -l.width, 0);
     });
     dirty = false;
   }
 
   void resize() {
+    Log.e("resize begin...");
     if (parent == null) {
       left_layout_height = 0;
       left?.forEach((layout) {
@@ -99,20 +111,22 @@ class BidiLayout extends Layout {
       });
       Log.e("resize right layout height = " + right_layout_height.toString());
     } else {
-      layout_height = 0;
+      children_layout_height = 0;
       if (children != null && children.length > 0) {
         children.forEach((layout) {
           if(layout.dirty) {
             layout.resize();
           }
-          layout_height += ToBidiLayout(layout).layout_height;
+          children_layout_height += ToBidiLayout(layout).layout_height;
         });
+        layout_height = children_layout_height > height ? children_layout_height : height;
         Log.e("resize middle node layout height = " + layout_height.toString());
       } else {
         layout_height = height + GAP;
         Log.e("resize leaf layout height = " + layout_height.toString());
       }
     }
+    Log.e("resize end...");
   }
 
   void addChild(Layout child, {Direction direction = Direction.auto}) {
@@ -218,7 +232,7 @@ class BidiLayout extends Layout {
       hittest(res, LayoutController().root, this, Rect.fromLTWH(x, y, width, height));
       if (res.hit) {
         if (holder == null) {
-          Log.e("moveTo1 " + this.hashCode.toString());
+          Log.i("moveTo1 " + this.hashCode.toString());
 
           holder = PlaceHolderWidget(res.widget, res.target, res.direction);
           MapController().mind_map_view_.foreground.addWidget(holder);
@@ -226,16 +240,17 @@ class BidiLayout extends Layout {
           holder.update(res.target, res.direction);
         }
       } else {
-        Log.e("moveTo1 _removeHolder");
+        Log.i("moveTo1 _removeHolder");
         _removeHolder();
       }
     } else {
-      Log.e("moveTo2 " + this.hashCode.toString()+" , " + floating.hashCode.toString());
+      Log.i("moveTo2 " + this.hashCode.toString()+" , " + floating.hashCode.toString());
       floating.onPanUpdate(detail);
     }
   }
 
   void onPanEnd(detail) {
+    Log.i("hittest onPanEnd");
     if (floating == null) {
       super.onPanEnd(detail);
     } else {
@@ -243,7 +258,7 @@ class BidiLayout extends Layout {
       PlaceHolderWidget holder = ToBidiLayout(floating.layout).holder;
       if (holder != null) {
         // widget.moveTo(holder);
-        Log.e("test begin move node");
+
         MapController().moveTo(widget.node, holder.widget.node, holder.direction);
       } else {
         Log.e("moveTo failed, holder is null for "
@@ -261,13 +276,16 @@ class BidiLayout extends Layout {
 
   void hittest(HitTestResult res, Layout cur, Layout floating, Rect floating_rect) {
     if (cur == null || cur == floating || ToBidiLayout(cur).floating != null) {
-      Log.e("hit invalid");
+      Log.i("hit invalid");
       return;
     }
-
     int score = 0;
     Rect nwr = Rect.fromLTWH(cur.x, cur.y, cur.width, cur.height);
     Rect intr = nwr.intersect(floating_rect);
+
+    Log.i("[hittest] hit rect: cur layout size=" + nwr.toString()+" id=" + cur.widget.node.id.toString() +", float size="+floating_rect.toString()+
+        ", intersect="+ intr.toString());
+
     if (!intr.isEmpty) {
       if (!res.hit) {
         res.hit = true;
@@ -276,7 +294,6 @@ class BidiLayout extends Layout {
       double right_div = nwr.width * 2 / 3;
       double top_div = nwr.height / 3;
       double bottom_div = nwr.height * 2 / 3;
-      Log.i("[hittest] hit rect " + nwr.toString()+","+floating_rect.toString()+", "+ intr.toString());
 
       if (intr.left - nwr.left > right_div) {
         res.direction = Direction.right;
@@ -310,7 +327,8 @@ class BidiLayout extends Layout {
     } else if (
       (floating_rect.left > cur.x && ToBidiLayout(cur).direction == Side.right) ||
       (floating_rect.left < cur.x && ToBidiLayout(cur).direction == Side.left)) {
-      children.forEach((e) {
+
+      cur.children.forEach((e) {
         hittest(res, e, floating, floating_rect);
       });
     }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 
@@ -118,6 +119,15 @@ class MapController {
     w.relayout();
   }
 
+  void repaint(Node node) {
+    if (node == null) return;
+    dynamic w = node.widget();
+    w.repaint();
+    node.children?.forEach((v) {
+      repaint(v);
+    });
+  }
+
   void addNodeForSelected() {
     print("addNode");
     if (selected == null) {
@@ -140,27 +150,13 @@ class MapController {
   }
 
   void moveTo(Node from, Node to, Direction direction) {
-    Log.e("MapController Node moveTo1");
-    mind_map_view_.foreground.removeNode(from);
-    from.removeFromParent();
-
-    if (direction == Direction.top) {
-      Node p = to.parent;
-      p?.insertBefore(from, to);
-      if(p == null) {
-        Log.e("parent is null");
-      }
-    } else if (direction == Direction.right || direction == Direction.left) {
-      mind_map_view_.foreground.removeNode(from);
-      from.removeFromParent();
+    if (direction == Direction.left || direction == Direction.right) {
       to.addChild(from, direction:direction);
+    } else if (direction == Direction.top) {
+      to.parent.insertBefore(from, to);
     } else if (direction == Direction.bottom) {
-      Node p = to.parent;
-      p?.insertAfter(from, to);
+      to.parent.insertAfter(from, to);
     }
-
-    mind_map_view_.foreground.addNode(from);
-    Log.e("Node moveTo3");
 
     dynamic w = to.root().widget();
     w.relayout();
@@ -177,7 +173,6 @@ class MapController {
     }
     Node root = node.root();
     node.removeFromParent();
-
     // relayout
     dynamic w = root.widget();
     w.relayout();
@@ -185,12 +180,12 @@ class MapController {
 
   void update(Node node) {
     dynamic w = node.widget();
-    w.updateStatus();
+    w.repaint();
 
     if (node.to_edges != null) {
       node.to_edges.forEach((e) {
         dynamic w = e.widget();
-        w.update();
+        w.update(null);
       });
     }
   }
@@ -199,4 +194,30 @@ class MapController {
     mind_map_view_.foreground.showInput(x, y, cb);
   }
 
+  void setDefaultFontSize(double size) {
+    Log.e("setDefaultFontSize " + size.toString());
+    Settings s = Settings();
+    s.default_font_size = size;
+
+    MindMap map = MindMap();
+    repaint(map.root);
+  }
+
+  void setDefaultFontWeight(bool is_bold) {
+    Log.e("setDefaultFontWeight " + is_bold.toString());
+    Settings s = Settings();
+    s.default_font_weight = is_bold;
+
+    MindMap map = MindMap();
+    repaint(map.root);
+  }
+
+  void setDefaultFontFamily(String font_family) {
+    Log.e("setDefaultFontFamily " + font_family);
+    Settings s = Settings();
+    s.default_font_family = font_family;
+
+    MindMap map = MindMap();
+    repaint(map.root);
+  }
 }

@@ -84,7 +84,7 @@ List<String> fonts = [
                   borderRadius: BorderRadius.only(topLeft:Radius.circular(6.0),bottomLeft:Radius.circular(6.0))
               ),
               child:IconButton(
-                icon: ImageIcon(AssetImage('images/icons/icon_file.png')),
+                icon: ImageIcon(AssetImage('assets/images/icons/icon_file.png')),
                 color: Colors.black38,
                 onPressed: () {
                   FileDialog.show(context).then((value){

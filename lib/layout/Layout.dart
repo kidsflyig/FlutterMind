@@ -21,9 +21,23 @@ class Layout {
   List<Layout> children;
   bool dirty = true;
   DragUtil drag_ = DragUtil();
-
+  double _width = 0;
+  double _height = 0;
   Layout(this.widget) {
     children = new List<Layout>();
+  }
+
+  double get width => _width;
+  double get height => _height;
+
+  void set width(double width) {
+    _width = width;
+    _markParentDirty(this);
+  }
+
+  void set height(double height) {
+    _height = height;
+    _markParentDirty(this);
   }
 
   void resize() {}
@@ -97,7 +111,7 @@ class Layout {
 
   void moveToPosition(Offset offset) {
     drag_.moveToPosition(offset);
-    widget.updateStatus();
+    widget.repaint();
   }
 
   double get x {
@@ -106,13 +120,5 @@ class Layout {
 
   double get y {
     return drag_.moveOffset.dy;
-  }
-
-  double get width {
-    return widget.width;
-  }
-
-  double get height {
-    return widget.height;
   }
 }
