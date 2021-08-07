@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 
@@ -9,6 +12,8 @@ import 'StarLayout.dart';
 
 class LayoutController {
   LayoutController._privateConstructor();
+  Rect map_rect;
+  Function _fn;
 
   static LayoutController _instance = null;
 
@@ -34,5 +39,23 @@ class LayoutController {
       root = l;
     }
     return l;
+  }
+
+  void onForegroundUpdated(Function fn) {
+    _fn = fn;
+  }
+
+  void updateMapRect(Rect r) {
+    if (map_rect == null) {
+      map_rect = r;
+    }
+    map_rect = map_rect.expandToInclude(r);
+    if (_fn != null) {
+      Log.e("chch before fn " + map_rect.toString());
+      _fn(map_rect, (r) {
+        map_rect = r;
+      });
+      Log.e("chch after fn " + map_rect.toString());
+    }
   }
 }

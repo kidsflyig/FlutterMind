@@ -111,6 +111,13 @@ class Layout {
 
   void moveToPosition(Offset offset) {
     drag_.moveToPosition(offset);
+    widget.setNeedsRepaint();
+    widget.repaint();
+  }
+
+  void moveByOffset(Offset offset) {
+    drag_.moveByOffset(offset);
+    widget.setNeedsRepaint();
     widget.repaint();
   }
 

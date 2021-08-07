@@ -14,33 +14,20 @@ import 'EdgeWidgetBase.dart';
 
 class RootNodeWidget extends NodeWidgetBase {
   RootNodeWidget({Key key, Node node}) : super(key: key, node: node) {
-    // SetScale(0.5);
-    // moveToPosition(Offset(node.left, node.top));
-
   }
 
   @override
   void SetScale(double scale) {
     super.SetScale(scale);
-    _update();
+    setNeedsRepaint();
   }
 
   @override
   void SetSize(Size size) {
     width = size.width;
     height = size.height;
-    _update();
-    updateEdges();
-  }
-
-  void _update() {
-    if (state == null) {
-      return;
-    }
-    if (state.mounted) {
-      state.setState(() {
-      });
-    }
+    setNeedsRepaint();
+    repaint();
   }
 
   Offset center() {
@@ -50,28 +37,29 @@ class RootNodeWidget extends NodeWidgetBase {
   @override
   void moveToPostion(Offset dst) {
     super.moveToPosition(dst);
-    _update();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void onPanStart(detail) {
     print("NodeWidget onPanStart");
     super.onPanStart(detail);
-    _update();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void onPanUpdate(detail) {
     print("NodeWidget onPanUpdate");
     super.onPanUpdate(detail);
-    updateEdges();
-    _update();
+    setNeedsRepaint();
+    repaint();
   }
 
   void onPanEnd(detail) {
     print("NodeWidget onPanEnd");
     super.onPanEnd(detail);
-    _update();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
@@ -80,7 +68,8 @@ class RootNodeWidget extends NodeWidgetBase {
       print("setSelected in nw");
       RootNodeWidgetState s = state;
       s.selected_ = selected;
-      _update();
+      setNeedsRepaint();
+      repaint();
     } else {
       print("setSelected state is null");
     }

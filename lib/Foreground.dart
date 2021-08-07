@@ -1,9 +1,12 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:FlutterMind/MapController.dart';
+import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/widgets/PlaceHolderWidget.dart';
+import 'package:FlutterMind/widgets/PopupWidget.dart';
 import 'package:flutter/material.dart';
 import 'Edge.dart';
 import 'Node.dart';
@@ -27,13 +30,57 @@ class Foreground extends StatefulWidget {
   double top_;
   double scale;
   DragUtil drag_ = DragUtil();
-  bool editing = false;
-  double edit_box_x = 0;
-  double edit_box_y = 0;
-  Function editing_cb;
+
+  // popup
+  double popup_x = 0;
+  double popup_y = 0;
+  double popup_width = 0;
+  double popup_height = 0;
+  Function popup_cb;
+  PopupMode popup_mode = PopupMode.HIDE;
+  double _width;
+  double _height;
 
   Foreground() {
     this.scale = 1.0;
+    _width = Utils.screenSize().width * 3;
+    _height = Utils.screenSize().height * 3;
+
+    LayoutController().onForegroundUpdated((Rect r, cb) {
+      Log.e("onForegroundUpdated = " + r.toString()+", screen size=" +Utils.screenSize().toString());
+      Offset offset = Offset.zero;
+      if (r.left < 0) {
+        _width += (-r.left);
+        offset = offset.translate(-r.left, 0);
+      }
+
+      if (r.top < 0) {
+        _height += (-r.top);
+        offset = offset.translate(-r.top, 0);
+      }
+
+      if (offset.dx > 0 || offset.dy > 0) {
+
+        cb(r.translate(offset.dx, offset.dy));
+
+        node_widget_list.forEach((e) {
+          Log.e("node list moveby " + offset.toString());
+          NodeWidgetBase nw = e;
+          nw.moveByOffset(offset);
+        });
+      }
+
+      if (r.right > _width) {
+        _width += (r.right - _width);
+      }
+
+      if (r.bottom > _height) {
+        _height += (r.bottom - _height);
+      }
+
+      MapController().repaint();
+      state_?.setState(() {});
+    });
   }
 
   void SetScale(double scale) {
@@ -70,10 +117,10 @@ class Foreground extends StatefulWidget {
     print("foreground mouse pos: " + drag_.delta.dx.toString()+","+drag_.delta.dy.toString());
     var newpl = state_.pl + drag_.delta.dx;
     var newpt = state_.pt + drag_.delta.dy;
-    if (newpl <= Utils.screenSize().width / 2 && newpl >= -Utils.screenSize().width * 5 / 2) {
+    if (newpl <= _width / 6 && newpl >= -_width * 5 / 6) {
       state_.pl = newpl;
     }
-    if (newpt <= Utils.screenSize().height / 2 && newpt >= -Utils.screenSize().height * 5 / 2) {
+    if (newpt <= _height / 6 && newpt >= -_height * 5 / 6) {
       state_.pt = newpt;
     }
 
@@ -98,7 +145,7 @@ class Foreground extends StatefulWidget {
 
     drag_.clear();
 
-    editing = false;
+    popup_mode = PopupMode.HIDE;
     state_?.setState(() {});
   }
 
@@ -147,16 +194,46 @@ class Foreground extends StatefulWidget {
       });
     }
 
-    state_?.setState(() {});
+    _update();
   }
 
-  void showInput(double x, double y, Function cb) {
-    editing = true;
-    edit_box_x = x;
-    edit_box_y = y;
-    this.editing_cb = cb;
+  void _showPopup(NodeWidgetBase widget, Function cb) {
+    popup_x = widget.x;
+    popup_y = widget.y;
+    popup_width = widget.width;
+    popup_height = widget.height;
+    this.popup_cb = cb;
+    _update();
+  }
+
+  void showInput(NodeWidgetBase widget, Function cb) {
+    this.popup_mode = PopupMode.Editing;
+    _showPopup(widget, cb);
+  }
+
+  void showPastePopup(NodeWidgetBase widget, Function cb) {
+    Log.e("showPastePopup " + widget?.toString());
+    if (widget == null) return;
+
+    this.popup_mode = PopupMode.Pasting;
+    _showPopup(widget, cb);
+  }
+
+  void _update() {
     state_?.setState(() {
     });
+  }
+
+  void hidePopup() {
+    Log.e("hidePopup");
+    this.popup_mode = PopupMode.HIDE;
+    _update();
+  }
+
+  void hideInputPanel() {
+    if (this.popup_mode == PopupMode.Editing) {
+      hidePopup();
+    }
   }
 
   void rebuild() {
@@ -167,7 +244,7 @@ class Foreground extends StatefulWidget {
     map.GatherEdgeWidgets(map.root, edge_widget_list);
     dynamic w = map.root.widget();
     w.relayout();
-
+    MapController().repaint();
     Log.e("rebuild finished");
     state_.setState(() {});
   }
@@ -196,8 +273,8 @@ class ForegroundState extends State<Foreground> {
     return  Positioned(
       left: pl,
       top: pt,
-      width: canvas_width,
-      height: canvas_height,
+      width: widget._width,
+      height: widget._height,
       child: Container(
         margin: EdgeInsets.only(left: ml, top: mt),
         color: Colors.green,
@@ -212,40 +289,9 @@ class ForegroundState extends State<Foreground> {
             Stack(
               children:widget.node_widget_list
             ),
-            Positioned(
-              left: widget.edit_box_x,
-              top: widget.edit_box_y,
-              width: 500,
-              height: 100,
-            child: Visibility(
-              visible: widget.editing,
-              child:
-                  new TextField(
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    autofocus: true,
-                    maxLines: 10,
-                    style: new TextStyle(
-                      color: Colors.red,
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                    ),
-                    onChanged: (rsp) {
-                      print(rsp);
-                      if (widget.editing_cb != null) {
-                        print("editing_cb type " + widget.editing_cb.runtimeType.toString());
-                        widget.editing_cb(rsp);
-                      }
-                    },
-                    onSubmitted: (msg) {
-                      widget.editing = false;
-                      setState(() { });
-                    },
-                  )
-            )
-            )
+            PopupWidget(
+               widget.popup_mode, widget.popup_x, widget.popup_y,
+                widget.popup_width, widget.popup_height, widget.popup_cb),
           ]
         )
       )

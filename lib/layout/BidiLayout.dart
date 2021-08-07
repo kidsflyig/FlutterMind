@@ -57,6 +57,7 @@ class BidiLayout extends Layout {
       relayoutByDirection(direction, children, layout_height);
     }
     Log.e("relayout end...");
+    MapController().repaint();
   }
 
   void relayoutByDirection(Side direction, List<Layout> layout_list, double layout_height) {
@@ -76,7 +77,7 @@ class BidiLayout extends Layout {
 
       // offset = offset.translate(direction == Side.right ? 0 : l.width, 0);
       layout.moveToPosition(offset.translate(direction == Side.right ? 0 : -l.width, h));
-      MapController().update(layout.widget.node);
+      // MapController().update(layout.widget.node);
 
       Log.e("relayoutByDirection next, child layout: "
       + l.layout_height.toString()+", child id:"+ l.widget.node.id.toString()
@@ -208,70 +209,84 @@ class BidiLayout extends Layout {
     }
   }
 
-  void onPanStart(detail) {
-    super.onPanStart(detail);
-    if (floating == null) {
-      floating = widget.clone();
-      NodeWidget.cast(floating).setColor(Colors.blue);
-      MapController().mind_map_view_.foreground.addWidget(floating);
-    }
-    widget.setAlpha(155);
+  // void onPanStart(detail) {
+  //   super.onPanStart(detail);
+  //   if (floating == null) {
+  //     floating = widget.clone();
+  //     NodeWidget.cast(floating).setColor(Colors.blue);
+  //     MapController().mind_map_view_.foreground.addWidget(floating);
+  //   }
+  //   widget.setAlpha(155);
+  // }
+
+  // void _removeHolder() {
+  //   if (holder != null) {
+  //     MapController().mind_map_view_.foreground.removeWidget(holder);
+  //     holder = null;
+  //   }
+  // }
+
+  // void onPanUpdate(detail) {
+  //   if (floating == null) {
+  //     super.onPanUpdate(detail);
+  //     HitTestResult res = HitTestResult();
+  //     hittest(res, LayoutController().root, this, Rect.fromLTWH(x, y, width, height));
+  //     if (res.hit) {
+  //       if (holder == null) {
+  //         Log.i("moveTo1 " + this.hashCode.toString());
+
+  //         holder = PlaceHolderWidget(res.widget, res.target, res.direction);
+  //         MapController().mind_map_view_.foreground.addWidget(holder);
+  //       } else {
+  //         holder.update(res.target, res.direction);
+  //       }
+  //     } else {
+  //       Log.i("moveTo1 _removeHolder");
+  //       _removeHolder();
+  //     }
+  //   } else {
+  //     Log.i("moveTo2 " + this.hashCode.toString()+" , " + floating.hashCode.toString());
+  //     floating.onPanUpdate(detail);
+  //   }
+  // }
+
+  // void onPanEnd(detail) {
+  //   Log.i("hittest onPanEnd");
+  //   if (floating == null) {
+  //     super.onPanEnd(detail);
+  //   } else {
+  //     floating.onPanEnd(detail);
+  //     PlaceHolderWidget holder = ToBidiLayout(floating.layout).holder;
+  //     if (holder != null) {
+  //       // widget.moveTo(holder);
+
+  //       MapController().moveTo(widget.node, holder.widget.node, holder.direction);
+  //     } else {
+  //       Log.e("moveTo failed, holder is null for "
+  //        + floating.layout.hashCode.toString()+". this:"+this.hashCode.toString());
+  //     }
+
+
+  //     ToBidiLayout(floating.layout)._removeHolder();
+
+  //     MapController().mind_map_view_.foreground.removeWidget(floating);
+  //     floating = null;
+  //     widget.setAlpha(255);
+  //   }
+  // }
+
+  @override
+  void moveToPosition(Offset offset) {
+    super.moveToPosition(offset);
+    LayoutController().updateMapRect(
+      Rect.fromLTWH(drag_.moveOffset.dx, drag_.moveOffset.dy, width, height));
   }
 
-  void _removeHolder() {
-    if (holder != null) {
-      MapController().mind_map_view_.foreground.removeWidget(holder);
-      holder = null;
-    }
-  }
-
-  void onPanUpdate(detail) {
-    if (floating == null) {
-      super.onPanUpdate(detail);
-      HitTestResult res = HitTestResult();
-      hittest(res, LayoutController().root, this, Rect.fromLTWH(x, y, width, height));
-      if (res.hit) {
-        if (holder == null) {
-          Log.i("moveTo1 " + this.hashCode.toString());
-
-          holder = PlaceHolderWidget(res.widget, res.target, res.direction);
-          MapController().mind_map_view_.foreground.addWidget(holder);
-        } else {
-          holder.update(res.target, res.direction);
-        }
-      } else {
-        Log.i("moveTo1 _removeHolder");
-        _removeHolder();
-      }
-    } else {
-      Log.i("moveTo2 " + this.hashCode.toString()+" , " + floating.hashCode.toString());
-      floating.onPanUpdate(detail);
-    }
-  }
-
-  void onPanEnd(detail) {
-    Log.i("hittest onPanEnd");
-    if (floating == null) {
-      super.onPanEnd(detail);
-    } else {
-      floating.onPanEnd(detail);
-      PlaceHolderWidget holder = ToBidiLayout(floating.layout).holder;
-      if (holder != null) {
-        // widget.moveTo(holder);
-
-        MapController().moveTo(widget.node, holder.widget.node, holder.direction);
-      } else {
-        Log.e("moveTo failed, holder is null for "
-         + floating.layout.hashCode.toString()+". this:"+this.hashCode.toString());
-      }
-
-
-      ToBidiLayout(floating.layout)._removeHolder();
-
-      MapController().mind_map_view_.foreground.removeWidget(floating);
-      floating = null;
-      widget.setAlpha(255);
-    }
+  @override
+  void moveByOffset(Offset offset) {
+    super.moveByOffset(offset);
+    LayoutController().updateMapRect(
+      Rect.fromLTWH(drag_.moveOffset.dx, drag_.moveOffset.dy, width, height));
   }
 
   void hittest(HitTestResult res, Layout cur, Layout floating, Rect floating_rect) {

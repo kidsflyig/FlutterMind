@@ -1,3 +1,4 @@
+import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
@@ -16,7 +17,7 @@ class NodeWidgetBase extends StatefulWidget {
   Node node;
   // DragUtil drag_ = DragUtil();
   double scale_ = 1.0;
-
+  bool _dirty = true;
   State<NodeWidgetBase> state;
   Layout layout;
 
@@ -54,7 +55,11 @@ class NodeWidgetBase extends StatefulWidget {
   }
 
   void moveToPosition(Offset dst) {
-    layout.drag_.moveToPosition(dst);
+    layout.moveToPosition(dst);
+  }
+
+  void moveByOffset(Offset offset) {
+    layout.moveByOffset(offset);
   }
 
   void SetScale(double scale) {
@@ -147,18 +152,21 @@ class NodeWidgetBase extends StatefulWidget {
   }
 
   void updateEdges() {}
+
   void addChild(Node node, {Direction direction = Direction.auto}) {
     dynamic w = node.widget();
     Layout l = w.layout;
     layout.addChild(l, direction:direction);
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void removeChild(Node node) {
     dynamic w = node.widget();
     Layout l = w.layout;
     layout.removeChild(l);
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void removeFromParent() {
@@ -168,7 +176,8 @@ class NodeWidgetBase extends StatefulWidget {
     }
 
     layout.removeFromParent();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void insertBefore(node, target) {
@@ -184,7 +193,8 @@ class NodeWidgetBase extends StatefulWidget {
     dynamic w2 = target.widget();
     Layout l2 = w2.layout;
     layout.insertBefore(l1, l2);
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   void insertAfter(node, target) {
@@ -200,11 +210,24 @@ class NodeWidgetBase extends StatefulWidget {
     dynamic w2 = target.widget();
     Layout l2 = w2.layout;
     layout.insertAfter(l1, l2);
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
+  }
+
+  void setNeedsRepaint() {
+    if (!_dirty) {
+      _dirty = true;
+    }
   }
 
   void repaint() {
-    state?.setState(() {});
+    if (_dirty || true) {
+      if (state != null && state.mounted) {
+        state.setState(() {});
+      }
+      updateEdges();
+      _dirty = false;
+    }
   }
 
   void relayout() {

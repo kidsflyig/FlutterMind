@@ -42,21 +42,17 @@ class NodeWidget extends NodeWidgetBase {
     return null;
   }
 
-  void _update() {
-    state?.setState(() {});
-  }
-
   @override
   void SetScale(double scale) {
     super.SetScale(scale);
-    state?.setState(() {});
+    setNeedsRepaint();
   }
 
   @override
   void moveToPosition(Offset dst) {
     super.moveToPosition(dst);
-    _update();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
@@ -67,56 +63,58 @@ class NodeWidget extends NodeWidgetBase {
     }
     width = size.width;
     height = size.height;
-    // _update();
-    updateEdges();
-
     MapController().relayout();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   void setAlpha(alpha) {
     bgColor = bgColor.withAlpha(alpha);
-    _update();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   setColor(color) {
     bgColor = color;
-    _update();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   void onPanStart(detail) {
     Log.i("NodeWidget onPanStart");
     super.onPanStart(detail);
-    _update();
-    // updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   void onPanUpdate(detail) {
     super.onPanUpdate(detail);
 
-    _update();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   void onPanEnd(detail) {
     Log.i("NodeWidget onPanEnd");
     super.onPanEnd(detail);
-    _update();
-    updateEdges();
+    setNeedsRepaint();
+    repaint();
   }
 
   @override
   void setSelected(selected) {
     if (state != null) {
       print("setSelected in nw");
-      state.setState(() {
-        NodeWidgetState s = state;
-        s.selected_ = selected;
-      });
+      NodeWidgetState s = state;
+      s.selected_ = selected;
+
+      setNeedsRepaint();
+      repaint();
     } else {
       print("setSelected state is null");
     }
@@ -125,7 +123,8 @@ class NodeWidget extends NodeWidgetBase {
   void resizeTextBox(String msg) {
     if (msg.length > 10) {
       this.width += 50;
-      _update();
+      setNeedsRepaint();
+      repaint();
     }
   }
 
@@ -176,6 +175,7 @@ class NodeWidgetState extends State<NodeWidget> {
     WidgetsBinding.instance.addPostFrameCallback((mag) {
        RenderBox box = context.findRenderObject();
        widget.SetSize(box.size);
+      //  MapController().repaint();
     });
 
     Log.e("node widget repaint");
@@ -201,18 +201,21 @@ class NodeWidgetState extends State<NodeWidget> {
                 Log.i("pan end");
                 if (widget is RootNodeWidget) return false;
                 widget.onPanEnd(detail);
+                // MapController().hidePopup();
               },
               onDoubleTap: () {
-                MapController().input(widget.x, widget.y, (msg) {
+                MapController().input(widget.node, (msg) {
                   widget.label = msg;
                   widget.repaint();
                 });
+                MapController().hideInputPanel();
               },
               onSecondaryTap: () {
                 return true;
               },
               onTap: () {
                 MapController().selectNode(widget);
+                // MapController().hidePopup();
               },
               child: Container(
                 padding: EdgeInsets.all(10),

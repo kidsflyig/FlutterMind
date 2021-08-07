@@ -30,6 +30,9 @@ class MapController {
   Map<Node, Edge> edges;
   NodeWidgetBase selected;
 
+  NodeWidgetBase cutted;
+  bool _paiting = false;
+
   static of(MindMap doc) {
     if (controllers == null) {
       controllers = Map<MindMap, MapController>();
@@ -52,6 +55,18 @@ class MapController {
     }
     selected = nw;
     nw.setSelected(true);
+
+    if (cutted != null) {
+      showPastePopup();
+    }
+  }
+
+  void hidePopup() {
+    mind_map_view_.foreground.hidePopup();
+  }
+
+  void hideInputPanel() {
+    mind_map_view_.foreground.hideInputPanel();
   }
 
   Node addNodeFromJson(Map<String, dynamic> data, Node p) {
@@ -119,12 +134,22 @@ class MapController {
     w.relayout();
   }
 
-  void repaint(Node node) {
-    if (node == null) return;
-    dynamic w = node.widget();
-    w.repaint();
-    node.children?.forEach((v) {
-      repaint(v);
+  void repaint() {
+    if (_paiting) {
+      Log.e("repaint in progress");
+      return;
+    }
+    _paiting = true;
+    Future(() {
+      Log.e("repainting");
+      MindMap map = MindMap();
+      dynamic w = map.root.widget();
+      w.repaint();
+      map.root.children?.forEach((v) {
+        dynamic w = v.widget();
+        w.repaint();
+      });
+      _paiting = false;
     });
   }
 
@@ -139,10 +164,32 @@ class MapController {
       node.addChild(n);
       dynamic w = node.root().widget();
       w.relayout();
+      MapController().repaint();
     }
     mind_map_view_.foreground.addNode(n);
 
     mind_map_view_.updatePreview();
+  }
+
+  NodeWidgetBase getSelected() {
+    return selected;
+  }
+
+  void cut() {
+    Log.e("cut " + selected?.toString());
+    cutted = selected;
+  }
+
+  void showPastePopup() {
+    Log.e("showPastePopup " + selected?.toString());
+    mind_map_view_.foreground.showPastePopup(selected, null);
+  }
+
+  void paste(Direction direction) {
+    Log.e("paste " + direction.toString());
+    hidePopup();
+    moveTo(cutted.node, selected.node, direction);
+    cutted = null;
   }
 
   void centerlize() {
@@ -160,6 +207,7 @@ class MapController {
 
     dynamic w = to.root().widget();
     w.relayout();
+    MapController().repaint();
   }
 
   void removeSelctedNode() {
@@ -176,48 +224,43 @@ class MapController {
     // relayout
     dynamic w = root.widget();
     w.relayout();
+    MapController().repaint();
   }
 
-  void update(Node node) {
-    dynamic w = node.widget();
-    w.repaint();
+  // void update(Node node) {
+  //   dynamic w = node.widget();
+  //   w.repaint();
 
-    if (node.to_edges != null) {
-      node.to_edges.forEach((e) {
-        dynamic w = e.widget();
-        w.update(null);
-      });
-    }
-  }
+  //   if (node.to_edges != null) {
+  //     node.to_edges.forEach((e) {
+  //       dynamic w = e.widget();
+  //       w.update(null);
+  //     });
+  //   }
+  // }
 
-  void input(double x, double y, Function cb) {
-    mind_map_view_.foreground.showInput(x, y, cb);
+  void input(Node node, Function cb) {
+    mind_map_view_.foreground.showInput(node.widget(), cb);
   }
 
   void setDefaultFontSize(double size) {
     Log.e("setDefaultFontSize " + size.toString());
     Settings s = Settings();
     s.default_font_size = size;
-
-    MindMap map = MindMap();
-    repaint(map.root);
+    repaint();
   }
 
   void setDefaultFontWeight(bool is_bold) {
     Log.e("setDefaultFontWeight " + is_bold.toString());
     Settings s = Settings();
     s.default_font_weight = is_bold;
-
-    MindMap map = MindMap();
-    repaint(map.root);
+    repaint();
   }
 
   void setDefaultFontFamily(String font_family) {
     Log.e("setDefaultFontFamily " + font_family);
     Settings s = Settings();
     s.default_font_family = font_family;
-
-    MindMap map = MindMap();
-    repaint(map.root);
+    repaint();
   }
 }

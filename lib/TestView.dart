@@ -16,6 +16,12 @@ class MyTextField extends StatelessWidget {
 
   MyTextField(this.data);
 
+  void test() {
+    print("in test1");
+    Future(() => print('in test2'));
+    print("in test3");
+  }
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((mag) {
@@ -23,11 +29,18 @@ class MyTextField extends StatelessWidget {
 
        print("页面渲染完毕:" + box.size.toString());
     });
-    return  Container(
+    return GestureDetector(
+      child: Container(
       color: Colors.red,
+      width:50,
+      height:50,
       child:Text(data)
-
-    );
+    ),
+    onTap: () {
+      print("before test");
+      test();
+      print("after test");
+    },);
   }
 }
 
