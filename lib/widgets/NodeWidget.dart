@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:FlutterMind/Foreground.dart';
+import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
@@ -18,7 +19,6 @@ import '../Node.dart';
 import 'EdgeWidgetBase.dart';
 
 class NodeWidget extends NodeWidgetBase {
-  Color bgColor = Colors.purple;
   String label;
 
   NodeWidget({Key key, Node node}) : super(key: key, node: node) {
@@ -42,11 +42,15 @@ class NodeWidget extends NodeWidgetBase {
     return null;
   }
 
-  @override
-  void SetScale(double scale) {
-    super.SetScale(scale);
-    setNeedsRepaint();
+  Color get bgColor {
+    return Settings().nodeBgColor;
   }
+
+  // @override
+  // void SetScale(double scale) {
+  //   super.SetScale(scale);
+  //   setNeedsRepaint();
+  // }
 
   @override
   void moveToPosition(Offset dst) {
@@ -68,19 +72,19 @@ class NodeWidget extends NodeWidgetBase {
     repaint();
   }
 
-  @override
-  void setAlpha(alpha) {
-    bgColor = bgColor.withAlpha(alpha);
-    setNeedsRepaint();
-    repaint();
-  }
+  // @override
+  // void setAlpha(alpha) {
+  //   bgColor = bgColor.withAlpha(alpha);
+  //   setNeedsRepaint();
+  //   repaint();
+  // }
 
-  @override
-  setColor(color) {
-    bgColor = color;
-    setNeedsRepaint();
-    repaint();
-  }
+  // @override
+  // setColor(color) {
+  //   bgColor = color;
+  //   setNeedsRepaint();
+  //   repaint();
+  // }
 
   @override
   void onPanStart(detail) {
@@ -208,14 +212,14 @@ class NodeWidgetState extends State<NodeWidget> {
                   widget.label = msg;
                   widget.repaint();
                 });
-                MapController().hideInputPanel();
+                // MapController().hideInputPanel();
               },
               onSecondaryTap: () {
                 return true;
               },
               onTap: () {
                 MapController().selectNode(widget);
-                // MapController().hidePopup();
+                MapController().hideInputPanel();
               },
               child: Container(
                 padding: EdgeInsets.all(10),

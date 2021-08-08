@@ -10,6 +10,7 @@ import 'package:FlutterMind/widgets/PopupWidget.dart';
 import 'package:flutter/material.dart';
 import 'Edge.dart';
 import 'Node.dart';
+import 'Settings.dart';
 import 'widgets/NodeWidget.dart';
 
 import 'MindMap.dart';
@@ -28,7 +29,7 @@ class Foreground extends StatefulWidget {
   ForegroundState state_;
   double left_;
   double top_;
-  double scale;
+  // double scale;
   DragUtil drag_ = DragUtil();
 
   // popup
@@ -42,7 +43,7 @@ class Foreground extends StatefulWidget {
   double _height;
 
   Foreground() {
-    this.scale = 1.0;
+    // this.scale = 1.0;
     _width = Utils.screenSize().width * 3;
     _height = Utils.screenSize().height * 3;
 
@@ -79,23 +80,28 @@ class Foreground extends StatefulWidget {
       }
 
       MapController().repaint();
-      state_?.setState(() {});
+      _update();
     });
   }
 
-  void SetScale(double scale) {
-    this.scale = scale;
-    node_widget_list.forEach((e) {
-      NodeWidgetBase nw = e;
-      nw.SetScale(scale);
-    });
-  }
+  // void SetScale(double scale) {
+  //   this.scale = scale;
+  //   node_widget_list.forEach((e) {
+  //     NodeWidgetBase nw = e;
+  //     nw.SetScale(scale);
+  //   });
+  // }
 
   void centerlize() {
-    state_.pl=-Utils.screenSize().width;
-    state_.pt=-Utils.screenSize().height;
-    state_?.setState(() {
-    });
+    Log.e("Foreground centerlize");
+    state_.pl = (Utils.screenSize().width - _width) / 2;
+    state_.pt= (Utils.screenSize().height - _height) / 2;
+
+    _update();
+  }
+
+  Color backgroundColor() {
+    return Settings().backgroundColor;
   }
 
   List<Operation> operations() {
@@ -219,9 +225,15 @@ class Foreground extends StatefulWidget {
     _showPopup(widget, cb);
   }
 
+  void repaint() {
+    _update();
+  }
+
   void _update() {
-    state_?.setState(() {
-    });
+    if (state_ != null && state_.mounted) {
+      state_.setState(() {
+      });
+    }
   }
 
   void hidePopup() {
@@ -277,7 +289,7 @@ class ForegroundState extends State<Foreground> {
       height: widget._height,
       child: Container(
         margin: EdgeInsets.only(left: ml, top: mt),
-        color: Colors.green,
+        color: widget.backgroundColor(),
         // color: Color.fromARGB(0x0, 0, 0, 0),
         // width: Utils.screenSize().width,
         // height: Utils.screenSize().height,

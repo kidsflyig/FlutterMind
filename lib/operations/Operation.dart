@@ -1,8 +1,14 @@
+import 'package:FlutterMind/operations/History.dart';
+
 class Operation {
   String descrition;
-  Operation(this.descrition);
+  Operation(this.descrition) {
+    History().push(this);
+  }
 
-  void doAction() { }
+  void doAction() {
+  }
 
-  void undoAction() {}
+  void undoAction() {
+  }
 }

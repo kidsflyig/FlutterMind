@@ -13,6 +13,6 @@ class Utils {
   }
 
   static Size screenSize() {
-    return mediaQuery.size;
+    return MediaQueryData.fromWindow(window).size;
   }
 }

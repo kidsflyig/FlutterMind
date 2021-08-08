@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/operations/History.dart';
+import 'package:FlutterMind/operations/OpSetScale.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 
@@ -9,6 +11,9 @@ import 'Edge.dart';
 import 'MindMapView.dart';
 import 'Node.dart';
 import 'operations/OpCenterlize.dart';
+import 'operations/OpSetBgColor.dart';
+import 'operations/OpSetEdgeColor.dart';
+import 'operations/OpSetNodeBgColor.dart';
 import 'utils/HitTestResult.dart';
 import 'widgets/NodeWidget.dart';
 import 'widgets/NodeWidgetBase.dart';
@@ -126,12 +131,24 @@ class MapController {
     mind_map_view_.foreground.rebuild();
 
     mind_map_view_.updatePreview();
+
+    mind_map_view_.foreground.centerlize();
   }
 
   void relayout() {
     MindMap map = MindMap();
     dynamic w = map.root.widget();
     w.relayout();
+  }
+
+  void _repaint(Node n) {
+    NodeWidgetBase w = n.widget();
+    w.repaint();
+    n.children?.forEach((Node v) {
+      NodeWidgetBase w = v.widget();
+      w.repaint();
+      _repaint(v);
+    });
   }
 
   void repaint() {
@@ -143,12 +160,7 @@ class MapController {
     Future(() {
       Log.e("repainting");
       MindMap map = MindMap();
-      dynamic w = map.root.widget();
-      w.repaint();
-      map.root.children?.forEach((v) {
-        dynamic w = v.widget();
-        w.repaint();
-      });
+      _repaint(map.root);
       _paiting = false;
     });
   }
@@ -246,21 +258,55 @@ class MapController {
   void setDefaultFontSize(double size) {
     Log.e("setDefaultFontSize " + size.toString());
     Settings s = Settings();
-    s.default_font_size = size;
+    s.fontSize = size;
     repaint();
   }
 
   void setDefaultFontWeight(bool is_bold) {
     Log.e("setDefaultFontWeight " + is_bold.toString());
     Settings s = Settings();
-    s.default_font_weight = is_bold;
+    s.fontWeight = is_bold;
     repaint();
   }
 
   void setDefaultFontFamily(String font_family) {
     Log.e("setDefaultFontFamily " + font_family);
     Settings s = Settings();
-    s.default_font_family = font_family;
+    s.fontFamily = font_family;
     repaint();
+  }
+
+  void setScaleLevel(double scale_level) {
+    Log.e("setScaleLevel " + scale_level.toString());
+    // Settings s = Settings();
+    // s.scaleLevel = scale_level;
+    // repaint();
+    OpSetScale.create(scale_level).doAction();
+  }
+
+  void repaintBackground() {
+    mind_map_view_.foreground.repaint();
+  }
+
+  void setBackgroundColor(Color c) {
+    OpSetBgColor.create(c).doAction();
+  }
+
+  void setNodeBackgroundColor(Color c) {
+    OpSetNodeBgColor.create(c).doAction();
+  }
+
+  void setEdgeColor(Color c) {
+    OpSetEdgeColor.create(c).doAction();
+  }
+
+  void undo() {
+    Log.e("MapController undo");
+    History().pop();
+  }
+
+  void redo() {
+    Log.e("MapController redo");
+    History().restore();
   }
 }

@@ -69,7 +69,6 @@ class BezierEdgeWidget extends EdgeWidgetBase {
 
 class BezierEdgeWidgetState extends State<BezierEdgeWidget> {
 
-
   @override
   void initState() {
     super.initState();
@@ -89,7 +88,7 @@ class BezierEdgeWidgetState extends State<BezierEdgeWidget> {
         left: widget.l,
         top: widget.t,
         child:CustomPaint(
-          painter: TouchMovePainter(this.widget, widget.ll, widget.lt, widget.width, widget.height),
+          painter: TouchMovePainter(this.widget, widget.color, widget.ll, widget.lt, widget.width, widget.height),
           size: Size( widget.width == 0? 50 : widget.width, widget.height)
           // size: Size(1,1)
           // painter: MyPainter(data),
@@ -106,12 +105,11 @@ class TouchMovePainter extends CustomPainter {
   Offset t;
   var w;
   var h;
-  TouchMovePainter(this.widget, this.l, this.t, this.w, this.h);
+  TouchMovePainter(this.widget, this.painterColor, this.l, this.t, this.w, this.h);
 
   @override
   void paint(Canvas canvas, Size size) {
     painter.color = painterColor;
-    painter.color = Colors.yellow; // tobe removed
     painter.style = PaintingStyle.stroke;
     painter.strokeWidth = 2;
     var path = Path();

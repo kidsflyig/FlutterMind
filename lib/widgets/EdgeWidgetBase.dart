@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:FlutterMind/Edge.dart';
+import 'package:FlutterMind/Settings.dart';
 import 'package:flutter/material.dart';
 
 import '../Node.dart';
@@ -16,6 +17,10 @@ class EdgeWidgetBase extends StatefulWidget {
 
   void update(Edge e) {
 
+  }
+
+  Color get color {
+    return Settings().edgeColor;
   }
 
   @override

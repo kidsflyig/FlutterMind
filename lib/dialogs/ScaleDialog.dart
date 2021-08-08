@@ -1,3 +1,5 @@
+import 'package:FlutterMind/MapController.dart';
+import 'package:FlutterMind/Settings.dart';
 import 'package:flutter/material.dart';
 
 import '../Foreground.dart';
@@ -23,16 +25,15 @@ class ScaleDialog extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return ScaleDialogState(_foreground.scale);
+    return ScaleDialogState(Settings().scaleLevel);
   }
 }
 
 class ScaleDialogState extends State <ScaleDialog> {
   double _sliderItemA = 5;
 
-  ScaleDialogState(double scale) {
-    int temp = (scale * 100).toInt();
-    _sliderItemA = temp.toDouble();
+  ScaleDialogState(double scale_level) {
+    _sliderItemA = scale_level;
     print("first scale:"+_sliderItemA.toString());
   }
   Widget build(BuildContext context) {
@@ -46,20 +47,20 @@ class ScaleDialogState extends State <ScaleDialog> {
             value: _sliderItemA,
             onChanged: (value) {
               print("onChanged " + value.toString());
-
               _sliderItemA = value;
               setState(() {
                 _sliderItemA = value;
               });
               // double scale = ((_sliderItemA - 5)*0.1 + 1);
-              widget._foreground.SetScale(value / 100);
+              // widget._foreground.SetScale(value / 100);
+              MapController().setScaleLevel(value);
             },
             activeColor: Theme.of(context).accentColor,
             inactiveColor: Theme.of(context).accentColor.withOpacity(0.3),
-            min: 10,
-            max: 300,
-            divisions: 29,
-            label: '%' + _sliderItemA.ceil().toString(),
+            min: 1,
+            max: 10,
+            divisions: 9,
+            label: (100 + (_sliderItemA - 5) * 10).toString() + '%',
           )
         )
         // painter: MyPainter(data),

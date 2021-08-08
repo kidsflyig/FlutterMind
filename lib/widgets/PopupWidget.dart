@@ -7,6 +7,7 @@ import 'package:FlutterMind/layout/BidiLayout.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
@@ -45,8 +46,9 @@ class PopupWidget extends NodeWidgetBase {
     height = h;
     this.mode = mode;
     this.cb = cb;
-
-    if (mode == PopupMode.Pasting) {
+    if (mode == PopupMode.Editing) {
+      width = Utils.screenSize().width / 2;
+    } else if (mode == PopupMode.Pasting) {
       width = w + 20;
       height = h + 20;
       this.left -= 10;

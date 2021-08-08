@@ -1,29 +1,13 @@
-import 'package:FlutterMind/Foreground.dart';
-import 'package:FlutterMind/utils/DragUtil.dart';
+import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/utils/Log.dart';
-import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../MapController.dart';
-import '../operations/OpCenterlize.dart';
-import '../operations/OpLoadFromFile.dart';
-import '../operations/OpWriteToFile.dart';
-import 'FileDialog.dart';
-import 'ScaleDialog.dart';
-import 'OperationDialog.dart';
 
 class BottomToolBar extends StatefulWidget {
-  Foreground foreground_;
-  BottomToolBar(this.foreground_);
-  @override
-  State<StatefulWidget> createState() {
-    return BottomToolBarState();
-  }
-}
-
-class BottomToolBarState extends State<BottomToolBar> {
+  BottomToolBarState _state;
   bool menu_exposed = false;
   // GlobalKey l = GlobalKey();
   // GlobalKey c = GlobalKey();
@@ -32,11 +16,31 @@ class BottomToolBarState extends State<BottomToolBar> {
   // Rect lr;
   // Rect cr;
   // Rect rr;
-  void toggle() {
-    setState(() {
-      menu_exposed = !menu_exposed;
-    });
+  void hide() {
+    if (_state!=null && _state.mounted) {
+      _state.setState(() {
+        menu_exposed = false;
+      });
+    }
   }
+
+  void toggle() {
+    if (_state!=null && _state.mounted) {
+      _state.setState(() {
+        menu_exposed = !menu_exposed;
+      });
+    }
+  }
+
+  BottomToolBar();
+  @override
+  State<StatefulWidget> createState() {
+    _state = BottomToolBarState();
+    return _state;
+  }
+}
+
+class BottomToolBarState extends State<BottomToolBar> {
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +81,7 @@ class BottomToolBarState extends State<BottomToolBar> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Visibility(
-                  visible: menu_exposed,
+                  visible: widget.menu_exposed,
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -91,7 +95,7 @@ class BottomToolBarState extends State<BottomToolBar> {
                                width: 50, height: 50),
                             onTap: () {
                               MapController().addNodeForSelected();
-                              toggle();
+                              widget.toggle();
                             }),
                         GestureDetector(
                             child: Container(
@@ -103,7 +107,7 @@ class BottomToolBarState extends State<BottomToolBar> {
                                 width: 50, height: 50),
                             onTap: () {
                               MapController().removeSelctedNode();
-                              toggle();
+                              widget.toggle();
                             }),
                         GestureDetector(
                             child: Container(
@@ -116,7 +120,7 @@ class BottomToolBarState extends State<BottomToolBar> {
                             onTap: () {
                               Log.e("click 3 button");
                               MapController().cut();
-                              toggle();
+                              widget.toggle();
                             }),
                         GestureDetector(
                             child: Container(
@@ -125,11 +129,30 @@ class BottomToolBarState extends State<BottomToolBar> {
                                   borderRadius: BorderRadius.all(Radius.circular(2.0)),
                                   color: Colors.black87
                                 ),
+                                child:Text("undo", style: TextStyle(color:
+                                  History().canUndo() ? Colors.red :
+                                Colors.white)),
                                 width: 50, height: 50),
                             onTap: () {
                               Log.e("click 4 button");
-                              MapController().showPastePopup();
-                              toggle();
+                              MapController().undo();
+                              widget.toggle();
+                            }),
+                        GestureDetector(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.white, width: 1),//边框
+                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
+                                  color: Colors.black87
+                                ),
+                                child:Text("redo", style: TextStyle(color:
+                                  History().canRedo() ? Colors.red :
+                                Colors.white)),
+                                width: 50, height: 50),
+                            onTap: () {
+                              Log.e("click 5 button");
+                              MapController().redo();
+                              widget.toggle();
                             }),
                       ])
 
@@ -188,10 +211,10 @@ class BottomToolBarState extends State<BottomToolBar> {
                     height: 50),
                 onDoubleTap: () {
                   MapController().centerlize();
-                  toggle();
+                  widget.toggle();
                 },
                 onTap: () {
-                  toggle();
+                  widget.toggle();
                 },
               )
             ],

@@ -9,7 +9,7 @@ import '../operations/OpWriteToFile.dart';
 import 'FileDialog.dart';
 import 'ScaleDialog.dart';
 import 'OperationDialog.dart';
-import 'package:text_style_editor/text_style_editor.dart';
+// import 'package:text_style_editor/text_style_editor.dart';
 
 class TopToolBar extends StatelessWidget {
 List<String> fonts = [
@@ -123,25 +123,25 @@ List<String> fonts = [
               )
           ),
 
-          TextStyleEditor(
-            fonts: fonts,
-            textStyle: textStyle,
-            textAlign: textAlign,
-            paletteColors: paletteColors,
-            onTextAlignEdited: (align) {
-              // setState(() {
-              //   textAlign = align;
-              // });
-            },
-            onTextStyleEdited: (style) {
-              // setState(() {
-              //   textStyle = textStyle.merge(style);
-              // });
-            },
-            onCpasLockTaggle: (caps) {
-              // Uppercase or lowercase letters
-            },
-          )
+          // TextStyleEditor(
+          //   fonts: fonts,
+          //   textStyle: textStyle,
+          //   textAlign: textAlign,
+          //   paletteColors: paletteColors,
+          //   onTextAlignEdited: (align) {
+          //     // setState(() {
+          //     //   textAlign = align;
+          //     // });
+          //   },
+          //   onTextStyleEdited: (style) {
+          //     // setState(() {
+          //     //   textStyle = textStyle.merge(style);
+          //     // });
+          //   },
+          //   onCpasLockTaggle: (caps) {
+          //     // Uppercase or lowercase letters
+          //   },
+          // )
         ],
       // )
     );

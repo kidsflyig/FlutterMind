@@ -63,6 +63,12 @@ class MindMapView extends StatefulWidget {
 
 class MindMapViewState extends State<MindMapView> {
   bool scaling = false;
+  BottomToolBar bottomToolBar;
+
+  MindMapViewState() {
+    bottomToolBar = BottomToolBar();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -94,7 +100,7 @@ class MindMapViewState extends State<MindMapView> {
                 widget.background,
                 widget.foreground,
                 TopToolBar(widget.foreground),
-                BottomToolBar(widget.foreground),
+                bottomToolBar,
                 // Container(
                 //   width:200,
                 //   height:200,
@@ -139,6 +145,8 @@ class MindMapViewState extends State<MindMapView> {
 
           onPanStart: (detail) {
             print("app pan start");
+            bottomToolBar.hide();
+
             if(scaling) return;
             widget.foreground.onPanStart(detail);
           },

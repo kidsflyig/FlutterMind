@@ -1,5 +1,6 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/dialogs/ColorPickerDialog.dart';
 import 'package:FlutterMind/third_party/smartselection/smart_select.dart';
 import 'package:FlutterMind/utils/localization.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,20 @@ class _FeaturesSinglePageState extends State<FeaturesSinglePage> {
   double font_size = 12;
   bool is_bold = false;
   String family = "";
+  Color _bgColor;
+  Color _nodeBgColor;
+  Color _edgeColor;
+
+  _FeaturesSinglePageState() {
+    _bgColor = Settings().backgroundColor;
+    _nodeBgColor = Settings().nodeBgColor;
+    _edgeColor = Settings().edgeColor;
+  }
 
   @override
   Widget build(BuildContext context) {
-    font_size = Settings().default_font_size;
-    is_bold = Settings().default_font_weight;
+    font_size = Settings().fontSize;
+    is_bold = Settings().fontWeight;
 
     return Column(
       children: <Widget>[
@@ -55,6 +65,75 @@ class _FeaturesSinglePageState extends State<FeaturesSinglePage> {
             setState(() => family = selected.value);
             MapController().setDefaultFontFamily(family);
           }
+        ),
+        const Divider(indent: 5),
+        GestureDetector(
+          child: Row(children: [
+            Text("Background Color"),
+            Container(
+              width:10,
+              height:10,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1),//边框
+                borderRadius: BorderRadius.all(Radius.circular(1.0)),
+                color: _bgColor,
+              ),
+            ),
+          ],),
+          onTap: () {
+            ColorPickerDialog.show(context, (Color c) {
+              MapController().setBackgroundColor(c);
+              setState((){
+                _bgColor = c;
+              });
+            }, _bgColor);
+          },
+        ),
+        const Divider(indent: 20),
+        GestureDetector(
+          child: Row(children: [
+            Text("Node Color"),
+            Container(
+              width:10,
+              height:10,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1),//边框
+                borderRadius: BorderRadius.all(Radius.circular(1.0)),
+                color: _nodeBgColor,
+              ),
+            ),
+          ],),
+          onTap: () {
+            ColorPickerDialog.show(context, (Color c) {
+              MapController().setNodeBackgroundColor(c);
+              setState((){
+                _nodeBgColor = c;
+              });
+            }, _nodeBgColor);
+          },
+        ),
+        const Divider(indent: 20),
+        GestureDetector(
+          child: Row(children: [
+            Text("Edge Color"),
+            Container(
+              width:10,
+              height:10,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1),//边框
+                borderRadius: BorderRadius.all(Radius.circular(1.0)),
+                color: _edgeColor,
+              ),
+            ),
+          ],),
+          onTap: () {
+            ColorPickerDialog.show(context, (Color c) {
+              MapController().setEdgeColor(c);
+              setState((){
+                _edgeColor = c;
+              });
+            }, _edgeColor);
+          },
         ),
         const SizedBox(height: 7),
       ],

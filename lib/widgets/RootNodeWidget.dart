@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
@@ -14,20 +15,22 @@ import 'EdgeWidgetBase.dart';
 
 class RootNodeWidget extends NodeWidgetBase {
   RootNodeWidget({Key key, Node node}) : super(key: key, node: node) {
+    SetSize(Settings().rootNodeSize);
   }
 
-  @override
-  void SetScale(double scale) {
-    super.SetScale(scale);
-    setNeedsRepaint();
-  }
+  // @override
+  // void SetScale(double scale) {
+  //   super.SetScale(scale);
+  //   setNeedsRepaint();
+  // }
 
   @override
   void SetSize(Size size) {
     width = size.width;
     height = size.height;
+
     setNeedsRepaint();
-    repaint();
+    // repaint();
   }
 
   Offset center() {
@@ -36,6 +39,7 @@ class RootNodeWidget extends NodeWidgetBase {
 
   @override
   void moveToPostion(Offset dst) {
+    dst = dst.translate(-width / 2, -height / 2);
     super.moveToPosition(dst);
     setNeedsRepaint();
     repaint();
@@ -96,7 +100,6 @@ class RootNodeWidget extends NodeWidgetBase {
   @override
   State<StatefulWidget> createState() {
     state = RootNodeWidgetState();
-    SetSize(Size(200, 100));
     return state;
   }
 }

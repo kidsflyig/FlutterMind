@@ -62,28 +62,28 @@ class NodeWidgetBase extends StatefulWidget {
     layout.moveByOffset(offset);
   }
 
-  void SetScale(double scale) {
-    if (scale_ == scale) {
-      return;
-    }
-    double sdiff = scale - scale_;
-    scale_ = scale;
-    width = ScreenUtil.getDp(plain_text_node_width) * (scale_);
-    height = ScreenUtil.getDp(plain_text_node_width) * (scale_);
+  // void SetScale(double scale) {
+  //   if (scale_ == scale) {
+  //     return;
+  //   }
+  //   double sdiff = scale - scale_;
+  //   scale_ = scale;
+  //   width = ScreenUtil.getDp(plain_text_node_width) * (scale_);
+  //   height = ScreenUtil.getDp(plain_text_node_width) * (scale_);
 
-    if (node.parent != null) {
-      NodeWidgetBase parent = node.parent.widget();
-      Offset parent_pos = parent.offset;
-      Offset self_pos = offset;
+  //   if (node.parent != null) {
+  //     NodeWidgetBase parent = node.parent.widget();
+  //     Offset parent_pos = parent.offset;
+  //     Offset self_pos = offset;
 
-      var newx = self_pos.dx + (self_pos.dx - parent_pos.dx) * sdiff;
-      var newy = self_pos.dy + (self_pos.dy - parent_pos.dy) * sdiff;
-      Log.v("self_pos = " + self_pos.toString()+", parent pos=" + parent_pos.toString());
-      Log.v("sdiff = " + sdiff.toString());
-      Log.v("new pos = " + Offset(newx, newy).toString());
-      moveToPosition(Offset(newx, newy));
-    }
-  }
+  //     var newx = self_pos.dx + (self_pos.dx - parent_pos.dx) * sdiff;
+  //     var newy = self_pos.dy + (self_pos.dy - parent_pos.dy) * sdiff;
+  //     Log.v("self_pos = " + self_pos.toString()+", parent pos=" + parent_pos.toString());
+  //     Log.v("sdiff = " + sdiff.toString());
+  //     Log.v("new pos = " + Offset(newx, newy).toString());
+  //     moveToPosition(Offset(newx, newy));
+  //   }
+  // }
 
   // void SetSize(Size size) {
   //   width = size.width;
@@ -124,18 +124,24 @@ class NodeWidgetBase extends StatefulWidget {
   double fontSize() {
     // TODO：affected by scale
     Settings s = Settings();
-    return s.default_font_size;
+    return s.fontSize + (s.scaleLevel - 5);
   }
 
   FontWeight fontWeight() {
     Settings s = Settings();
-    return s.default_font_weight ? FontWeight.bold : FontWeight.normal;
+    return s.fontWeight ? FontWeight.bold : FontWeight.normal;
   }
 
   String fontFamily() {
     Settings s = Settings();
-    Log.e("s.default_font_family = " + s.default_font_family);
-    return s.default_font_family;
+    Log.e("s.default_font_family = " + s.fontFamily);
+    return s.fontFamily;
+  }
+
+  double scaleLevel() {
+    Settings s = Settings();
+    Log.e("s.default_font_family = " + s.scaleLevel.toString());
+    return s.scaleLevel;
   }
 
   void onPanStart(detail) {

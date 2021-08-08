@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:FlutterMind/MindMap.dart';
+import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
@@ -24,7 +25,6 @@ class BidiLayout extends Layout {
   List<Layout> left;
   List<Layout> right;
   double GAP = 10;
-  double distance = 200;
   Side direction;
   double layout_height = 0;
   double children_layout_height = 0;
@@ -67,6 +67,7 @@ class BidiLayout extends Layout {
     }
     Log.e("relayoutByDirection " + direction.toString());
     Offset offset = NodeWidgetBase.ToNodeWidgetBase(widget).center();
+    double distance = Settings().distance;
     offset = offset.translate( direction == Side.right ? distance : -distance, -layout_height/2);
 
     Log.e("relayoutByDirection  init layoutheight: " + layout_height.toString());
