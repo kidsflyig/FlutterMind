@@ -55,7 +55,9 @@ class MindMap {
   }
 
   GatherNodeWidgets(Node node, List<Widget> list) {
-    list.add(node.widget());
+    if (node.attached) {
+      list.add(node.widget());
+    }
     Log.e("GatherNodeWidgets " + node.id.toString()+", " + node.parent?.id.toString());
     if (node.children != null) {
       node.children.forEach((e) => GatherNodeWidgets(e, list));
@@ -68,7 +70,9 @@ class MindMap {
       edges.forEach((e) {
 
         print("GatherEdgeWidgets " + e.hashCode.toString());
-        list.insert(0, e.widget());
+        if (e.to.attached) {
+          list.insert(0, e.widget());
+        }
       });
     }
 

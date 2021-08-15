@@ -1,5 +1,6 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/Style.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
@@ -17,6 +18,12 @@ class NodeWidgetBase extends StatefulWidget {
   Node node;
   // DragUtil drag_ = DragUtil();
   double scale_ = 1.0;
+  double _fontSize;
+  FontWeight _fontWeight;
+  String _fontFamily;
+  Color _bgColor;
+  Style _style;
+
   bool _dirty = true;
   State<NodeWidgetBase> state;
   Layout layout;
@@ -121,21 +128,35 @@ class NodeWidgetBase extends StatefulWidget {
     layout.height = height;
   }
 
+  Style createStyleIfNotExists() {
+    if (_style == null) {
+      _style = Style(null);
+    }
+    return _style;
+  }
+
   double fontSize() {
-    // TODO：affected by scale
-    Settings s = Settings();
-    return s.fontSize + (s.scaleLevel - 5);
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.fontSize() + (Settings().scaleLevel - 5);
+    }
+    return _style.fontSize();
   }
 
   FontWeight fontWeight() {
-    Settings s = Settings();
-    return s.fontWeight ? FontWeight.bold : FontWeight.normal;
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.fontWeight();
+    }
+    return _style.fontWeight();
   }
 
   String fontFamily() {
-    Settings s = Settings();
-    Log.e("s.default_font_family = " + s.fontFamily);
-    return s.fontFamily;
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.fontFamily();
+    }
+    return _style.fontFamily();
   }
 
   double scaleLevel() {
@@ -144,17 +165,25 @@ class NodeWidgetBase extends StatefulWidget {
     return s.scaleLevel;
   }
 
+  Color bgColor() {
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.bgColor();
+    }
+    return _style.bgColor();
+  }
+
   void onPanStart(detail) {
     Log.i("NodeWidgetBase onPanStart");
-    layout.onPanStart(detail);
+    // layout.onPanStart(detail);
   }
 
   void onPanUpdate(detail) {
-    layout.onPanUpdate(detail);
+    // layout.onPanUpdate(detail);
   }
 
   void onPanEnd(detail) {
-    layout.onPanEnd(detail);
+    // layout.onPanEnd(detail);
   }
 
   void updateEdges() {}
@@ -218,6 +247,14 @@ class NodeWidgetBase extends StatefulWidget {
     layout.insertAfter(l1, l2);
     setNeedsRepaint();
     repaint();
+  }
+
+  void attach() {
+    layout.attach();
+  }
+
+  void detach() {
+    layout.detach();
   }
 
   void setNeedsRepaint() {

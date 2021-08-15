@@ -23,6 +23,8 @@ class Layout {
   DragUtil drag_ = DragUtil();
   double _width = 0;
   double _height = 0;
+  bool attached = true;
+
   Layout(this.widget) {
     children = new List<Layout>();
   }
@@ -127,5 +129,15 @@ class Layout {
 
   double get y {
     return drag_.moveOffset.dy;
+  }
+
+  void attach() {
+    attached = true;
+    _markParentDirty(this);
+  }
+
+  void detach() {
+    attached = false;
+    _markParentDirty(this);
   }
 }

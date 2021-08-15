@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/layout/BidiLayout.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
@@ -20,7 +21,7 @@ import 'EdgeWidgetBase.dart';
 
 class NodeWidget extends NodeWidgetBase {
   String label;
-
+  bool children_dettached = false;
   NodeWidget({Key key, Node node}) : super(key: key, node: node) {
     // SetScale(0.5);
     // if (node==null || node.left == null || node.top == null) {
@@ -42,10 +43,6 @@ class NodeWidget extends NodeWidgetBase {
     return null;
   }
 
-  Color get bgColor {
-    return Settings().nodeBgColor;
-  }
-
   // @override
   // void SetScale(double scale) {
   //   super.SetScale(scale);
@@ -55,6 +52,7 @@ class NodeWidget extends NodeWidgetBase {
   @override
   void moveToPosition(Offset dst) {
     super.moveToPosition(dst);
+
     setNeedsRepaint();
     repaint();
   }
@@ -130,6 +128,26 @@ class NodeWidget extends NodeWidgetBase {
       setNeedsRepaint();
       repaint();
     }
+  }
+
+  Side direction() {
+    BidiLayout l = layout;
+    return l.direction;
+  }
+
+  @override
+  void attach() {
+    super.attach();
+    children_dettached = false;
+    repaint();
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    BidiLayout l = layout;
+    children_dettached = true;
+    repaint();
   }
 
   void updateEdges() {
@@ -221,10 +239,20 @@ class NodeWidgetState extends State<NodeWidget> {
                 MapController().selectNode(widget);
                 MapController().hideInputPanel();
               },
-              child: Container(
+              child: Row(
+                children: [
+                  Visibility(
+                  visible: widget.children_dettached && widget.direction() == Side.left,
+                  child:
+                  Container(
+                    width:10,
+                    height:10,
+                    color: Colors.red,
+                  )),
+                  Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: widget.bgColor,
+                  color: widget.bgColor(),
                   border: selected_
                       ? Border.all(color: Colors.red, width: 1)
                       : Border.all(color: Colors.transparent, width: 1), //边框
@@ -242,7 +270,16 @@ class NodeWidgetState extends State<NodeWidget> {
                     // fontFamily:
                   ),
                 )
+              ),
+                  Visibility(
+                  visible: widget.children_dettached && widget.direction() == Side.right,
+                  child:
+              Container(
+                width:10,
+                height:10,
+                color: Colors.red,
               )),
+              ])),
         ));
   }
 }

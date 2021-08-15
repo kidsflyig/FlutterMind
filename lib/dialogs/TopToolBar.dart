@@ -1,4 +1,5 @@
 import 'package:FlutterMind/Foreground.dart';
+import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import '../operations/OpLoadFromFile.dart';
 import '../operations/OpWriteToFile.dart';
 import 'FileDialog.dart';
 import 'ScaleDialog.dart';
-import 'OperationDialog.dart';
 // import 'package:text_style_editor/text_style_editor.dart';
 
 class TopToolBar extends StatelessWidget {
@@ -101,7 +101,7 @@ List<String> fonts = [
                 icon: Icon(Icons.notifications),
                 color: Colors.black38,
                 onPressed: () {
-                    OperationDialog.show(context, foreground_).then((value){
+                    StyleEditorDialog.show(context, null).then((value){
                       // created or closed?
                     });
                 },

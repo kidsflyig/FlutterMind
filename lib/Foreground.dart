@@ -257,8 +257,7 @@ class Foreground extends StatefulWidget {
     dynamic w = map.root.widget();
     w.relayout();
     MapController().repaint();
-    Log.e("rebuild finished");
-    state_.setState(() {});
+    _update();
   }
 
   void test() {

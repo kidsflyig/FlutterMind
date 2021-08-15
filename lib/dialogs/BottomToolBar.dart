@@ -1,5 +1,6 @@
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,7 +9,6 @@ import '../MapController.dart';
 
 class BottomToolBar extends StatefulWidget {
   BottomToolBarState _state;
-  bool menu_exposed = false;
   // GlobalKey l = GlobalKey();
   // GlobalKey c = GlobalKey();
   // GlobalKey r = GlobalKey();
@@ -17,18 +17,14 @@ class BottomToolBar extends StatefulWidget {
   // Rect cr;
   // Rect rr;
   void hide() {
-    if (_state!=null && _state.mounted) {
-      _state.setState(() {
-        menu_exposed = false;
-      });
+    if (_state != null) {
+      _state.hide();
     }
   }
 
   void toggle() {
-    if (_state!=null && _state.mounted) {
-      _state.setState(() {
-        menu_exposed = !menu_exposed;
-      });
+    if (_state != null) {
+      _state.toggle();
     }
   }
 
@@ -40,185 +36,148 @@ class BottomToolBar extends StatefulWidget {
   }
 }
 
-class BottomToolBarState extends State<BottomToolBar> {
+class BottomButton extends StatelessWidget {
+  bool visible;
+  double x;
+  double y;
+  Function cb;
+  BottomButton(this.visible, this.x, this.y, this.cb);
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance.addPostFrameCallback((callback) {
-    //   RenderBox lbox = l.currentContext?.findRenderObject();
-    //   RenderBox cbox = c.currentContext?.findRenderObject();
-    //   RenderBox rbox = r.currentContext?.findRenderObject();
-    //   if (lbox != null) {
-    //     BoxHitTestResult result = BoxHitTestResult();
-    //     lr = Rect.fromLTWH(
-    //         lbox.localToGlobal(Offset.zero).dx,
-    //         lbox.localToGlobal(Offset.zero).dy,
-    //         lbox.size.width,
-    //         lbox.size.height);
-    //   }
-    //   if (cbox != null) {
-    //     cr = Rect.fromLTWH(
-    //         cbox.localToGlobal(Offset.zero).dx,
-    //         cbox.localToGlobal(Offset.zero).dy,
-    //         cbox.size.width,
-    //         cbox.size.height);
-    //   }
-    //   if (rbox != null) {
-    //     rr = Rect.fromLTWH(
-    //         rbox.localToGlobal(Offset.zero).dx,
-    //         rbox.localToGlobal(Offset.zero).dy,
-    //         rbox.size.width,
-    //         rbox.size.height);
-    //   }
-    // });
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-          // width: 200,
-          // height: 100,
-          constraints: BoxConstraints(maxHeight: 100),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Visibility(
-                  visible: widget.menu_exposed,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 1),//边框
-                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                  color: Colors.black87
-                                ),
-                               width: 50, height: 50),
-                            onTap: () {
-                              MapController().addNodeForSelected();
-                              widget.toggle();
-                            }),
-                        GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 1),//边框
-                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                  color: Colors.black87
-                                ),
-                                width: 50, height: 50),
-                            onTap: () {
-                              MapController().removeSelctedNode();
-                              widget.toggle();
-                            }),
-                        GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 1),//边框
-                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                  color: Colors.black87
-                                ),
-                                width: 50, height: 50),
-                            onTap: () {
-                              Log.e("click 3 button");
-                              MapController().cut();
-                              widget.toggle();
-                            }),
-                        GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 1),//边框
-                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                  color: Colors.black87
-                                ),
-                                child:Text("undo", style: TextStyle(color:
-                                  History().canUndo() ? Colors.red :
-                                Colors.white)),
-                                width: 50, height: 50),
-                            onTap: () {
-                              Log.e("click 4 button");
-                              MapController().undo();
-                              widget.toggle();
-                            }),
-                        GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white, width: 1),//边框
-                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                  color: Colors.black87
-                                ),
-                                child:Text("redo", style: TextStyle(color:
-                                  History().canRedo() ? Colors.red :
-                                Colors.white)),
-                                width: 50, height: 50),
-                            onTap: () {
-                              Log.e("click 5 button");
-                              MapController().redo();
-                              widget.toggle();
-                            }),
-                      ])
+    return Visibility(
+        visible: visible,
+        child: Positioned(
+            left: x,
+            top: y,
+            child: GestureDetector(
+              child:Container(width: 50, height: 50, color: Colors.red),
+              onTap: () {
+                if (cb != null) {
+                  cb();
+                }
+              },
+              ),
+              ));
+  }
+}
 
-                  // Row(
-                  //   children: [
-                  //   GestureDetector(
-                  //       child: Container(
-                  //           padding: EdgeInsets.only(top: 30),
-                  //           key: l,
-                  //           color: Colors.black,
-                  //           width: 50,
-                  //           height: 50),
-                  //       onTap: () {
-                  //         MapController().addNodeForSelected();
-                  //       },
-                  //     ),
-                  //     GestureDetector(
-                  //       child: Container(
-                  //           key: c,
-                  //           color: Colors.black,
-                  //           width: 50,
-                  //           height: 50),
-                  //       onTap: () {
-                  //         MapController().removeSelctedNode();
-                  //       },
-                  //     ),
-                  //     GestureDetector(
-                  //             child: Container(
-                  //                 key: r,
-                  //                 color: Colors.black,
-                  //                 width: 50,
-                  //                 height: 50),
-                  //             onTap: () {
-                  //               Log.e("click 3 button");
-                  //               MapController().cut();
-                  //             }),
-                  //     GestureDetector(
-                  //             child: Container(
-                  //                 key: r,
-                  //                 color: Colors.black,
-                  //                 width: 50,
-                  //                 height: 50),
-                  //             onTap: () {
-                  //               Log.e("click 4 button");
-                  //               MapController().paste();
-                  //             })
-                  //   ],
-                  // )
-                  ),
-              GestureDetector(
-                behavior: HitTestBehavior.deferToChild,
-                child: Container(
-                    alignment: Alignment.bottomCenter,
-                    color: Colors.blue,
-                    width: 50,
-                    height: 50),
-                onDoubleTap: () {
-                  MapController().centerlize();
-                  widget.toggle();
-                },
-                onTap: () {
-                  widget.toggle();
-                },
-              )
-            ],
-          )),
+class BottomToolBarState extends State<BottomToolBar>
+    with SingleTickerProviderStateMixin {
+  bool menu_exposed = false;
+  Animation<double> animation;
+  AnimationController controller;
+  double init_x;
+  double init_y;
+
+  void hide() {
+    Log.e("hide");
+    animation.addStatusListener(animationStatusChanged);
+    controller.reverse();
+  }
+
+  void show() {
+    Log.e("show");
+    menu_exposed = true;
+    controller.forward();
+  }
+
+  void toggle() {
+    if (mounted) {
+      menu_exposed ? hide() : show();
+      setState(() {
+      });
+    }
+  }
+
+  void animationUpdate() {
+    setState(() {});
+  }
+
+  void animationStatusChanged(AnimationStatus status) {
+    Log.e("animationStatusChanged " + status.toString());
+    if (status == AnimationStatus.dismissed) {
+      menu_exposed = false;
+      setState(() {});
+      animation.removeStatusListener(animationStatusChanged);
+    }
+  }
+
+  initState() {
+    super.initState();
+    init_x = Utils.screenSize().width / 2 - 25;
+    init_y = Utils.screenSize().height - 50;
+    controller = new AnimationController(
+        duration: const Duration(milliseconds: 250), vsync: this);
+    animation = new Tween(begin: 0.0, end: 1.0).animate(controller)
+        ..addListener(animationUpdate);
+  }
+
+  Function wrapper(Function cb) {
+    return () {
+      cb();
+      widget.toggle();
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            child: Container(width: 50, height: 50, color: Colors.red),
+            onTap: () {
+              widget.toggle();
+            },
+            onDoubleTap: () {
+              MapController().centerlize();
+            },
+          ),
+        ),
+        BottomButton(menu_exposed,
+            init_x - animation?.value * 50,
+            init_y - animation?.value * 100, wrapper(() {
+              Log.e("click1");
+              MapController().addNodeForSelected();
+              widget.toggle();
+            })),
+        BottomButton(menu_exposed,
+            init_x,
+            init_y - animation?.value * 100, wrapper(() {
+              Log.e("click2");
+              MapController().removeSelctedNode();
+              widget.toggle();
+            })),
+        BottomButton(menu_exposed,
+            init_x + animation?.value * 50,
+            init_y - animation?.value * 100, wrapper(() {
+              Log.e("click3");
+              MapController().cut();
+              widget.toggle();
+            })),
+        BottomButton(menu_exposed,
+            init_x - animation?.value * 50,
+            init_y - animation?.value * 200, wrapper(() {
+              Log.e("click4");
+              MapController().detachSelctedNode();
+            })),
+        BottomButton(menu_exposed,
+            init_x,
+            init_y - animation?.value * 200, wrapper(() {
+              Log.e("click5");
+              MapController().popupStyleEditorForSelected(context);
+            })),
+        BottomButton(menu_exposed,
+            init_x + animation?.value * 50,
+            init_y - animation?.value * 200, wrapper(() {
+              Log.e("click6");
+              MapController().showStyleSelector(context);
+
+            })),
+      ],
     );
   }
 }

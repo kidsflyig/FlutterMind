@@ -31,6 +31,8 @@ class Node {
   HashSet<Edge> to_edges;
   MindMap map;
   Node parent;
+  bool attached = true;
+  bool children_attached = true;
   // double left = 0;
   // double top = 0;
   GlobalKey key;
@@ -149,6 +151,22 @@ class Node {
     }
 
     print(this.hashCode.toString()+ ", " +e.hashCode.toString());
+  }
+
+  void attach() {
+    children_attached = true;
+    children.forEach((v) {
+      v.attached = true;
+      v.attach();
+    });
+  }
+
+  void detach() {
+    children_attached = false;
+    children.forEach((v) {
+      v.attached = false;
+      v.detach();
+    });
   }
 
   Widget widget() {

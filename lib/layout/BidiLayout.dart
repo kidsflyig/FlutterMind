@@ -86,7 +86,9 @@ class BidiLayout extends Layout {
 
       offset = offset.translate(0, l.layout_height);
       // layout children
-      l.relayoutByDirection(direction, l.children, l.children_layout_height);
+      if (l.attached) {
+        l.relayoutByDirection(direction, l.children, l.children_layout_height);
+      }
       // offset = offset.translate(direction == Side.right ? 0 : -l.width, 0);
     });
     dirty = false;
@@ -114,7 +116,7 @@ class BidiLayout extends Layout {
       Log.e("resize right layout height = " + right_layout_height.toString());
     } else {
       children_layout_height = 0;
-      if (children != null && children.length > 0) {
+      if (children != null && children.length > 0 && attached) {
         children.forEach((layout) {
           if(layout.dirty) {
             layout.resize();

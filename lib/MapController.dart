@@ -1,10 +1,13 @@
 import 'dart:ui';
 
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/Style.dart';
+import 'package:FlutterMind/dialogs/StyleSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/operations/OpSetScale.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
 
 import 'MindMap.dart';
 import 'Edge.dart';
@@ -255,32 +258,25 @@ class MapController {
     mind_map_view_.foreground.showInput(node.widget(), cb);
   }
 
-  void setDefaultFontSize(double size) {
-    Log.e("setDefaultFontSize " + size.toString());
-    Settings s = Settings();
-    s.fontSize = size;
+  void setFontSize(double size, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget);
+    template.setFontSize(size);
+  }
+
+  void setFontWeight(bool is_bold, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget);
+    template.setFontWeight(is_bold);
     repaint();
   }
 
-  void setDefaultFontWeight(bool is_bold) {
-    Log.e("setDefaultFontWeight " + is_bold.toString());
-    Settings s = Settings();
-    s.fontWeight = is_bold;
-    repaint();
-  }
-
-  void setDefaultFontFamily(String font_family) {
-    Log.e("setDefaultFontFamily " + font_family);
-    Settings s = Settings();
-    s.fontFamily = font_family;
+  void setFontFamily(String font_family, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget);
+    template.setFontFamily(font_family);
     repaint();
   }
 
   void setScaleLevel(double scale_level) {
     Log.e("setScaleLevel " + scale_level.toString());
-    // Settings s = Settings();
-    // s.scaleLevel = scale_level;
-    // repaint();
     OpSetScale.create(scale_level).doAction();
   }
 
@@ -292,12 +288,24 @@ class MapController {
     OpSetBgColor.create(c).doAction();
   }
 
-  void setNodeBackgroundColor(Color c) {
-    OpSetNodeBgColor.create(c).doAction();
+  void setBackgroundColorForWidget(Color c, NodeWidgetBase widget) {
+    OpSetNodeBgColor.create(c, widget).doAction();
   }
 
   void setEdgeColor(Color c) {
     OpSetEdgeColor.create(c).doAction();
+  }
+
+  void detachSelctedNode() {
+    if (selected.node.children_attached) {
+      selected.node.detach();
+      selected.detach();
+    } else {
+      selected.node.attach();
+      selected.attach();
+    }
+    // selected.node.detach();
+    mind_map_view_.foreground.rebuild();
   }
 
   void undo() {
@@ -308,5 +316,20 @@ class MapController {
   void redo() {
     Log.e("MapController redo");
     History().restore();
+  }
+
+  void popupStyleEditorForSelected(context) {
+    StyleEditorDialog.show(context, selected).then((value){
+      // created or closed?
+    });
+  }
+
+  void showStyleSelector(context) {
+    StyleSelectorDialog.showStyleSelector(context);
+  }
+
+  void saveAsTemplate(NodeWidgetBase widget) {
+    Style style = Style.styleForWidget(widget);
+    style.setName("test");
   }
 }
