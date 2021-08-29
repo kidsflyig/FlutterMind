@@ -1,6 +1,6 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
-import 'package:FlutterMind/Style.dart';
+import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
@@ -126,6 +126,12 @@ class NodeWidgetBase extends StatefulWidget {
 
   void set height(double height) {
     layout.height = height;
+  }
+
+  void setStyle(style) {
+    _style = style;
+    Log.e("setStyle " + style.bgColor().toString());
+    repaint();
   }
 
   Style createStyleIfNotExists() {

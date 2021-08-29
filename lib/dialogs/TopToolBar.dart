@@ -1,5 +1,6 @@
-import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
+import 'package:FlutterMind/third_party/SimpleImageButton.dart';
+import 'package:FlutterMind/utils/Constants.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'ScaleDialog.dart';
 // import 'package:text_style_editor/text_style_editor.dart';
 
 class TopToolBar extends StatelessWidget {
-List<String> fonts = [
+  List<String> fonts = [
     'Billabong',
     'AlexBrush',
     'Allura',
@@ -55,8 +56,7 @@ List<String> fonts = [
   TextStyle textStyle;
   TextAlign textAlign;
 
-  Foreground foreground_;
-  TopToolBar(this.foreground_) {
+  TopToolBar() {
     textStyle = TextStyle(
       fontSize: 15,
       color: Colors.white,
@@ -68,82 +68,63 @@ List<String> fonts = [
 
   @override
   Widget build(BuildContext context) {
-    return
-    // Container(
-    //   color: Colors.transparent,
-    //   alignment: Alignment.center,
-    //   margin: EdgeInsets.only(right: ScreenUtil.getDp(main_menu_padding_left)),
-    //   height: 50,
-    //   child:
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.only(topLeft:Radius.circular(6.0),bottomLeft:Radius.circular(6.0))
-              ),
-              child:IconButton(
-                icon: ImageIcon(AssetImage('assets/images/icons/icon_file.png')),
-                color: Colors.black38,
-                onPressed: () {
-                  FileDialog.show(context).then((value){
-                    // created or closed?
-                  });
-                },
-              )
-          ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey,
-              ),
-              child:IconButton(
-                icon: Icon(Icons.notifications),
-                color: Colors.black38,
-                onPressed: () {
-                    StyleEditorDialog.show(context, null).then((value){
-                      // created or closed?
-                    });
-                },
-              )
-          ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.only(topRight:Radius.circular(6.0),bottomRight:Radius.circular(6.0))
-              ),
-              child:IconButton(
-                icon: Icon(Icons.notifications),
-                color: Colors.black38,
-                onPressed: () {
-                  ScaleDialog.show(context, foreground_).then((value){
-                    // created or closed?
-                  });
-                },
-              )
-          ),
-
-          // TextStyleEditor(
-          //   fonts: fonts,
-          //   textStyle: textStyle,
-          //   textAlign: textAlign,
-          //   paletteColors: paletteColors,
-          //   onTextAlignEdited: (align) {
-          //     // setState(() {
-          //     //   textAlign = align;
-          //     // });
-          //   },
-          //   onTextStyleEdited: (style) {
-          //     // setState(() {
-          //     //   textStyle = textStyle.merge(style);
-          //     // });
-          //   },
-          //   onCpasLockTaggle: (caps) {
-          //     // Uppercase or lowercase letters
-          //   },
-          // )
-        ],
-      // )
-    );
+    var bg_color = Colors.black45;
+    var width = ScreenUtil.getDp(C.top_toolbar_btn_width);
+    return Align(
+        alignment: Alignment.topCenter,
+        child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                    padding: EdgeInsets.only(top: 3, left: 5, bottom: 3, right: 1),
+                    decoration: BoxDecoration(
+                      color: bg_color,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(6.0),
+                          bottomLeft: Radius.circular(6.0))),
+                    child: SimpleImageButton(
+                      width: width,
+                      normalImage: 'assets/images/icons/icon_file.png',
+                      pressedImage: 'assets/images/icons/icon_file.png',
+                      onPressed: () {
+                        FileDialog.showMyDialog(context).then((value) {
+                          // created or closed?
+                        });
+                      },
+                    )),
+                Container(
+                    padding: EdgeInsets.only(top: 3, left: 1, bottom: 3, right: 1),
+                    decoration: BoxDecoration(
+                      color: bg_color,
+                    ),
+                    child: SimpleImageButton(
+                      width: width,
+                      normalImage: 'assets/images/icons/icon_style_editor.png',
+                      pressedImage: 'assets/images/icons/icon_style_editor.png',
+                      onPressed: () {
+                        StyleEditorDialog.show(context, null).then((value) {
+                          // created or closed?
+                        });
+                      },
+                    )),
+                Container(
+                    padding: EdgeInsets.only(top: 3, left: 1, bottom: 3, right: 5),
+                    decoration: BoxDecoration(
+                        color: bg_color,
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(6.0),
+                            bottomRight: Radius.circular(6.0))),
+                    child: SimpleImageButton(
+                      width: width,
+                      normalImage: 'assets/images/icons/icon_scale.png',
+                      pressedImage: 'assets/images/icons/icon_scale.png',
+                      onPressed: () {
+                        ScaleDialog.show(context).then((value) {
+                          // created or closed?
+                        });
+                      },
+                    )),
+              ],
+            ));
   }
 }

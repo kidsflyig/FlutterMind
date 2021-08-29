@@ -9,6 +9,7 @@ import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
@@ -46,49 +47,46 @@ class MyTextField extends StatelessWidget {
   }
 }
 
-class TestView1 extends NodeWidgetBase {
+class TestView extends NodeWidgetBase {
   @override
   State<StatefulWidget> createState() {
     return TestViewState();
   }
 }
 
-class TestViewState extends State<TestView1> {
+class TestViewState extends State<TestView> {
 
   UniqueKey key = new UniqueKey();
   String data = "";
+
+  // Future fetchImage() async {
+  //   var image = await ImagePicker.pickImage(source:ImageSource.);
+  // }
 
   @override
   Widget build(BuildContext context) {
 
 
-    return new Scaffold(
-      body: Container(
-        // width: Utils.screenSize().width,
-        // height: Utils.screenSize().height,
-        child:
-
-          Container(
-            child: Column(children: [
-              MyTextField(data),
-              TextField(
-                onChanged: (msg) {
-                  this.data  = msg;
-                  setState(() {
-
-                                    });
-                },
-              )
-
-            ],)
-
-        )));
+    return MaterialApp(
+      home: Scaffold(
+          appBar: AppBar(
+            title: Text("RichText学习"),
+          ),
+          body: Container(
+            padding: EdgeInsets.all(10),
+            child: TextButton(
+              onPressed: () {
+                print("11111");
+              },
+              child: Text("click")
+            ))),
+    );
   }
 }
 
 
 
-class TestView extends StatefulWidget {
+class TestView2 extends StatefulWidget {
   _LogoAppState createState() => new _LogoAppState();
 }
 

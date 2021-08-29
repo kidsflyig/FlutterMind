@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:FlutterMind/Settings.dart';
-import 'package:FlutterMind/Style.dart';
+import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/dialogs/StyleSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/operations/OpSetScale.dart';
@@ -328,8 +328,13 @@ class MapController {
     StyleSelectorDialog.showStyleSelector(context);
   }
 
-  void saveAsTemplate(NodeWidgetBase widget) {
+  void saveAsTemplate(NodeWidgetBase widget, name) {
+    Log.e("saveAsTemplate");
     Style style = Style.styleForWidget(widget);
-    style.setName("test");
+    style.setName(name);
+  }
+
+  Offset posInScreen(Offset pos) {
+    return pos.translate(mind_map_view_.foreground.left_, mind_map_view_.foreground.top_);
   }
 }

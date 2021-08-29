@@ -15,4 +15,8 @@ class Utils {
   static Size screenSize() {
     return MediaQueryData.fromWindow(window).size;
   }
+
+  static Offset center() {
+    return Offset(screenSize().width / 2, screenSize().height / 2);
+  }
 }

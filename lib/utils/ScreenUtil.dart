@@ -2,16 +2,15 @@ import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-final int main_menu_padding_left = 0;
-final int plain_text_node_width = 1;
-final int plain_text_node_font_size_100p = 2;
+import 'package:FlutterMind/utils/Constants.dart';
 
 class ScreenUtil {
   static MediaQueryData mediaQuery = MediaQueryData.fromWindow(window);
   static HashMap<int, double> screen = new HashMap<int, double>();
   static void initScreen() {
     double width = mediaQuery.size.width;
+    print("initScreen width="+width.toString());
+
     if ( width <= 720)  {
       initScreenlt720();
     } else if (width <= 1048) {
@@ -23,26 +22,38 @@ class ScreenUtil {
     }
   }
 
-  static void initScreenlt720() {
-    screen[main_menu_padding_left] = 50;
-    screen[plain_text_node_width] = 100;
-    screen[plain_text_node_font_size_100p] = 10;
-  }
-
-  static void initScreenlt1048() {
-    screen[main_menu_padding_left] = 50;
-    screen[plain_text_node_width] = 100;
-    screen[plain_text_node_font_size_100p] = 20;
-  }
-
-  static void initScreenlt1366() {
-    screen[main_menu_padding_left] = 50;
-    screen[plain_text_node_width] = 100;
-    screen[plain_text_node_font_size_100p] = 30;
-  }
-
   static double getDp(int id) {
     double res = screen[id];
     return res;
+  }
+
+  static void initScreenlt720() {
+    screen[C.main_menu_padding_left] = 50;
+    screen[C.plain_text_node_width] = 100;
+    screen[C.plain_text_node_font_size_100p] = 10;
+    screen[C.bottom_toolbar_toggle_button_width] = 50;
+    screen[C.bottom_toolbar_item_bg_width] = 50;
+    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.dialog_file_btn_width] = 50;
+  }
+
+  static void initScreenlt1048() {
+    screen[C.main_menu_padding_left] = 50;
+    screen[C.plain_text_node_width] = 100;
+    screen[C.plain_text_node_font_size_100p] = 20;
+    screen[C.bottom_toolbar_toggle_button_width] = 50;
+    screen[C.bottom_toolbar_item_bg_width] = 50;
+    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.dialog_file_btn_width] = 50;
+  }
+
+  static void initScreenlt1366() {
+    screen[C.main_menu_padding_left] = 50;
+    screen[C.plain_text_node_width] = 100;
+    screen[C.plain_text_node_font_size_100p] = 30;
+    screen[C.bottom_toolbar_toggle_button_width] = 50;
+    screen[C.bottom_toolbar_item_bg_width] = 50;
+    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.dialog_file_btn_width] = 50;
   }
 }

@@ -27,8 +27,10 @@ class Foreground extends StatefulWidget {
   List<Widget> node_widget_list = [];
   List<Widget> edge_widget_list = [];
   ForegroundState state_;
-  double left_;
-  double top_;
+
+  double left_=-Utils.screenSize().width;
+  double top_=-Utils.screenSize().height;
+
   // double scale;
   DragUtil drag_ = DragUtil();
 
@@ -94,8 +96,8 @@ class Foreground extends StatefulWidget {
 
   void centerlize() {
     Log.e("Foreground centerlize");
-    state_.pl = (Utils.screenSize().width - _width) / 2;
-    state_.pt= (Utils.screenSize().height - _height) / 2;
+    left_ = (Utils.screenSize().width - _width) / 2;
+    top_= (Utils.screenSize().height - _height) / 2;
 
     _update();
   }
@@ -119,15 +121,15 @@ class Foreground extends StatefulWidget {
   void onPanUpdate(detail){
     drag_.onPanUpdate(detail);
 
-    print("foreground padding: " + state_.pl.toString()+","+state_.pt.toString());
+    print("foreground padding: " + left_.toString()+","+ top_.toString());
     print("foreground mouse pos: " + drag_.delta.dx.toString()+","+drag_.delta.dy.toString());
-    var newpl = state_.pl + drag_.delta.dx;
-    var newpt = state_.pt + drag_.delta.dy;
+    var newpl = left_ + drag_.delta.dx;
+    var newpt = top_ + drag_.delta.dy;
     if (newpl <= _width / 6 && newpl >= -_width * 5 / 6) {
-      state_.pl = newpl;
+      left_ = newpl;
     }
     if (newpt <= _height / 6 && newpt >= -_height * 5 / 6) {
-      state_.pt = newpt;
+      top_ = newpt;
     }
 
     state_?.setState(() {
@@ -273,8 +275,8 @@ class Foreground extends StatefulWidget {
 }
 
 class ForegroundState extends State<Foreground> {
-  double pl=-Utils.screenSize().width;
-  double pt=-Utils.screenSize().height;
+  // double pl=-Utils.screenSize().width;
+  // double pt=-Utils.screenSize().height;
   double ml=0;
   double mt=0;
   double canvas_width = Utils.screenSize().width * 3;
@@ -282,8 +284,8 @@ class ForegroundState extends State<Foreground> {
   @override
   Widget build(BuildContext context) {
     return  Positioned(
-      left: pl,
-      top: pt,
+      left: widget.left_,
+      top: widget.top_,
       width: widget._width,
       height: widget._height,
       child: Container(

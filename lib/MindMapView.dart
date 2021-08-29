@@ -99,7 +99,7 @@ class MindMapViewState extends State<MindMapView> {
               children: [
                 widget.background,
                 widget.foreground,
-                TopToolBar(widget.foreground),
+                TopToolBar(),
                 bottomToolBar,
                 // Container(
                 //   width:200,

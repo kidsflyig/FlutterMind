@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/layout/BidiLayout.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
@@ -122,6 +123,10 @@ class NodeWidget extends NodeWidgetBase {
     }
   }
 
+  Offset posInScreen(Offset pos) {
+    return MapController().posInScreen(pos);
+  }
+
   void resizeTextBox(String msg) {
     if (msg.length > 10) {
       this.width += 50;
@@ -226,10 +231,23 @@ class NodeWidgetState extends State<NodeWidget> {
                 // MapController().hidePopup();
               },
               onDoubleTap: () {
-                MapController().input(widget.node, (msg) {
-                  widget.label = msg;
-                  widget.repaint();
-                });
+                Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));
+                Log.e("chch "+ screen_pos.dx.toString()+","+ screen_pos.dy.toString());
+                EditingDialog.showMyDialog(context, EditConfig(
+                    pos: screen_pos,
+                    maxLength: 999,
+                    maxLines:10,
+                    keyboardType : TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    onChanged: (msg) {
+                      widget.label = msg;
+                      widget.repaint();
+                    }
+                ));
+                // MapController().input(widget.node, (msg) {
+                //   widget.label = msg;
+                //   widget.repaint();
+                // });
                 // MapController().hideInputPanel();
               },
               onSecondaryTap: () {

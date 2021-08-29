@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
-import 'package:FlutterMind/Style.dart';
+import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 

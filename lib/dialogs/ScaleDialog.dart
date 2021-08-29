@@ -2,21 +2,17 @@ import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:flutter/material.dart';
 
-import '../Foreground.dart';
-
 class ScaleDialog extends StatefulWidget {
-  Foreground _foreground;
-
   // Data data;
-  ScaleDialog(this._foreground);
+  ScaleDialog();
   // Background(Data d):data = d;
 
-  static Future show(BuildContext ctx, Foreground foreground) async {
+  static Future show(BuildContext ctx) async {
     var result = await showDialog(
         context: ctx,
         builder: (context) {
           return AlertDialog(
-                      content: ScaleDialog(foreground)
+                      content: ScaleDialog()
                       );
         });
     print("result   -- >  " + result.toString());
@@ -51,8 +47,7 @@ class ScaleDialogState extends State <ScaleDialog> {
               setState(() {
                 _sliderItemA = value;
               });
-              // double scale = ((_sliderItemA - 5)*0.1 + 1);
-              // widget._foreground.SetScale(value / 100);
+
               MapController().setScaleLevel(value);
             },
             activeColor: Theme.of(context).accentColor,

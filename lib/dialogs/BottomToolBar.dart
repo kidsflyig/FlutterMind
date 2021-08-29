@@ -1,21 +1,18 @@
 import 'package:FlutterMind/operations/History.dart';
+import 'package:FlutterMind/third_party/SimpleImageButton.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/Localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
+import 'package:FlutterMind/utils/Constants.dart';
 import '../MapController.dart';
 
 class BottomToolBar extends StatefulWidget {
   BottomToolBarState _state;
-  // GlobalKey l = GlobalKey();
-  // GlobalKey c = GlobalKey();
-  // GlobalKey r = GlobalKey();
-  // DragUtil drag_ = DragUtil();
-  // Rect lr;
-  // Rect cr;
-  // Rect rr;
+
   void hide() {
     if (_state != null) {
       _state.hide();
@@ -38,27 +35,31 @@ class BottomToolBar extends StatefulWidget {
 
 class BottomButton extends StatelessWidget {
   bool visible;
-  double x;
-  double y;
+  Offset pos;
   Function cb;
-  BottomButton(this.visible, this.x, this.y, this.cb);
+  String title;
+  BottomButton(this.visible, this.pos, this.cb, this.title);
 
   @override
   Widget build(BuildContext context) {
     return Visibility(
         visible: visible,
         child: Positioned(
-            left: x,
-            top: y,
-            child: GestureDetector(
-              child:Container(width: 50, height: 50, color: Colors.red),
-              onTap: () {
-                if (cb != null) {
-                  cb();
-                }
-              },
-              ),
-              ));
+          left: pos.dx,
+          top: pos.dy,
+          child:
+          SimpleImageButton(
+            normalImage: 'assets/images/icons/item_bg.png',
+            pressedImage: 'assets/images/icons/item_bg.png',
+            width: ScreenUtil.getDp(C.bottom_toolbar_item_bg_width),
+            title : title,
+            onPressed: () {
+              if (cb != null) {
+                cb();
+              }
+            },
+          )
+        ));
   }
 }
 
@@ -85,8 +86,7 @@ class BottomToolBarState extends State<BottomToolBar>
   void toggle() {
     if (mounted) {
       menu_exposed ? hide() : show();
-      setState(() {
-      });
+      setState(() {});
     }
   }
 
@@ -95,7 +95,6 @@ class BottomToolBarState extends State<BottomToolBar>
   }
 
   void animationStatusChanged(AnimationStatus status) {
-    Log.e("animationStatusChanged " + status.toString());
     if (status == AnimationStatus.dismissed) {
       menu_exposed = false;
       setState(() {});
@@ -110,7 +109,7 @@ class BottomToolBarState extends State<BottomToolBar>
     controller = new AnimationController(
         duration: const Duration(milliseconds: 250), vsync: this);
     animation = new Tween(begin: 0.0, end: 1.0).animate(controller)
-        ..addListener(animationUpdate);
+      ..addListener(animationUpdate);
   }
 
   Function wrapper(Function cb) {
@@ -120,63 +119,86 @@ class BottomToolBarState extends State<BottomToolBar>
     };
   }
 
+  Offset idxToPos(x, y, width, ratio, i, j) {
+    print("idxToPos1 " + x.toString());
+    print("idxToPos2 " + y.toString());
+    print("idxToPos3 " + width.toString());
+    print("idxToPos4 " + ratio.toString());
+    print("idxToPos5 " + i.toString());
+    print("idxToPos6 " + j.toString());
+    return Offset(x + (i - 1) * width * ratio,
+    y - (j + 1) * width * ratio);
+  }
+
   @override
   Widget build(BuildContext context) {
+    var item_bg_width = ScreenUtil.getDp(C.bottom_toolbar_item_bg_width);
+    print("item_bg_width " + item_bg_width.toString());
     return Stack(
       children: [
         Align(
           alignment: Alignment.bottomCenter,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            child: Container(width: 50, height: 50, color: Colors.red),
-            onTap: () {
+          child:
+          SimpleImageButton(
+            normalImage: 'assets/images/icons/bottom_toogle_normal.png',
+            pressedImage: 'assets/images/icons/bottom_toogle_pressed.png',
+            width: 54,
+            onPressed: () {
               widget.toggle();
-            },
-            onDoubleTap: () {
-              MapController().centerlize();
             },
           ),
         ),
         BottomButton(menu_exposed,
-            init_x - animation?.value * 50,
-            init_y - animation?.value * 100, wrapper(() {
-              Log.e("click1");
-              MapController().addNodeForSelected();
-              widget.toggle();
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 0, 0),
+          wrapper(() {
+            Log.e("click1");
+            MapController().addNodeForSelected();
+            widget.toggle();
+        }),
+        LC.getString(context, C.add_node),
+        ),
         BottomButton(menu_exposed,
-            init_x,
-            init_y - animation?.value * 100, wrapper(() {
-              Log.e("click2");
-              MapController().removeSelctedNode();
-              widget.toggle();
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 1, 0),
+            wrapper(() {
+            Log.e("click2");
+            MapController().removeSelctedNode();
+            widget.toggle();
+        }),
+        LC.getString(context, C.remove_node),
+        ),
         BottomButton(menu_exposed,
-            init_x + animation?.value * 50,
-            init_y - animation?.value * 100, wrapper(() {
-              Log.e("click3");
-              MapController().cut();
-              widget.toggle();
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 2, 0),
+          wrapper(() {
+            Log.e("click3");
+            MapController().cut();
+            widget.toggle();
+        }),
+        LC.getString(context, C.cut),
+        ),
         BottomButton(menu_exposed,
-            init_x - animation?.value * 50,
-            init_y - animation?.value * 200, wrapper(() {
-              Log.e("click4");
-              MapController().detachSelctedNode();
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 0, 1),
+          wrapper(() {
+            Log.e("click4");
+            MapController().detachSelctedNode();
+        }),
+        LC.getString(context, C.unfold),
+        ),
         BottomButton(menu_exposed,
-            init_x,
-            init_y - animation?.value * 200, wrapper(() {
-              Log.e("click5");
-              MapController().popupStyleEditorForSelected(context);
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 1, 1),
+          wrapper(() {
+            Log.e("click5");
+            MapController().popupStyleEditorForSelected(context);
+        }),
+        LC.getString(context, C.edit_style),
+        ),
         BottomButton(menu_exposed,
-            init_x + animation?.value * 50,
-            init_y - animation?.value * 200, wrapper(() {
-              Log.e("click6");
-              MapController().showStyleSelector(context);
-
-            })),
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 2, 1),
+          wrapper(() {
+            Log.e("click6");
+            MapController().showStyleSelector(context);
+        }),
+        LC.getString(context, C.style_selector),
+        ),
       ],
     );
   }

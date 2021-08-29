@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:FlutterMind/Style.dart';
+import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
 
