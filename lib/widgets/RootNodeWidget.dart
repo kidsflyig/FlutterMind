@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/dialogs/EditingDialog.dart';
+import 'package:FlutterMind/widgets/NodeWidget.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
@@ -17,12 +19,6 @@ class RootNodeWidget extends NodeWidgetBase {
   RootNodeWidget({Key key, Node node}) : super(key: key, node: node) {
     SetSize(Settings().rootNodeSize);
   }
-
-  // @override
-  // void SetScale(double scale) {
-  //   super.SetScale(scale);
-  //   setNeedsRepaint();
-  // }
 
   @override
   void SetSize(Size size) {
@@ -136,6 +132,28 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
               ),
               width: widget.width,
               height: widget.height,
-            )));
+              child: Text(
+                  widget.label == null ? "" : widget.label,
+                  style: TextStyle(
+                    fontSize: widget.fontSize(),
+                    fontWeight: widget.fontWeight(),
+                    fontFamily: widget.fontFamily(),
+                  ))
+            ),
+            onDoubleTap: () {
+              Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));
+              EditingDialog.showMyDialog(context, EditConfig(
+                  pos: screen_pos,
+                  maxLength: 999,
+                  maxLines:10,
+                  keyboardType : TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  onSubmit: (msg) {
+                    widget.label = msg;
+                    widget.repaint();
+                  }
+              ));
+            },
+            ));
   }
 }

@@ -1,7 +1,11 @@
+import 'package:FlutterMind/MapController.dart';
+import 'package:FlutterMind/MindMapBrowser.dart';
+import 'package:FlutterMind/operations/OpCreateNew.dart';
 import 'package:FlutterMind/operations/OpLoadFromFile.dart';
 import 'package:FlutterMind/operations/OpWriteToFile.dart';
 import 'package:FlutterMind/third_party/SimpleImageButton.dart';
 import 'package:FlutterMind/utils/Constants.dart';
+import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +73,7 @@ class FileDialogState extends State<FileDialog> {
                 pressedImage: 'assets/images/icons/icon_file_new.png',
                 title: '新建',
                 onPressed: () {
-                  OpLoadFromFile("Load").doAction();
+                  MapController().createNew();
                   Navigator.pop(context);
                 },
               ),
@@ -81,7 +85,7 @@ class FileDialogState extends State<FileDialog> {
                 pressedImage: 'assets/images/icons/icon_file_save.png',
                 title: '保存',
                 onPressed: () {
-                  OpWriteToFile("Save").doAction();
+                  MapController().save();
                   Navigator.pop(context);
                 },
               ),
@@ -97,8 +101,12 @@ class FileDialogState extends State<FileDialog> {
                 pressedImage: 'assets/images/icons/icon_file_open.png',
                 title: '打开',
                 onPressed: () {
-                  OpLoadFromFile("Load").doAction();
                   Navigator.pop(context);
+                  Navigator.push(context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MindMapBrowser();
+                      }));
                 },
               ),
               Container(height: 40, width:1, color:Colors.grey),
@@ -109,7 +117,7 @@ class FileDialogState extends State<FileDialog> {
                 pressedImage: 'assets/images/icons/icon_file_login.png',
                 title: '登录',
                 onPressed: () {
-                  OpWriteToFile("Save").doAction();
+                  // TODO, 接入腾讯云开发flutter sdk
                   Navigator.pop(context);
                 },
               ),

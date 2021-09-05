@@ -39,6 +39,12 @@ class BidiLayout extends Layout {
     right = new List<Layout>();
   }
 
+  void clear() {
+    left.clear();
+    right.clear();
+    // super.clear();
+  }
+
   BidiLayout ToBidiLayout(Layout l) {
     if (l is BidiLayout) {
       return l;

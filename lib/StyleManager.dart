@@ -55,17 +55,13 @@ class StyleManager {
     _templates.remove(key);
     _templates[key] = value;
     Log.e("addStyle " + key.toString());
-    _listeners.forEach((e) {
-      e.onChanged(choices());
-    });
   }
 
   List<SelectionItem> choices() {
     List<SelectionItem> choices_ = [];
     int i = 0;
     _templates.forEach((k, e) {
-      print("_template i="+i.toString()+", k="+k.toString());
-      choices_.add(SelectionItem(value: i, title: k, id: e.id));
+      choices_.add(SelectionItem(value: k, title: k));
       i++;
     });
     return choices_;
@@ -105,6 +101,7 @@ class Style extends LinkedListEntry<Style> {
   }
 
   void setName(template_name) {
+    _templateName = template_name;
     StyleManager().addStyle(template_name, this);
   }
 

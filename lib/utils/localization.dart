@@ -57,6 +57,11 @@ class LC {
       C.unfold : "折叠",
       C.edit_style : "编辑样式",
       C.style_selector : "样式选择",
+      C.bold : "粗体",
+      C.font : "字体",
+      C.background_color : "背景颜色",
+      C.node_color : "节点颜色",
+      C.edge_color : "线条颜色",
     }
   };
 }

@@ -41,7 +41,7 @@ class DragUtil {
     } else {
       offset = detail;
     }
-    print("Drag onPanStart " + offset.toString());
+
     lastStartOffset = offset;
     lastEndOffset = lastStartOffset;
   }
@@ -60,7 +60,6 @@ class DragUtil {
   }
 
   void onPanEnd(DragEndDetails detail) {
-    Log.e("Drag onPanEnd");
     idleOffset = moveOffset;
   }
 

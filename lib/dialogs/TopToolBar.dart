@@ -76,7 +76,7 @@ class TopToolBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                    padding: EdgeInsets.only(top: 3, left: 5, bottom: 3, right: 1),
+                    padding: EdgeInsets.only(top: 5, left: 10, bottom: 5, right: 5),
                     decoration: BoxDecoration(
                       color: bg_color,
                       borderRadius: BorderRadius.only(
@@ -93,7 +93,7 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
-                    padding: EdgeInsets.only(top: 3, left: 1, bottom: 3, right: 1),
+                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 5),
                     decoration: BoxDecoration(
                       color: bg_color,
                     ),
@@ -108,7 +108,7 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
-                    padding: EdgeInsets.only(top: 3, left: 1, bottom: 3, right: 5),
+                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 10),
                     decoration: BoxDecoration(
                         color: bg_color,
                         borderRadius: BorderRadius.only(

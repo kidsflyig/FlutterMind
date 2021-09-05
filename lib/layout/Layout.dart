@@ -123,6 +123,10 @@ class Layout {
     widget.repaint();
   }
 
+  void clear() {
+    children.clear();
+  }
+
   double get x {
     return drag_.moveOffset.dx;
   }

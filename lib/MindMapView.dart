@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:ui' as ui;
 
@@ -67,6 +68,14 @@ class MindMapViewState extends State<MindMapView> {
 
   MindMapViewState() {
     bottomToolBar = BottomToolBar();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (Utils().isAndroid) {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
   }
 
   @override
@@ -152,12 +161,10 @@ class MindMapViewState extends State<MindMapView> {
           },
           onPanUpdate: (detail){
             if(scaling) return;
-            print("app pan update");
             widget.foreground.onPanUpdate(detail);
           },
           onPanEnd: (detail) {
             if(scaling) return;
-            print("app pan end");
             widget.foreground.onPanEnd(null);
           },
         ),

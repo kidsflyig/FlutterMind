@@ -22,6 +22,7 @@ class MindMap {
   }
 
   Node root;
+  String file_name;
 
   fromJson(data) {
     print("NodeWidget fromJson " + data);
@@ -36,6 +37,14 @@ class MindMap {
     print(result.toString());
     dynamic data = json.encode(result);
     return data.toString();
+  }
+
+  void Clear() {
+    if (root == null) {
+      root = Node.create(NodeType.rootNode);
+    }
+    root.Clear();
+    MapController().rebuild();
   }
 
   GenerateNodes() {

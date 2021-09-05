@@ -54,6 +54,10 @@ class NodeWidgetBase extends StatefulWidget {
     return w;
   }
 
+  Offset posInScreen(Offset pos) {
+    return MapController().posInScreen(pos);
+  }
+
   void setAlpha(alpha) {
 
   }
@@ -119,6 +123,12 @@ class NodeWidgetBase extends StatefulWidget {
 
   double get width => layout.width;
   double get height => layout.height;
+
+  String get label => node.label;
+
+  set label(String l) {
+    node.label = l;
+  }
 
   void set width(double width) {
     layout.width = width;
@@ -261,6 +271,10 @@ class NodeWidgetBase extends StatefulWidget {
 
   void detach() {
     layout.detach();
+  }
+
+  void clear() {
+    layout.clear();
   }
 
   void setNeedsRepaint() {

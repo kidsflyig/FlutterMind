@@ -1,8 +1,40 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
 class Utils {
+  bool is_android = false;
+  bool is_ios = false;
+  bool is_web = false;
+
+  Utils._privateConstructor() {
+    try {
+      if (Platform.isIOS) {
+        print("is ios");
+        is_ios = true;
+      } else if (Platform.isAndroid) {
+        print("is andrid");
+        is_android = true;
+      }
+    } catch(UnsupportedError) {
+      print("is web");
+      is_web = true;
+    }
+  }
+
+  static Utils _instance = null;
+
+  factory Utils() {
+    if (_instance == null) {
+      _instance = Utils._privateConstructor();
+    }
+    return _instance;
+  }
+
+  bool get isAndroid => is_android;
+  bool get isIOS => is_ios;
+  bool get isWeb => is_web;
 
   static MediaQueryData mediaQuery = MediaQueryData.fromWindow(window);
 

@@ -41,7 +41,6 @@ class BezierEdgeWidget extends EdgeWidgetBase {
       Log.e("EdgeWidget update edge is null");
       return;
     }
-    Log.e("update edge "+ edge.from.id.toString()+", "+ edge.to.id.toString());
     NodeWidgetBase fnw = edge.from.widget();
     NodeWidgetBase tnw = edge.to.widget();
 

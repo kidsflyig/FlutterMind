@@ -21,20 +21,12 @@ import '../Node.dart';
 import 'EdgeWidgetBase.dart';
 
 class NodeWidget extends NodeWidgetBase {
-  String label;
   bool children_dettached = false;
   NodeWidget({Key key, Node node}) : super(key: key, node: node) {
-    // SetScale(0.5);
-    // if (node==null || node.left == null || node.top == null) {
-    //   print("set new node =="+node.toString()+" , "+node.left.toString());
-    // }
-    // moveToPosition(Offset(node.left, node.top));
-    label = node.id.toString();
   }
 
   Widget clone() {
     NodeWidget w = super.clone();
-    w.label = label;
     return w;
   }
   static NodeWidget cast(t) {
@@ -121,10 +113,6 @@ class NodeWidget extends NodeWidgetBase {
     } else {
       print("setSelected state is null");
     }
-  }
-
-  Offset posInScreen(Offset pos) {
-    return MapController().posInScreen(pos);
   }
 
   void resizeTextBox(String msg) {
@@ -239,7 +227,7 @@ class NodeWidgetState extends State<NodeWidget> {
                     maxLines:10,
                     keyboardType : TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
-                    onChanged: (msg) {
+                    onSubmit: (msg) {
                       widget.label = msg;
                       widget.repaint();
                     }

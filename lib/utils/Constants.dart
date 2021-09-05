@@ -11,6 +11,11 @@ static final int cut = 6;
 static final int unfold = 7;
 static final int edit_style = 8;
 static final int style_selector = 9;
+static final int bold = 10;
+static final int font = 11;
+static final int background_color = 12;
+static final int node_color = 13;
+static final int edge_color = 14;
 
 // dimens
 static final int main_menu_padding_left = 0;

@@ -120,12 +120,6 @@ class BottomToolBarState extends State<BottomToolBar>
   }
 
   Offset idxToPos(x, y, width, ratio, i, j) {
-    print("idxToPos1 " + x.toString());
-    print("idxToPos2 " + y.toString());
-    print("idxToPos3 " + width.toString());
-    print("idxToPos4 " + ratio.toString());
-    print("idxToPos5 " + i.toString());
-    print("idxToPos6 " + j.toString());
     return Offset(x + (i - 1) * width * ratio,
     y - (j + 1) * width * ratio);
   }
@@ -133,7 +127,6 @@ class BottomToolBarState extends State<BottomToolBar>
   @override
   Widget build(BuildContext context) {
     var item_bg_width = ScreenUtil.getDp(C.bottom_toolbar_item_bg_width);
-    print("item_bg_width " + item_bg_width.toString());
     return Stack(
       children: [
         Align(

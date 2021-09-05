@@ -5,9 +5,10 @@ import 'package:FlutterMind/TestView.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/utils/Localization.dart';
+import 'package:FlutterMind/utils/Utils.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 // import 'MindMapView.dart';
 // import 'Splash.dart';
 
@@ -22,10 +23,6 @@ class Data {
 class MyApp extends StatelessWidget {
   MyApp() {
     // WidgetsFlutterBinding.ensureInitialized();
-    // // 全屏
-    // if (Platform.isAndroid) {
-    //   SystemChrome.setEnabledSystemUIOverlays ([]);
-    // }
     // initialize
     ScreenUtil.initScreen();
     Log.init();

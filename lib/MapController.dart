@@ -4,7 +4,11 @@ import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/dialogs/StyleSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
+import 'package:FlutterMind/operations/OpCreateNew.dart';
+import 'package:FlutterMind/operations/OpDeleteFile.dart';
+import 'package:FlutterMind/operations/OpLoadFromFile.dart';
 import 'package:FlutterMind/operations/OpSetScale.dart';
+import 'package:FlutterMind/operations/OpWriteToFile.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
@@ -40,6 +44,7 @@ class MapController {
 
   NodeWidgetBase cutted;
   bool _paiting = false;
+  String file_name;
 
   static of(MindMap doc) {
     if (controllers == null) {
@@ -136,6 +141,10 @@ class MapController {
     mind_map_view_.updatePreview();
 
     mind_map_view_.foreground.centerlize();
+  }
+
+  void Clear() {
+    mind_map_view_.foreground.Clear();
   }
 
   void relayout() {
@@ -261,6 +270,7 @@ class MapController {
   void setFontSize(double size, NodeWidgetBase widget) {
     Style template = Style.styleForWidget(widget);
     template.setFontSize(size);
+    repaint();
   }
 
   void setFontWeight(bool is_bold, NodeWidgetBase widget) {
@@ -319,6 +329,7 @@ class MapController {
   }
 
   void popupStyleEditorForSelected(context) {
+    print("selected = " + selected.toString());
     StyleEditorDialog.show(context, selected).then((value){
       // created or closed?
     });
@@ -336,5 +347,28 @@ class MapController {
 
   Offset posInScreen(Offset pos) {
     return pos.translate(mind_map_view_.foreground.left_, mind_map_view_.foreground.top_);
+  }
+  void createNew() {
+    OpCreateNew("New").doAction();
+    file_name = "";
+  }
+
+  void load(path) {
+    OpLoadFromFile(path).doAction();
+    file_name = path;
+  }
+
+  void save() {
+    MindMap map = MindMap();
+    OpWriteToFile(file_name, map.root.label).doAction();
+  }
+
+  void delete(String path) {
+    MindMap map = MindMap();
+    OpDeleteFile(path).doAction();
+    if (path == file_name) {
+      MindMap map = MindMap();
+      map.Clear();
+    }
   }
 }

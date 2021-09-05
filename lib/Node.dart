@@ -23,6 +23,7 @@ enum NodeType {
 
 class Node {
   int id;
+  String label = "";
   NodeType type;
   Layout layout;
 
@@ -180,6 +181,12 @@ class Node {
     }
 
     return _widget;
+  }
+
+  void Clear() {
+    children.clear();
+    from_edges.clear();
+    _widget = null;
   }
 
   Node root() {

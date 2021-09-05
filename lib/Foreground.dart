@@ -106,14 +106,6 @@ class Foreground extends StatefulWidget {
     return Settings().backgroundColor;
   }
 
-  List<Operation> operations() {
-    return [
-      OpCenterlize(this, "centerlize"),
-      OpLoadFromFile("Load"),
-      OpWriteToFile("Save")
-      ];
-  }
-
   void onPanStart(detail) {
     drag_.onPanStart(detail);
   }
@@ -121,8 +113,6 @@ class Foreground extends StatefulWidget {
   void onPanUpdate(detail){
     drag_.onPanUpdate(detail);
 
-    print("foreground padding: " + left_.toString()+","+ top_.toString());
-    print("foreground mouse pos: " + drag_.delta.dx.toString()+","+drag_.delta.dy.toString());
     var newpl = left_ + drag_.delta.dx;
     var newpt = top_ + drag_.delta.dy;
     if (newpl <= _width / 6 && newpl >= -_width * 5 / 6) {
@@ -132,8 +122,7 @@ class Foreground extends StatefulWidget {
       top_ = newpt;
     }
 
-    state_?.setState(() {
-    });
+    repaint();
   }
 
   void onPanEnd(detail) {
@@ -154,7 +143,7 @@ class Foreground extends StatefulWidget {
     drag_.clear();
 
     popup_mode = PopupMode.HIDE;
-    state_?.setState(() {});
+    repaint();
   }
 
   void _toggleFavorite() {
@@ -163,12 +152,12 @@ class Foreground extends StatefulWidget {
 
   void addWidget(w) {
     node_widget_list.add(w);
-    state_?.setState(() {});
+    repaint();
   }
 
   void removeWidget(w) {
     node_widget_list.remove(w);
-    state_?.setState(() {});
+    repaint();
   }
 
   void addNode(node) {
@@ -183,7 +172,7 @@ class Foreground extends StatefulWidget {
         // state_.widget_list.insert(0, e.widget());
       });
     }
-    state_?.setState(() {});
+    repaint();
   }
 
   void removeNode(node) {
@@ -260,6 +249,11 @@ class Foreground extends StatefulWidget {
     w.relayout();
     MapController().repaint();
     _update();
+  }
+
+  void Clear() {
+    node_widget_list.clear();
+    edge_widget_list.clear();
   }
 
   void test() {
