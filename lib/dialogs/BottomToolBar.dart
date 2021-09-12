@@ -145,7 +145,7 @@ class BottomToolBarState extends State<BottomToolBar>
           idxToPos(init_x, init_y, item_bg_width, animation?.value, 0, 0),
           wrapper(() {
             Log.e("click1");
-            MapController().addNodeForSelected();
+            MapController().addNewNodeForSelected();
             widget.toggle();
         }),
         LC.getString(context, C.add_node),
@@ -188,7 +188,8 @@ class BottomToolBarState extends State<BottomToolBar>
           idxToPos(init_x, init_y, item_bg_width, animation?.value, 2, 1),
           wrapper(() {
             Log.e("click6");
-            MapController().showStyleSelector(context);
+            MapController().copy();
+            widget.toggle();
         }),
         LC.getString(context, C.style_selector),
         ),

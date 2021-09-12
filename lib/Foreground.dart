@@ -1,18 +1,19 @@
 import 'dart:collection';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
-import 'package:FlutterMind/widgets/PlaceHolderWidget.dart';
 import 'package:FlutterMind/widgets/PopupWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'Edge.dart';
 import 'Node.dart';
 import 'Settings.dart';
 import 'widgets/NodeWidget.dart';
-
+import 'dart:ui' as ui;
 import 'MindMap.dart';
 import 'widgets/NodeWidgetBase.dart';
 import 'operations/OpCenterlize.dart';
@@ -33,7 +34,7 @@ class Foreground extends StatefulWidget {
 
   // double scale;
   DragUtil drag_ = DragUtil();
-
+  GlobalKey globalKey = GlobalKey();
   // popup
   double popup_x = 0;
   double popup_y = 0;
@@ -49,41 +50,41 @@ class Foreground extends StatefulWidget {
     _width = Utils.screenSize().width * 3;
     _height = Utils.screenSize().height * 3;
 
-    LayoutController().onForegroundUpdated((Rect r, cb) {
-      Log.e("onForegroundUpdated = " + r.toString()+", screen size=" +Utils.screenSize().toString());
-      Offset offset = Offset.zero;
-      if (r.left < 0) {
-        _width += (-r.left);
-        offset = offset.translate(-r.left, 0);
-      }
+    // LayoutController().onForegroundUpdated((Rect r, cb) {
+    //   Log.e("onForegroundUpdated = " + r.toString()+", screen size=" +Utils.screenSize().toString());
+    //   Offset offset = Offset.zero;
+    //   if (r.left < 0) {
+    //     _width += (-r.left);
+    //     offset = offset.translate(-r.left, 0);
+    //   }
 
-      if (r.top < 0) {
-        _height += (-r.top);
-        offset = offset.translate(-r.top, 0);
-      }
+    //   if (r.top < 0) {
+    //     _height += (-r.top);
+    //     offset = offset.translate(-r.top, 0);
+    //   }
 
-      if (offset.dx > 0 || offset.dy > 0) {
+    //   if (offset.dx > 0 || offset.dy > 0) {
 
-        cb(r.translate(offset.dx, offset.dy));
+    //     cb(r.translate(offset.dx, offset.dy));
 
-        node_widget_list.forEach((e) {
-          Log.e("node list moveby " + offset.toString());
-          NodeWidgetBase nw = e;
-          nw.moveByOffset(offset);
-        });
-      }
+    //     node_widget_list.forEach((e) {
+    //       Log.e("node list moveby " + offset.toString());
+    //       NodeWidgetBase nw = e;
+    //       nw.moveByOffset(offset);
+    //     });
+    //   }
 
-      if (r.right > _width) {
-        _width += (r.right - _width);
-      }
+    //   if (r.right > _width) {
+    //     _width += (r.right - _width);
+    //   }
 
-      if (r.bottom > _height) {
-        _height += (r.bottom - _height);
-      }
+    //   if (r.bottom > _height) {
+    //     _height += (r.bottom - _height);
+    //   }
 
-      MapController().repaint();
-      _update();
-    });
+    //   MapController().repaint();
+    //   _update();
+    // });
   }
 
   // void SetScale(double scale) {
@@ -261,6 +262,23 @@ class Foreground extends StatefulWidget {
     map.GenerateNodes();
   }
 
+  void updatePreview(cb) {
+    toImage().then((data) {
+      if (cb != null) {
+        cb(data);
+      }
+    });
+  }
+
+  Future<Uint8List> toImage() async  {
+   RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject();
+    var dpr = ui.window.devicePixelRatio;
+    ui.Image image = await boundary.toImage(pixelRatio: dpr);
+    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List pngBytes = byteData.buffer.asUint8List();
+    return pngBytes;
+  }
+
   @override
   State<StatefulWidget> createState() {
     state_ = ForegroundState();
@@ -277,7 +295,8 @@ class ForegroundState extends State<Foreground> {
   double canvas_height = Utils.screenSize().height * 3;
   @override
   Widget build(BuildContext context) {
-    return  Positioned(
+    return
+    Positioned(
       left: widget.left_,
       top: widget.top_,
       width: widget._width,

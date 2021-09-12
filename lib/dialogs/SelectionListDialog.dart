@@ -14,31 +14,6 @@ class SelectionItem {
   SelectionItem({this.value, this.title, this.id});
 }
 
-class PopRoute extends PopupRoute {
-  final Duration _duration = Duration(milliseconds: 300);
-  Widget child;
-
-  PopRoute({@required this.child});
-
-  @override
-  Color get barrierColor => null;
-
-  @override
-  bool get barrierDismissible => true;
-
-  @override
-  String get barrierLabel => null;
-
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
-    return child;
-  }
-
-  @override
-  Duration get transitionDuration => _duration;
-}
-
 class SelectionPanel<T> extends StatefulWidget {
   String title;
   T selectedValue;
@@ -116,13 +91,23 @@ class SelectionPanelState extends State<SelectionPanel> {
           setState(() {});
         },
         child: GestureDetector(
+            onPanStart: (d) {
+              hover = true;
+              setState(() {});
+            },
+            onPanEnd:(d) {
+              hover = false;
+              setState(() {});
+            },
             onTap: () {
+              hover = false;
               if (widget.onpressed == null) {
                 show(context, widget.title, widget.selectedValue,
                     widget.choiceItems, wrapper, widget.confirm, widget.widget);
               } else {
                 widget.onpressed();
               }
+              setState(() {});
             },
             child: Container(
                 padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),

@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileUtil {
-  String root_path;
+  Directory root_path;
 
   FileUtil._privateConstructor();
 
@@ -20,8 +20,8 @@ class FileUtil {
   }
 
   Future<Directory> get _rootPath async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    return appDocDir;
+    root_path = await getApplicationDocumentsDirectory();
+    return root_path;
   }
 
   Future<bool> exists(String name) async {
@@ -33,7 +33,17 @@ class FileUtil {
   Future<File> mkFile(String name) async {
     final path = await _rootPath;
     String path_str = path.path;
-    File file = File('$path_str/' + name + '.fm');
+    File file = File('$path_str/' + name);
+    return file;
+  }
+
+  File mkFileSync(String name) {
+    if (root_path == null) {
+      return null;
+    }
+
+    String path_str = root_path.path;
+    File file = File('$path_str/' + name);
     return file;
   }
 
@@ -61,7 +71,6 @@ class FileUtil {
     } else {
       return false;
     }
-    ;
   }
 
   Future<List<String>> getFileList() async {
@@ -77,5 +86,28 @@ class FileUtil {
     if (name == null || name.isEmpty) return;
     File file = await mkFile(name);
     file.delete();
+  }
+
+  Future<bool> writeDataToFile(data, String file_name) async {
+    File f = await mkFile(file_name);
+    if (f != null) {
+      f.writeAsBytes(data);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<Map<String, File>> getPreviews() async {
+    final Directory path = await _rootPath;
+    Map<String, File> map = Map<String, File>();
+    path
+      .list()
+      .where((FileSystemEntity entity) => entity.path.endsWith(".cap"))
+      .forEach((entity) {
+        var key = basenameWithoutExtension(entity.path);
+        map[key] = File(entity.path);
+      });
+    return map;
   }
 }

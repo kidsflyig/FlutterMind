@@ -7,6 +7,7 @@ import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 
 import '../Document.dart';
@@ -73,7 +74,7 @@ class Layout {
     return l;
   }
 
-  void addChild(Layout l, {Direction direction = Direction.auto}) {
+  void addChild(Layout l, Direction direction) {
     l.parent = this;
     children.add(l);
     _markParentDirty(this);

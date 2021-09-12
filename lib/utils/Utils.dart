@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Utils {
   bool is_android = false;
@@ -50,5 +51,11 @@ class Utils {
 
   static Offset center() {
     return Offset(screenSize().width / 2, screenSize().height / 2);
+  }
+
+  static void disableStatusBar() {
+    if (Utils().isAndroid) {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
   }
 }

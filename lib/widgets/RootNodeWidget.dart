@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
+import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/widgets/NodeWidget.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
@@ -31,6 +32,15 @@ class RootNodeWidget extends NodeWidgetBase {
 
   Offset center() {
     return offset.translate(super.width / 2, super.height / 2);
+  }
+
+  @override
+  void addChild(Node node) {
+    dynamic w = node.widget();
+    Layout l = w.layout;
+    layout.addChild(l, node.direction);
+    setNeedsRepaint();
+    repaint();
   }
 
   @override

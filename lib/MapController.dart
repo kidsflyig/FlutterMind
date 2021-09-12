@@ -12,6 +12,7 @@ import 'package:FlutterMind/operations/OpWriteToFile.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
+import 'package:FlutterMind/utils/base.dart';
 
 import 'MindMap.dart';
 import 'Edge.dart';
@@ -43,6 +44,7 @@ class MapController {
   NodeWidgetBase selected;
 
   NodeWidgetBase cutted;
+  NodeWidgetBase copied;
   bool _paiting = false;
   String file_name;
 
@@ -69,8 +71,14 @@ class MapController {
     selected = nw;
     nw.setSelected(true);
 
-    if (cutted != null) {
+    if (cutted != null || copied != null) {
       showPastePopup();
+    }
+
+    if (selected != null) {
+      mind_map_view_.left_drawer_enabled = true;
+      mind_map_view_.right_drawer_enabled = true;
+      mind_map_view_.repaint();
     }
   }
 
@@ -96,7 +104,7 @@ class MapController {
     } else {
       n = Node.create(NodeType.plainText);
       n.data = title;
-      p.addChild(n);
+      p.addChild(n, p.direction);
     }
     // n.left = CalcNewLocation(n).dx;
     // n.top = CalcNewLocation(n).dy;
@@ -138,7 +146,7 @@ class MapController {
   void rebuild() {
     mind_map_view_.foreground.rebuild();
 
-    mind_map_view_.updatePreview();
+    mind_map_view_.updatePreview(null);
 
     mind_map_view_.foreground.centerlize();
   }
@@ -177,22 +185,34 @@ class MapController {
     });
   }
 
-  void addNodeForSelected() {
+  void addNodeForNode(Node p, Node c) {
+    Node node = p;
+    node.addChild(c, p.direction);
+
+    dynamic w = node.root().widget();
+    w.relayout();
+    MapController().repaint();
+
+    mind_map_view_.foreground.addNode(c);
+    mind_map_view_.updatePreview(null);
+  }
+
+  void addNewNodeForSelected() {
     print("addNode");
     if (selected == null) {
       return;
     }
-    var n = Node.create(NodeType.plainText);
-    if (selected != null ) {
-      Node node = selected.node;
-      node.addChild(n);
-      dynamic w = node.root().widget();
-      w.relayout();
-      MapController().repaint();
-    }
-    mind_map_view_.foreground.addNode(n);
 
-    mind_map_view_.updatePreview();
+    var n = Node.create(NodeType.plainText);
+    addNodeForNode(selected.node, n);
+  }
+
+  void addChild(Node parent, Node child) {
+    if (parent.parent == null) {
+
+    } else {
+      parent.addChild(child, parent.direction);
+    }
   }
 
   NodeWidgetBase getSelected() {
@@ -204,6 +224,11 @@ class MapController {
     cutted = selected;
   }
 
+  void copy() {
+    Log.e("cut " + selected?.toString());
+    copied = selected;
+  }
+
   void showPastePopup() {
     Log.e("showPastePopup " + selected?.toString());
     mind_map_view_.foreground.showPastePopup(selected, null);
@@ -212,26 +237,43 @@ class MapController {
   void paste(Direction direction) {
     Log.e("paste " + direction.toString());
     hidePopup();
-    moveTo(cutted.node, selected.node, direction);
-    cutted = null;
+    if (cutted != null) {
+      moveTo(cutted.node, selected.node, direction);
+      cutted = null;
+    } else if (copied != null) {
+      cloneNodeTree(copied.node, selected.node, direction);
+      copied = null;
+    }
+
+    dynamic w = selected.node.root().widget();
+    w.relayout();
+    MapController().repaint();
   }
 
   void centerlize() {
     OpCenterlize(mind_map_view_.foreground, "居中").doAction();
   }
 
+  void cloneNodeTree(Node from, Node to, Direction direction) {
+    Node cloned = from.clone();
+    moveTo(cloned, to, direction);
+    mind_map_view_.foreground.addNode(cloned);
+    var children = from.children;
+    if (children != null) {
+      children.forEach((v) {
+        cloneNodeTree(v, cloned, Direction.right);
+      });
+    }
+  }
+
   void moveTo(Node from, Node to, Direction direction) {
     if (direction == Direction.left || direction == Direction.right) {
-      to.addChild(from, direction:direction);
+      to.addChild(from, direction);
     } else if (direction == Direction.top) {
       to.parent.insertBefore(from, to);
     } else if (direction == Direction.bottom) {
       to.parent.insertAfter(from, to);
     }
-
-    dynamic w = to.root().widget();
-    w.relayout();
-    MapController().repaint();
   }
 
   void removeSelctedNode() {
@@ -306,6 +348,13 @@ class MapController {
     OpSetEdgeColor.create(c).doAction();
   }
 
+  void setNodeBorderColor(Color c) {
+    // todo history
+    Style style = Style.styleForWidget(selected);
+    style.setNodeBorderColor(c);
+    MapController().repaint();
+  }
+
   void detachSelctedNode() {
     if (selected.node.children_attached) {
       selected.node.detach();
@@ -361,6 +410,12 @@ class MapController {
   void save() {
     MindMap map = MindMap();
     OpWriteToFile(file_name, map.root.label).doAction();
+  }
+
+  void caputre(cb) {
+    mind_map_view_.updatePreview((data) {
+      cb(data);
+    });
   }
 
   void delete(String path) {

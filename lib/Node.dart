@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,8 @@ class Node {
   Layout layout;
 
   List<Node> children;
+  int left = 0;
+  int right = 0;
   HashSet<Edge> from_edges;
   HashSet<Edge> to_edges;
   MindMap map;
@@ -38,11 +41,14 @@ class Node {
   // double top = 0;
   GlobalKey key;
   NodeWidgetBase _widget;
+  Direction direction = Direction.auto;
+
   Node(this.type) {
     children = List();
     from_edges = HashSet();
     to_edges = HashSet();
     id = nextID();
+    Log.e("new node id = " + id.toString());
   }
 
   static Node create(type) {
@@ -55,6 +61,7 @@ class Node {
 
   Node clone() {
     Node n = Node.create(type);
+    n.label = label;
     return n;
   }
 
@@ -67,7 +74,7 @@ class Node {
     return ++_next_id;
   }
 
-  addChild(Node node, {Direction direction = Direction.auto}) {
+  addChild(Node node, Direction direction) {
     print("Node addChild");
     if (node.parent != null) {
       if(node.parent != this) {
@@ -87,15 +94,33 @@ class Node {
       node.map = map;
     }
     children.add(node);
+    if (direction == Direction.auto) {
+      if (left > right) {
+        node.direction = Direction.right;
+      } else {
+        node.direction = Direction.left;
+      }
+    } else {
+      node.direction = direction;
+    }
+    if (node.direction == Direction.right) {
+      right++;
+    } else {
+      left++;
+    }
 
-     widget(); // createWidget
-    _widget.addChild(node, direction:direction);
+    widget(); // createWidget
+    _widget.addChild(node);
   }
 
   void insertBefore(Node n, Node target) {
     n.removeFromParent(cb:(e) {
-      e.update(this, n);
-      Log.e("insertBefore modify edge " + this.id.toString()+":"+n.id.toString());
+      if (e != null) {
+        e.update(this, n);
+        Log.e("insertBefore modify edge " + this.id.toString()+":"+n.id.toString());
+      } else {
+        new Edge(this, n);
+      }
     });
     n.parent = this;
 
@@ -107,8 +132,12 @@ class Node {
 
   void insertAfter(Node n, Node target) {
     n.removeFromParent(cb:(e) {
-      e.update(this, n);
-      Log.e("insertAfter modify edge " + this.id.toString()+":"+n.id.toString());
+      if (e != null) {
+        e.update(this, n);
+        Log.e("insertAfter modify edge " + this.id.toString()+":"+n.id.toString());
+      } else {
+        new Edge(this, n);
+      }
     });
     n.parent = this;
 
@@ -124,6 +153,11 @@ class Node {
       return;
 
     children.remove(node);
+    if (node.direction == Direction.right) {
+      right--;
+    } else {
+      left--;
+    }
     print("removeNode2");
     if (from_edges != null) {
       Edge e = from_edges.firstWhere((e) => (e.to == node), orElse: () => null);
@@ -136,8 +170,10 @@ class Node {
 
   void removeFromParent({cb:null}) {
     print("removeFromParent1");
-    if (parent == null)
+    if (parent == null) {
+      cb(null);
       return;
+    }
     print("removeFromParent2");
     _widget.removeFromParent();
     parent.removeNode(this, cb:cb);

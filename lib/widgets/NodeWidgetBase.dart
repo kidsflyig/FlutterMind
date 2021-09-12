@@ -6,7 +6,7 @@ import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
-import 'package:FlutterMind/widgets/PlaceHolderWidget.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:flutter/material.dart';
 
 import '../Node.dart';
@@ -138,6 +138,13 @@ class NodeWidgetBase extends StatefulWidget {
     layout.height = height;
   }
 
+  String styleName() {
+    if (_style != null)
+    return _style.name();
+
+    return "默认样式";
+  }
+
   void setStyle(style) {
     _style = style;
     Log.e("setStyle " + style.bgColor().toString());
@@ -154,7 +161,7 @@ class NodeWidgetBase extends StatefulWidget {
   double fontSize() {
     if (_style == null) {
       Style s = Settings().defaultStyle();
-      return s.fontSize() + (Settings().scaleLevel - 5);
+      return s.fontSize();
     }
     return _style.fontSize();
   }
@@ -189,6 +196,16 @@ class NodeWidgetBase extends StatefulWidget {
     return _style.bgColor();
   }
 
+  Color borderColor() {
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+    Log.e("new border color " + s.nodeBorderColor().toString());
+      return s.nodeBorderColor();
+    }
+    Log.e("new border color " + _style.nodeBorderColor().toString());
+    return _style.nodeBorderColor();
+  }
+
   void onPanStart(detail) {
     Log.i("NodeWidgetBase onPanStart");
     // layout.onPanStart(detail);
@@ -204,10 +221,10 @@ class NodeWidgetBase extends StatefulWidget {
 
   void updateEdges() {}
 
-  void addChild(Node node, {Direction direction = Direction.auto}) {
+  void addChild(Node node) {
     dynamic w = node.widget();
     Layout l = w.layout;
-    layout.addChild(l, direction:direction);
+    layout.addChild(l, Direction.auto);
     setNeedsRepaint();
     repaint();
   }

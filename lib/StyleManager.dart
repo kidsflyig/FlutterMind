@@ -75,6 +75,7 @@ class Style extends LinkedListEntry<Style> {
   bool _isBold;
   String _fontFamily;
   Color _bgColor;
+  Color _nodeBorderColor;
   static int _nextId = 0;
 
   Style(this._templateName) {
@@ -82,6 +83,7 @@ class Style extends LinkedListEntry<Style> {
     _isBold = false;
     _fontFamily = "";
     _bgColor = Colors.blue;
+    _nodeBorderColor  = Colors.transparent;
 
     id = _nextId++;
     if (_templateName != null) {
@@ -141,4 +143,13 @@ class Style extends LinkedListEntry<Style> {
   Color bgColor() {
     return _bgColor;
   }
+
+  void setNodeBorderColor(color) {
+    _nodeBorderColor = color;
+  }
+
+  Color nodeBorderColor() {
+    return _nodeBorderColor;
+  }
+
 }

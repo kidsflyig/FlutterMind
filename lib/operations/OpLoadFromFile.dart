@@ -17,7 +17,7 @@ class OpLoadFromFile extends Operation {
   Future<void> doAction() {
     print("OpLoadFromFile");
     // print('OS: ${Platform.operatingSystem}');
-    FileUtil().loadFromFile(path).then((data) {
+    FileUtil().loadFromFile(path + ".fm").then((data) {
       print("OpLoadFromFile1 "+ data);
       MindMap().fromJson(data);
     });

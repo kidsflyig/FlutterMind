@@ -1,3 +1,4 @@
+import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
 import 'package:FlutterMind/third_party/SimpleImageButton.dart';
 import 'package:FlutterMind/utils/Constants.dart';
@@ -9,7 +10,6 @@ import '../operations/OpCenterlize.dart';
 import '../operations/OpLoadFromFile.dart';
 import '../operations/OpWriteToFile.dart';
 import 'FileDialog.dart';
-import 'ScaleDialog.dart';
 // import 'package:text_style_editor/text_style_editor.dart';
 
 class TopToolBar extends StatelessWidget {
@@ -108,6 +108,19 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
+                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 5),
+                    decoration: BoxDecoration(
+                      color: bg_color,
+                    ),
+                    child: SimpleImageButton(
+                      width: width,
+                      normalImage: 'assets/images/icons/icon_undo.png',
+                      pressedImage: 'assets/images/icons/icon_undo.png',
+                      onPressed: () {
+                        MapController().undo();
+                      },
+                    )),
+                Container(
                     padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 10),
                     decoration: BoxDecoration(
                         color: bg_color,
@@ -116,12 +129,10 @@ class TopToolBar extends StatelessWidget {
                             bottomRight: Radius.circular(6.0))),
                     child: SimpleImageButton(
                       width: width,
-                      normalImage: 'assets/images/icons/icon_scale.png',
-                      pressedImage: 'assets/images/icons/icon_scale.png',
+                      normalImage: 'assets/images/icons/icon_redo.png',
+                      pressedImage: 'assets/images/icons/icon_redo.png',
                       onPressed: () {
-                        ScaleDialog.show(context).then((value) {
-                          // created or closed?
-                        });
+                        MapController().redo();
                       },
                     )),
               ],

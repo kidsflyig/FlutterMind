@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 // import 'choices.dart' as choices;
 import 'package:FlutterMind/utils/Constants.dart';
 
+import 'ScaleDialog.dart';
+
 List<SelectionItem> font_sizes = [
   SelectionItem(value: 12, title: '12'),
   SelectionItem(value: 13, title: '13'),
@@ -41,7 +43,12 @@ class StyleEditorDialog extends StatefulWidget {
         builder: (context) {
           return AlertDialog(
               title: Text("编辑样式"),
-              titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              titleTextStyle: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold, fontSize: 18,
+                decorationStyle: TextDecorationStyle.wavy
+              ),
+              scrollable: true,
               contentPadding : const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
               content: StyleEditorDialog(selected));
         });
@@ -60,6 +67,7 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
   Color _bgColor;
   Color _nodeBgColor;
   Color _edgeColor;
+  Color _nodeBorderColor;
   int _template = 0;
 
   _StyleEditorDialogState() {}
@@ -75,13 +83,13 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
     _nodeBgColor = style.bgColor();
     font_size = style.fontSize();
     is_bold = style.fontIsBold();
+    _nodeBorderColor = style.nodeBorderColor();
 
     return Container(
         width: 100,
         child: IntrinsicHeight(
             child: Column(
           children: <Widget>[
-            const Divider(indent: 0, thickness: 2),
             SelectionPanel<String>(
               title: LC.getString(context, C.template),
               selectedValue: style.name(),
@@ -117,8 +125,14 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                 onChanged: (selected) {
                   Log.e("new font size = " + selected.toString());
                   MapController().setFontSize(selected, widget.widget);
-                }),
-            const Divider(indent: 10, thickness: 2),
+                },
+                onpressed: () {
+                  ScaleDialog.show(context, 15, 30, 5, (size) {
+                    MapController().setFontSize(size, widget.widget);
+                  });
+                }
+                ),
+            // const Divider(indent: 10, thickness: 2),
             SelectionPanel<bool>(
                 title: LC.getString(context, C.bold),
                 selectedValue: is_bold,
@@ -128,7 +142,7 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                   setState(() => is_bold = selected);
                   MapController().setFontWeight(is_bold, widget.widget);
                 }),
-            const Divider(indent: 10, thickness: 2),
+            // const Divider(indent: 10, thickness: 2),
             SelectionPanel<String>(
                 title: LC.getString(context, C.font),
                 selectedValue: family,
@@ -138,6 +152,7 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                   setState(() => family = selected);
                   MapController().setFontFamily(family, widget.widget);
                 }),
+
             const Divider(indent: 10, thickness: 2),
             SelectionPanel<String>(
                 title: LC.getString(context, C.background_color),
@@ -183,7 +198,6 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                     });
                   }, _nodeBgColor);
                 }),
-            const Divider(indent: 10, thickness: 2),
             SelectionPanel<String>(
                 title: LC.getString(context, C.edge_color),
                 selectedValue: "",
@@ -204,6 +218,28 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                       _edgeColor = c;
                     });
                   }, _edgeColor);
+                }),
+            SelectionPanel<String>(
+                title: "边框颜色",
+                selectedValue: "",
+                widget: widget.widget,
+                right: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1), //边框
+                    borderRadius: BorderRadius.all(Radius.circular(1.0)),
+                    color: _nodeBorderColor,
+                  ),
+                ),
+                onpressed: () {
+                  ColorPickerDialog.show(context, (Color c) {
+                    Log.e("pick new border colro " + c.toString());
+                    MapController().setNodeBorderColor(c);
+                    setState(() {
+                      _nodeBorderColor = c;
+                    });
+                  }, _nodeBorderColor);
                 }),
             const SizedBox(height: 7),
           ],

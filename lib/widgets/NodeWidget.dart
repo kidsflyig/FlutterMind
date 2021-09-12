@@ -6,6 +6,8 @@ import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/layout/BidiLayout.dart';
+import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/third_party/dotted_border/dotted_border.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
@@ -22,13 +24,13 @@ import 'EdgeWidgetBase.dart';
 
 class NodeWidget extends NodeWidgetBase {
   bool children_dettached = false;
-  NodeWidget({Key key, Node node}) : super(key: key, node: node) {
-  }
+  NodeWidget({Key key, Node node}) : super(key: key, node: node) {}
 
   Widget clone() {
     NodeWidget w = super.clone();
     return w;
   }
+
   static NodeWidget cast(t) {
     if (t is NodeWidget) {
       return t;
@@ -143,6 +145,15 @@ class NodeWidget extends NodeWidgetBase {
     repaint();
   }
 
+  @override
+  void addChild(Node node) {
+    dynamic w = node.widget();
+    Layout l = w.layout;
+    layout.addChild(l, node.direction);
+    setNeedsRepaint();
+    repaint();
+  }
+
   void updateEdges() {
     Log.i("NodeWidget updateEdges");
     HashSet<Edge> from_edges = node.from_edges;
@@ -188,8 +199,8 @@ class NodeWidgetState extends State<NodeWidget> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((mag) {
-       RenderBox box = context.findRenderObject();
-       widget.SetSize(box.size);
+      RenderBox box = context.findRenderObject();
+      widget.SetSize(box.size);
       //  MapController().repaint();
     });
 
@@ -219,19 +230,24 @@ class NodeWidgetState extends State<NodeWidget> {
                 // MapController().hidePopup();
               },
               onDoubleTap: () {
-                Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));
-                Log.e("chch "+ screen_pos.dx.toString()+","+ screen_pos.dy.toString());
-                EditingDialog.showMyDialog(context, EditConfig(
-                    pos: screen_pos,
-                    maxLength: 999,
-                    maxLines:10,
-                    keyboardType : TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    onSubmit: (msg) {
-                      widget.label = msg;
-                      widget.repaint();
-                    }
-                ));
+                Offset screen_pos =
+                    widget.posInScreen(Offset(widget.x, widget.y));
+                Log.e("chch " +
+                    screen_pos.dx.toString() +
+                    "," +
+                    screen_pos.dy.toString());
+                EditingDialog.showMyDialog(
+                    context,
+                    EditConfig(
+                        pos: screen_pos,
+                        maxLength: 999,
+                        maxLines: 10,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
+                        onSubmit: (msg) {
+                          widget.label = msg;
+                          widget.repaint();
+                        }));
                 // MapController().input(widget.node, (msg) {
                 //   widget.label = msg;
                 //   widget.repaint();
@@ -245,46 +261,58 @@ class NodeWidgetState extends State<NodeWidget> {
                 MapController().selectNode(widget);
                 MapController().hideInputPanel();
               },
-              child: Row(
-                children: [
-                  Visibility(
-                  visible: widget.children_dettached && widget.direction() == Side.left,
-                  child:
-                  Container(
-                    width:10,
-                    height:10,
-                    color: Colors.red,
-                  )),
-                  Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: widget.bgColor(),
-                  border: selected_
-                      ? Border.all(color: Colors.red, width: 1)
-                      : Border.all(color: Colors.transparent, width: 1), //边框
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                ),
-                // height: widget.height,
-                // width: widget.width,
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontSize: widget.fontSize(),
-                    fontWeight: widget.fontWeight(),
-                    fontFamily: widget.fontFamily(),
-                    // fontStyle: FontStyle.italic,
-                    // fontFamily:
-                  ),
-                )
-              ),
-                  Visibility(
-                  visible: widget.children_dettached && widget.direction() == Side.right,
-                  child:
-              Container(
-                width:10,
-                height:10,
-                color: Colors.red,
-              )),
+              child: Row(children: [
+                Visibility(
+                    visible: widget.children_dettached &&
+                        widget.direction() == Side.left,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      color: Colors.red,
+                    )),
+                DottedBorder(
+                    color: selected_ ? Colors.red : widget.borderColor(),
+                    bgcolor: widget.bgColor(),
+                    dashPattern: selected_ ? [8, 0] : [8, 4],
+                    strokeWidth: selected_ ? 4 : 2,
+                    strokeCap: StrokeCap.round,
+                    borderType: BorderType.RRect,
+                    radius: Radius.circular(20),
+                    child: Container(
+                        padding: EdgeInsets.all(10),
+                        // decoration: BoxDecoration(
+                        //   // color: widget.bgColor(),
+                        //   border: selected_
+                        //       ? Border.all(
+                        //           color: Colors.red,
+                        //           width: 1,
+                        //           style: BorderStyle.solid)
+                        //       : Border.all(
+                        //           color: Colors.transparent, width: 1), //边框
+                        //   borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        // ),
+                        // height: widget.height,
+                        // width: widget.width,
+                        child: Text(
+                          widget.label,
+                          style: TextStyle(
+                            fontSize: widget.fontSize(),
+                            fontWeight: widget.fontWeight(),
+                            fontFamily: widget.fontFamily(),
+                            // fontStyle: FontStyle.italic,
+                            // fontFamily:
+                          ),
+                        ))),
+                Visibility(
+                    visible: widget.children_dettached &&
+                        widget.direction() == Side.right,
+                    child:
+                        // Container(
+                        //   width:10,
+                        //   height:10,
+                        //   color: Colors.red,
+                        // )
+                        Icon(Icons.add_circle_outline, size: 10)),
               ])),
         ));
   }

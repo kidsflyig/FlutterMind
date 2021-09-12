@@ -55,12 +55,12 @@ class MindMap {
     var textNode = Node.create(NodeType.plainText);
     // textNode.left = 200;
     // textNode.top = 200;
-    root.addChild(textNode);
+    root.addChild(textNode, root.direction);
 
     var textNode1 = Node.create(NodeType.plainText);
     // textNode1.left = 300;
     // textNode1.top = 300;
-    root.addChild(textNode1);
+    root.addChild(textNode1, root.direction);
   }
 
   GatherNodeWidgets(Node node, List<Widget> list) {

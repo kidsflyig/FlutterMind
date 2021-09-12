@@ -3,13 +3,7 @@ import 'dart:ui';
 import 'package:FlutterMind/layout/BidiLayout.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 
-enum Direction {
-  top,
-  right,
-  bottom,
-  left,
-  auto
-}
+import 'base.dart';
 
 class HitTestResult {
   int score = 0;

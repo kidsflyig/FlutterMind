@@ -8,6 +8,7 @@ import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
@@ -125,10 +126,9 @@ class PopupWidgetState extends State<PopupWidget> {
                 child: Align(
                     alignment: Alignment.topCenter,
                     child: GestureDetector(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        color: Colors.red,
+                      child: Icon(
+                        Icons.arrow_upward_rounded,
+                        size: 20,
                       ),
                       onTap: () {
                         MapController().paste(Direction.top);
@@ -139,10 +139,9 @@ class PopupWidgetState extends State<PopupWidget> {
                 child: Align(
                     alignment: Alignment.bottomCenter,
                     child: GestureDetector(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        color: Colors.red,
+                      child: Icon(
+                        Icons.arrow_downward,
+                        size: 20,
                       ),
                       onTap: () {
                         MapController().paste(Direction.bottom);
@@ -153,10 +152,9 @@ class PopupWidgetState extends State<PopupWidget> {
                 child: Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        color: Colors.red,
+                      child: Icon(
+                        Icons.arrow_right,
+                        size: 20,
                       ),
                       onTap: () {
                         MapController().paste(Direction.right);
@@ -167,10 +165,9 @@ class PopupWidgetState extends State<PopupWidget> {
                 child: Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        color: Colors.red,
+                      child: Icon(
+                        Icons.arrow_left,
+                        size: 20,
                       ),
                       onTap: () {
                         MapController().paste(Direction.left);

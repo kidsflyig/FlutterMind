@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 // import 'package:file_picker/file_picker.dart';
 
+import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/MindMap.dart';
 import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/Log.dart';
@@ -33,14 +34,19 @@ class OpWriteToFile extends Operation {
     }
     print("OpWriteToFile file_name= " + file_name);
     if (Utils().is_android) {
-      bool res = await FileUtil().writeToFile(file_name, data);
+      bool res = await FileUtil().writeToFile(file_name + ".fm", data);
       if (res) {
         print("OpWriteToFile 000000 ");
         Fluttertoast.showToast(msg: "保存成功");
 
-        if (old_file_name != new_file_name) {
-          await FileUtil().delete(old_file_name);
+        if (old_file_name != new_file_name && old_file_name != null && old_file_name.isNotEmpty) {
+          await FileUtil().delete(old_file_name + ".fm");
+          await FileUtil().delete(old_file_name + ".cap");
         }
+
+        MapController().caputre((data) async {
+          await FileUtil().writeDataToFile(data, file_name + ".cap");
+        });
       } else {
         print("OpWriteToFile 111111");
         Fluttertoast.showToast(msg: "保存失败");

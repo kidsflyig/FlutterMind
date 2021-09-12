@@ -20,9 +20,12 @@ class OpDeleteFile extends Operation {
   }
 
   Future<void> DeleteFile() async {
+    if (file_name == null || file_name.isEmpty)
+      return;
+
     if (Utils().is_android) {
       try {
-        await FileUtil().delete(file_name);
+        await FileUtil().delete(file_name + ".fm");
         Fluttertoast.showToast(msg: "删除成功");
       } catch(e) {
         Fluttertoast.showToast(msg: "删除失败");

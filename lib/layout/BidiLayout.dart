@@ -7,9 +7,9 @@ import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidget.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
-import 'package:FlutterMind/widgets/PlaceHolderWidget.dart';
 import 'package:flutter/material.dart';
 
 import '../MapController.dart';
@@ -32,7 +32,6 @@ class BidiLayout extends Layout {
   double left_layout_height = 0;
   bool is_floating = false;
   NodeWidgetBase floating;
-  PlaceHolderWidget holder;
 
   BidiLayout(widget) : super(widget) {
     left = new List<Layout>();
@@ -139,31 +138,21 @@ class BidiLayout extends Layout {
     Log.e("resize end...");
   }
 
-  void addChild(Layout child, {Direction direction = Direction.auto}) {
+  void addChild(Layout child, Direction direction) {
     if (parent != null) {
       ToBidiLayout(child).direction = this.direction;
-      super.addChild(child, direction:direction);
+      super.addChild(child, direction);
       return;
     }
 
-    if (direction == Direction.auto) {
-      if (right.length > left.length) {
-        ToBidiLayout(child).direction = Side.left;
-        left.add(child);
-      } else {
-        ToBidiLayout(child).direction = Side.right;
-        right.add(child);
-      }
-    } else {
-
-      if (direction == Direction.left) {
-        ToBidiLayout(child).direction = Side.left;
-        left.add(child);
-      } else if (direction == Direction.right) {
-        ToBidiLayout(child).direction = Side.right;
-        right.add(child);
-      }
+    if (direction == Direction.left) {
+      ToBidiLayout(child).direction = Side.left;
+      left.add(child);
+    } else if (direction == Direction.right) {
+      ToBidiLayout(child).direction = Side.right;
+      right.add(child);
     }
+
     child.parent = this;
   }
 
@@ -217,72 +206,6 @@ class BidiLayout extends Layout {
       ToBidiLayout(src).direction = ToBidiLayout(target).direction;
     }
   }
-
-  // void onPanStart(detail) {
-  //   super.onPanStart(detail);
-  //   if (floating == null) {
-  //     floating = widget.clone();
-  //     NodeWidget.cast(floating).setColor(Colors.blue);
-  //     MapController().mind_map_view_.foreground.addWidget(floating);
-  //   }
-  //   widget.setAlpha(155);
-  // }
-
-  // void _removeHolder() {
-  //   if (holder != null) {
-  //     MapController().mind_map_view_.foreground.removeWidget(holder);
-  //     holder = null;
-  //   }
-  // }
-
-  // void onPanUpdate(detail) {
-  //   if (floating == null) {
-  //     super.onPanUpdate(detail);
-  //     HitTestResult res = HitTestResult();
-  //     hittest(res, LayoutController().root, this, Rect.fromLTWH(x, y, width, height));
-  //     if (res.hit) {
-  //       if (holder == null) {
-  //         Log.i("moveTo1 " + this.hashCode.toString());
-
-  //         holder = PlaceHolderWidget(res.widget, res.target, res.direction);
-  //         MapController().mind_map_view_.foreground.addWidget(holder);
-  //       } else {
-  //         holder.update(res.target, res.direction);
-  //       }
-  //     } else {
-  //       Log.i("moveTo1 _removeHolder");
-  //       _removeHolder();
-  //     }
-  //   } else {
-  //     Log.i("moveTo2 " + this.hashCode.toString()+" , " + floating.hashCode.toString());
-  //     floating.onPanUpdate(detail);
-  //   }
-  // }
-
-  // void onPanEnd(detail) {
-  //   Log.i("hittest onPanEnd");
-  //   if (floating == null) {
-  //     super.onPanEnd(detail);
-  //   } else {
-  //     floating.onPanEnd(detail);
-  //     PlaceHolderWidget holder = ToBidiLayout(floating.layout).holder;
-  //     if (holder != null) {
-  //       // widget.moveTo(holder);
-
-  //       MapController().moveTo(widget.node, holder.widget.node, holder.direction);
-  //     } else {
-  //       Log.e("moveTo failed, holder is null for "
-  //        + floating.layout.hashCode.toString()+". this:"+this.hashCode.toString());
-  //     }
-
-
-  //     ToBidiLayout(floating.layout)._removeHolder();
-
-  //     MapController().mind_map_view_.foreground.removeWidget(floating);
-  //     floating = null;
-  //     widget.setAlpha(255);
-  //   }
-  // }
 
   @override
   void moveToPosition(Offset offset) {
