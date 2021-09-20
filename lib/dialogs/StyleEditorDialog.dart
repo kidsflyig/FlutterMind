@@ -1,14 +1,18 @@
+import 'dart:convert';
+
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/dialogs/ColorPickerDialog.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/dialogs/SelectionListDialog.dart';
+import 'package:FlutterMind/third_party/dotted_border/dotted_border.dart';
 import 'package:FlutterMind/third_party/smartselection/smart_select.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Localization.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:smart_select/smart_select.dart';
 // import 'choices.dart' as choices;
@@ -32,6 +36,12 @@ List<SelectionItem> font_families = [
   SelectionItem(value: 'BERNHC', title: 'BERNHC'),
 ];
 
+List<SelectionItem> line_style = [
+  SelectionItem(value: 1, title: 'Style1'),
+  SelectionItem(value: 2, title: 'Style2'),
+  SelectionItem(value: 3, title: 'Style3'),
+];
+
 class StyleEditorDialog extends StatefulWidget {
   NodeWidgetBase widget;
 
@@ -44,12 +54,12 @@ class StyleEditorDialog extends StatefulWidget {
           return AlertDialog(
               title: Text("编辑样式"),
               titleTextStyle: TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.bold, fontSize: 18,
-                decorationStyle: TextDecorationStyle.wavy
-              ),
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  decorationStyle: TextDecorationStyle.wavy),
               scrollable: true,
-              contentPadding : const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+              contentPadding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
               content: StyleEditorDialog(selected));
         });
 
@@ -63,14 +73,38 @@ class StyleEditorDialog extends StatefulWidget {
 class _StyleEditorDialogState extends State<StyleEditorDialog> {
   double font_size = 12;
   bool is_bold = false;
+  bool italic = false;
+  bool underline = false;
   String family = "";
   Color _bgColor;
   Color _nodeBgColor;
   Color _edgeColor;
   Color _nodeBorderColor;
   int _template = 0;
+  int border_style = 0;
+  TextAlign align = TextAlign.left;
 
   _StyleEditorDialogState() {}
+
+  DottedBorder borderStyle(int index) {
+    List<double> pattern = [8, 4];
+    double width = 1;
+    if (index == 0) {
+      pattern = [8, 3];
+      width = 2;
+    } else {
+      pattern = [8, 2];
+      width = 3;
+    }
+    return DottedBorder(
+        color: Colors.black,
+        bgcolor: Colors.transparent,
+        dashPattern: pattern,
+        strokeWidth: width,
+        strokeCap: StrokeCap.round,
+        borderType: BorderType.Rect,
+        radius: Radius.circular(2));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,23 +113,38 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
     _edgeColor = Settings().edgeColor;
 
     // node
-    Style style = Style.styleForWidget(widget.widget);
+    Style style = Style.styleForWidget(widget.widget, false);
     _nodeBgColor = style.bgColor();
-    font_size = style.fontSize();
+    font_size = style.fontSize().round().toDouble();
     is_bold = style.fontIsBold();
+    italic = style.fontIsItalic();
+    underline = style.fontHasUnderline();
     _nodeBorderColor = style.nodeBorderColor();
+    align = style.textAlign();
+    List<SelectionItem> styles = StyleManager().choices();
 
+    Log.e("font size = " + font_size.toString());
     return Container(
-        width: 100,
+        width: 120,
         child: IntrinsicHeight(
             child: Column(
           children: <Widget>[
             SelectionPanel<String>(
               title: LC.getString(context, C.template),
               selectedValue: style.name(),
-              choiceItems: StyleManager().choices(),
-              widget: widget.widget,
-              confirm: (SelectionListDialog dialog) {
+              items: styles,
+              bottom: IconButton(
+                icon: Icon(Icons.add_circle),
+              ),
+              itemBuilder: (index, cur) {
+                if (index < styles.length) {
+                  return Text(styles[index].title);
+                }
+                return SizedBox(height: 1);
+              },
+              bottomOnPressed: () {
+                //SelectionListDialog dialog) {
+
                 EditingDialog.showMyDialog(
                     context,
                     EditConfig(
@@ -107,11 +156,11 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                         onSubmit: (msg) {
                           MapController().saveAsTemplate(widget.widget, msg);
                           setState(() {});
-                          dialog.update(StyleManager().choices(), style.name());
                         }));
               },
-              onChanged: (selected) {
-                Style s = StyleManager().getStyle(selected);
+              onChanged: (i) {
+                Log.e("style onchanged " + i.toString());
+                Style s = StyleManager().getStyle(styles[i].value);
                 NodeWidgetBase w = widget.widget;
                 w.setStyle(s);
               },
@@ -120,44 +169,121 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
             SelectionPanel<double>(
                 title: LC.getString(context, C.font_size),
                 selectedValue: font_size,
-                choiceItems: font_sizes,
-                widget: widget.widget,
-                onChanged: (selected) {
-                  Log.e("new font size = " + selected.toString());
-                  MapController().setFontSize(selected, widget.widget);
-                },
+                items: font_sizes,
+                //widget: widget.widget,
                 onpressed: () {
                   ScaleDialog.show(context, 15, 30, 5, (size) {
+                    Log.e("new font size = " + size.toString());
                     MapController().setFontSize(size, widget.widget);
+                    font_size = size;
+                    setState(() {});
                   });
-                }
-                ),
-            // const Divider(indent: 10, thickness: 2),
-            SelectionPanel<bool>(
-                title: LC.getString(context, C.bold),
-                selectedValue: is_bold,
-                choiceItems: is_font_bold,
-                widget: widget.widget,
-                onChanged: (selected) {
-                  setState(() => is_bold = selected);
-                  MapController().setFontWeight(is_bold, widget.widget);
                 }),
-            // const Divider(indent: 10, thickness: 2),
+            const Divider(indent: 10, thickness: 2),
+            SelectionPanel<bool>(
+              title: "文字格式",
+              //widget: widget.widget,
+              onpressed: () {},
+              right: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: is_bold ? Colors.black87 : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController().setFontWeight(!is_bold, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_bold)),
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: italic ? Colors.black87 : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController().setFontItalic(!italic, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_italic)),
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: underline ? Colors.black87 : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController()
+                          .setFontUnderline(!underline, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_underline)),
+              ]),
+            ),
+            SelectionPanel<bool>(
+              title: "文字对齐",
+              //widget: widget.widget,
+              onpressed: () {},
+              right: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: align == TextAlign.left
+                        ? Colors.black87
+                        : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController()
+                          .setTextAlign(TextAlign.left, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_align_left)),
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: align == TextAlign.center
+                        ? Colors.black87
+                        : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController()
+                          .setTextAlign(TextAlign.center, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_align_center)),
+                IconButton(
+                  constraints: BoxConstraints.expand(width: 18, height: 18),
+                    iconSize: 18,
+                    color: align == TextAlign.right
+                        ? Colors.black87
+                        : Colors.black26,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      MapController()
+                          .setTextAlign(TextAlign.right, widget.widget);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.format_align_right)),
+              ]),
+            ),
             SelectionPanel<String>(
                 title: LC.getString(context, C.font),
                 selectedValue: family,
-                choiceItems: font_families,
-                widget: widget.widget,
-                onChanged: (selected) {
-                  setState(() => family = selected);
-                  MapController().setFontFamily(family, widget.widget);
+                count: 1,
+                items: font_families,
+                //widget: widget.widget,
+                onChanged: (int index) {
+                  Log.e("font family changed index = " + index.toString());
+                  setState(() => family = font_families[index].title);
+                  MapController()
+                      .setFontFamily(font_families[index].value, widget.widget);
+                },
+                itemBuilder: (index, cur) {
+                  return Text("Bernic");
                 }),
-
             const Divider(indent: 10, thickness: 2),
             SelectionPanel<String>(
                 title: LC.getString(context, C.background_color),
                 selectedValue: "",
-                widget: widget.widget,
+                //widget: widget.widget,
                 right: Container(
                   width: 10,
                   height: 10,
@@ -179,7 +305,7 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
             SelectionPanel<String>(
                 title: LC.getString(context, C.node_color),
                 selectedValue: "",
-                widget: widget.widget,
+                //widget: widget.widget,
                 right: Container(
                   width: 10,
                   height: 10,
@@ -201,7 +327,7 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
             SelectionPanel<String>(
                 title: LC.getString(context, C.edge_color),
                 selectedValue: "",
-                widget: widget.widget,
+                //widget: widget.widget,
                 right: Container(
                   width: 10,
                   height: 10,
@@ -219,10 +345,11 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                     });
                   }, _edgeColor);
                 }),
+            const Divider(indent: 10, thickness: 2),
             SelectionPanel<String>(
                 title: "边框颜色",
                 selectedValue: "",
-                widget: widget.widget,
+                //widget: widget.widget,
                 right: Container(
                   width: 10,
                   height: 10,
@@ -241,6 +368,21 @@ class _StyleEditorDialogState extends State<StyleEditorDialog> {
                     });
                   }, _nodeBorderColor);
                 }),
+            SelectionPanel<int>(
+              title: "边框样式",
+              selectedValue: border_style,
+              //widget: widget.widget,
+              items: line_style,
+              onChanged: (v) {
+                border_style = v;
+                setState(() {});
+              },
+              right: Container(
+                  width: 100, height: 20, child: borderStyle(border_style)),
+              itemBuilder: (index, cur) {
+                return borderStyle(index);
+              },
+            ),
             const SizedBox(height: 7),
           ],
         )));

@@ -19,20 +19,20 @@ class OpSetNodeBgColor extends Operation {
   }
 
   OpSetNodeBgColor(color, this.widget):super("setNodeBgColor") {
-    Style style = Style.styleForWidget(widget);
+    Style style = Style.styleForWidget(widget, false);
     color_before = style.bgColor();
     color_after = color;
   }
 
   void doAction() {
-    Style style = Style.styleForWidget(widget);
+    Style style = Style.styleForWidget(widget, false);
     style.setBackgroundColor(color_after);
     MapController().repaint();
     super.doAction();
   }
 
   void undoAction() {
-    Style style = Style.styleForWidget(widget);
+    Style style = Style.styleForWidget(widget, false);
     style.setBackgroundColor(color_before);
     MapController().repaint();
     super.undoAction();

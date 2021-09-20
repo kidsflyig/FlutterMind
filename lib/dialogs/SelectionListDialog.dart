@@ -1,6 +1,7 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/utils/Localization.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
@@ -14,35 +15,61 @@ class SelectionItem {
   SelectionItem({this.value, this.title, this.id});
 }
 
-class SelectionPanel<T> extends StatefulWidget {
-  String title;
-  T selectedValue;
-  List<SelectionItem> choiceItems;
+class ListViewData<T> {
+  List<SelectionItem> items;
+  String title = "";
   Function onChanged;
-  Function confirm;
+  Widget bottom;
+  Function bottomOnPressed;
+  int index = 0;
+  Function itemBuilder;
+}
+
+class SelectionPanel<T> extends StatefulWidget {
+  // Function onChanged;
+  // Function confirm;
   Function onpressed;
-  Widget widget;
+  T selectedValue;
+
   Widget right;
+
   SelectionPanelState _state;
+  ListViewData data = ListViewData();
 
   SelectionPanel(
       {Key key,
-      this.title,
+      String title,
       this.selectedValue,
-      this.choiceItems,
-      this.widget,
-      this.onChanged,
-      this.confirm,
+      List<SelectionItem> items,
+      // this.widget,
+      Function onChanged,
+      Function bottomOnPressed,
+      Widget bottom,
       this.onpressed,
-      this.right
-      })
+      this.right,
+      Function itemBuilder,
+      int count})
       : super(key: key) {
+    data.items = items;
+    data.onChanged = onChanged;
+    data.bottom = bottom;
+    data.itemBuilder = itemBuilder;
+    data.title = title;
+    data.bottomOnPressed = bottomOnPressed;
+
+    // update index
+    if (items != null) {
+      for (int i = 0; i < items.length; i++) {
+        if (items[i].value == selectedValue) {
+          data.index = i;
+          break;
+        }
+      }
+    }
   }
 
   @override
-  void dispose() {
-
-  }
+  void dispose() {}
 
   @override
   State<StatefulWidget> createState() {
@@ -54,33 +81,33 @@ class SelectionPanel<T> extends StatefulWidget {
 class SelectionPanelState extends State<SelectionPanel> {
   bool hover = false;
 
-  static Future show(
-      BuildContext ctx, title, selectedValue, choiceItems, onChange, confirm, widget) async {
+  static Future show(BuildContext ctx, ListViewData data) async {
+    Log.e("show selection list dialog");
     var result = await showDialog(
         context: ctx,
         builder: (context) {
-          return AlertDialog(
-              content: SelectionListDialog(
-                  title: title,
-                  selectedValue: selectedValue,
-                  choiceItems: choiceItems,
-                  widget: widget,
-                  onChange: onChange,
-                  confirm: confirm));
+          return AlertDialog(content: SelectionListDialog(data));
         });
 
     return result;
   }
 
+  static void showMyDialog(BuildContext context, ListViewData data) async {
+    Navigator.push(context, PopRoute(child: SelectionListDialog(data)));
+  }
+
   @override
   Widget build(BuildContext context) {
-    Function wrapper = (newvalue) {
-      print("function wrapper");
-      widget.onChanged(newvalue);
-      setState(() {
-        widget.selectedValue = newvalue;
-      });
-    };
+    Function onChanged = widget.data.onChanged;
+    if (onChanged != null) {
+      widget.data.onChanged = (newvalue) {
+        print("function wrapper");
+        onChanged(newvalue);
+        setState(() {
+          widget.selectedValue = widget.data.items[newvalue].value;
+        });
+      };
+    }
     return MouseRegion(
         onHover: (e) {
           hover = true;
@@ -91,147 +118,125 @@ class SelectionPanelState extends State<SelectionPanel> {
           setState(() {});
         },
         child: GestureDetector(
+            behavior: HitTestBehavior.deferToChild,
             onPanStart: (d) {
               hover = true;
               setState(() {});
             },
-            onPanEnd:(d) {
+            onPanEnd: (d) {
+              hover = false;
+              setState(() {});
+            },
+            onPanCancel: () {
               hover = false;
               setState(() {});
             },
             onTap: () {
               hover = false;
               if (widget.onpressed == null) {
-                show(context, widget.title, widget.selectedValue,
-                    widget.choiceItems, wrapper, widget.confirm, widget.widget);
+                showMyDialog(context, widget.data);
               } else {
                 widget.onpressed();
               }
               setState(() {});
             },
             child: Container(
+                height: 25,
                 padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
                 color: hover ? Colors.grey : Colors.transparent,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: Text(widget.title), flex: 6),
+                    Expanded(child: Text(widget.data.title), flex: 4),
                     Expanded(
                         child: Container(
-                          alignment: Alignment.centerRight,
-                          child: widget.right == null ?
-                            Text(widget.selectedValue.toString(),
-                            style: TextStyle(fontSize: 15),
-                            ) :
-                          widget.right),
-                        flex: 4),
-                    Expanded(child: Icon(Icons.arrow_right), flex: 1),
+                            alignment: Alignment.centerRight,
+                            child: widget.right == null
+                                ? Text(
+                                    widget.selectedValue.toString(),
+                                    style: TextStyle(fontSize: 15),
+                                  )
+                                : widget.right),
+                        flex: 5),
+                    Visibility(
+                        visible: widget.right == null,
+                        child:
+                            Expanded(child: Icon(Icons.arrow_right), flex: 1)),
                   ],
                 ))));
   }
 }
 
 class SelectionListDialog<T> extends StatefulWidget {
-  String title;
-  T selectedValue;
-  List<SelectionItem> choiceItems;
-  Widget widget;
-  Function onChange;
-  Function confirm;
+  ListViewData data;
   _SelectionListDialog _state;
 
-  SelectionListDialog(
-      {Key key,
-      this.title,
-      this.selectedValue,
-      this.choiceItems,
-      this.widget,
-      this.onChange,
-      this.confirm
-      })
-      : super(key: key) {
-  }
+  SelectionListDialog(this.data) {}
 
   @override
-  void dispose() {
-  }
+  void dispose() {}
 
   @override
   State<StatefulWidget> createState() {
     _state = new _SelectionListDialog();
     return _state;
   }
-
-  void update(choices, selected) {
-    choiceItems = choices;
-    selectedValue = selected;
-    if (_state != null && _state.mounted)
-      _state.setState(() {});
-  }
 }
 
 class _SelectionListDialog extends State<SelectionListDialog> {
-  int group_value = -1;
-  List<Widget> w;
+  int index = 0;
+
   @override
   Widget build(BuildContext context) {
-    Log.e("_SelectionListDialog build " + widget.selectedValue.toString()+", choiceItems len="+
-    widget.choiceItems.length.toString());
-
-    w = List<Widget>();
-    int i = 0;
-    if (group_value < 0) {
-      for (int i=0;i<widget.choiceItems.length;i++) {
-        if (widget.choiceItems[i].value == widget.selectedValue) {
-          group_value = i;
-          break;
-        }
-      }
-      i = 0;
-    }
-    Log.e("_SelectionListDialog build group_value=" + group_value.toString());
-    w.add(Text(widget.title));
-    widget.choiceItems.forEach((element) {
-      Log.e("_SelectionListDialog build2 " + element.id.toString());
-
-      w.add(RadioListTile(
-          value: i++,
-          groupValue: group_value,
-          title: new Text(element.title),
-          onChanged: (int T) {
-            Log.e("updateGroupValue " + T.toString());
-            if (widget.onChange != null) {
-              Log.e("updateGroupValue changed to： " + widget.choiceItems[T].toString());
-              widget.onChange(widget.choiceItems[T].value);
-            }
-            updateGroupValue(T);
-          }));
-    });
-    // add confirm widget
-    w.add(
-      TextButton(
-        child: Text(LC.getString(context, C.save_as_tempate)),
-        onPressed: () {
-          widget.confirm(widget);
-        }
-      )
-    );
-
-    return Container(
-        width: 100,
-        height: 300,
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: w,
-        ));
+    var controller = new ScrollController();
+    return Material(
+      color: Colors.black26,
+      child: Center(
+        child: IntrinsicHeight(child:Column(children: [
+      Container(
+          color: Colors.white,
+          width: 200,
+          height: 200,
+          child: new ListView.builder(
+            itemCount: widget.data.items.length,
+            controller: controller,
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                  onTap: () {
+                    updateGroupValue(index);
+                  },
+                  child: Container(
+                      height: 50,
+                      padding: EdgeInsets.only(
+                          left: 10, top: 10, right: 10, bottom: 10),
+                      // color:Colors.indigo,
+                      decoration : BoxDecoration(
+                        border: Border.all(color:Colors.black12),
+                      ),
+                      child:
+                          widget.data.itemBuilder(index, widget.data.index)));
+            },
+          )),
+      widget.data.bottom == null
+          ? SizedBox(height: 1)
+          : GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+                if (widget.data.bottomOnPressed != null)
+                  widget.data.bottomOnPressed();
+              },
+              child: Container(child:widget.data.bottom, color:Colors.white, width: 200, height:30))
+    ]))));
   }
 
-  void updateGroupValue(int v) {
+  void updateGroupValue(int i) {
+    Log.e("updateGroupValue " + i.toString());
     setState(() {
-      group_value = v;
-      widget.selectedValue = widget.choiceItems[v];
+      index = i;
     });
+    if (widget.data.onChanged != null) {
+      widget.data.onChanged(i);
+    }
     Navigator.pop(context);
   }
 }

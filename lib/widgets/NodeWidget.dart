@@ -8,8 +8,10 @@ import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/layout/BidiLayout.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/third_party/dotted_border/dotted_border.dart';
+import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
@@ -265,11 +267,8 @@ class NodeWidgetState extends State<NodeWidget> {
                 Visibility(
                     visible: widget.children_dettached &&
                         widget.direction() == Side.left,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      color: Colors.red,
-                    )),
+                    child:
+                        Icon(Icons.add_circle_outline, size: 10)),
                 DottedBorder(
                     color: selected_ ? Colors.red : widget.borderColor(),
                     bgcolor: widget.bgColor(),
@@ -278,40 +277,37 @@ class NodeWidgetState extends State<NodeWidget> {
                     strokeCap: StrokeCap.round,
                     borderType: BorderType.RRect,
                     radius: Radius.circular(20),
-                    child: Container(
+                    child: Column(children: [
+                      Container(
                         padding: EdgeInsets.all(10),
-                        // decoration: BoxDecoration(
-                        //   // color: widget.bgColor(),
-                        //   border: selected_
-                        //       ? Border.all(
-                        //           color: Colors.red,
-                        //           width: 1,
-                        //           style: BorderStyle.solid)
-                        //       : Border.all(
-                        //           color: Colors.transparent, width: 1), //边框
-                        //   borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        // ),
-                        // height: widget.height,
-                        // width: widget.width,
                         child: Text(
                           widget.label,
+                          textAlign: widget.textAlign(), //TextAlign.right,
                           style: TextStyle(
-                            fontSize: widget.fontSize(),
-                            fontWeight: widget.fontWeight(),
-                            fontFamily: widget.fontFamily(),
-                            // fontStyle: FontStyle.italic,
-                            // fontFamily:
-                          ),
-                        ))),
+                              fontSize: widget.fontSize(),
+                              fontWeight: widget.fontWeight(),
+                              fontFamily: widget.fontFamily(),
+                              fontStyle: widget.fontItalic()
+                                  ? FontStyle.italic
+                                  : FontStyle.normal,
+                              decoration: widget.fontUnderline()
+                                  ? TextDecoration.underline
+                                  : TextDecoration.none,
+                              decorationStyle: TextDecorationStyle.solid
+                              // fontFamily:
+                              ),
+                        )),
+                        widget.image == null ? SizedBox() :
+                        Image(
+                          image: widget.image.image,
+                          width: 50,
+                          height: 50,
+                        )
+                        ])),
                 Visibility(
                     visible: widget.children_dettached &&
                         widget.direction() == Side.right,
                     child:
-                        // Container(
-                        //   width:10,
-                        //   height:10,
-                        //   color: Colors.red,
-                        // )
                         Icon(Icons.add_circle_outline, size: 10)),
               ])),
         ));

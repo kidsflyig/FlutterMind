@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -47,7 +48,17 @@ class FileUtil {
     return file;
   }
 
-  Future<String> loadFromFilePicker() async {
+  Future<File> loadFileFromFilePicker() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      return File(result.files[0].path);
+    } else {
+      return null;
+    }
+  }
+
+  Future<String> loadDataFromFilePicker() async {
     FilePickerResult result = await FilePicker.platform.pickFiles();
 
     if (result != null) {

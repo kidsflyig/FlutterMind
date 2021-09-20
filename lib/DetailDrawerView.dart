@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:FlutterMind/utils/FileUtil.dart';
+import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:flutter/material.dart';
 
@@ -15,15 +16,6 @@ class DetailDrawerView extends StatefulWidget {
 }
 
 class _DetailDrawerViewState extends State<DetailDrawerView> {
-  ImageProvider<Object> provider = AssetImage("assets/images/test.jpg");
-
-  void update() {
-    FileUtil().mkFile("test.jpg").then((v) {
-      provider = Image.file(v).image;
-      setState((){});
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     NodeWidgetBase selected = MapController().getSelected();
@@ -52,12 +44,22 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                   } else if (index == 1) {
                     return Text(selected.styleName());
                   } else if (index == 2) {
-                    return Image(
-                        width: 100,
-                        height: 100,
+                    return selected.image == null ? Text("没有图片") :
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, PopRoute(child: Image(
+                              width: 500,
+                              height: 500,
+                              fit: BoxFit.fitWidth,
+                              image: selected.image.image
+                            )));
+                          },
+                          child:Image(
+                        width: 500,
+                        height: 500,
                         fit: BoxFit.fitWidth,
-                        image: provider,
-                      );
+                        image: selected.image.image
+                      ));
                   } else {
                     return InkWell(
                       child: Container(
@@ -77,8 +79,8 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     crossAxisSpacing: 11,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 3.5)
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1)
             ),
           ],
         ),

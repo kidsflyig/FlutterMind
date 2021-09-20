@@ -1,4 +1,5 @@
-import 'dart:ui';
+import 'dart:io';
+// import 'dart:ui';
 
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
@@ -9,10 +10,12 @@ import 'package:FlutterMind/operations/OpDeleteFile.dart';
 import 'package:FlutterMind/operations/OpLoadFromFile.dart';
 import 'package:FlutterMind/operations/OpSetScale.dart';
 import 'package:FlutterMind/operations/OpWriteToFile.dart';
+import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
 import 'package:FlutterMind/utils/base.dart';
+import 'package:flutter/material.dart';
 
 import 'MindMap.dart';
 import 'Edge.dart';
@@ -177,12 +180,12 @@ class MapController {
       return;
     }
     _paiting = true;
-    Future(() {
+    // Future(() {
       Log.e("repainting");
       MindMap map = MindMap();
       _repaint(map.root);
       _paiting = false;
-    });
+    // });
   }
 
   void addNodeForNode(Node p, Node c) {
@@ -310,19 +313,38 @@ class MapController {
   }
 
   void setFontSize(double size, NodeWidgetBase widget) {
-    Style template = Style.styleForWidget(widget);
+    Style template = Style.styleForWidget(widget, false);
     template.setFontSize(size);
+    Settings().setDistanceByFontSize(size);
     repaint();
   }
 
   void setFontWeight(bool is_bold, NodeWidgetBase widget) {
-    Style template = Style.styleForWidget(widget);
+    Style template = Style.styleForWidget(widget, false);
     template.setFontWeight(is_bold);
     repaint();
   }
 
+  void setFontItalic(bool italic, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget, false);
+    template.setFontItalic(italic);
+    repaint();
+  }
+
+  void setFontUnderline(bool underline, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget, false);
+    template.setFontUnderline(underline);
+    repaint();
+  }
+
+  void setTextAlign(TextAlign align, NodeWidgetBase widget) {
+    Style template = Style.styleForWidget(widget, false);
+    template.setTextAlign(align);
+    repaint();
+  }
+
   void setFontFamily(String font_family, NodeWidgetBase widget) {
-    Style template = Style.styleForWidget(widget);
+    Style template = Style.styleForWidget(widget, false);
     template.setFontFamily(font_family);
     repaint();
   }
@@ -350,9 +372,9 @@ class MapController {
 
   void setNodeBorderColor(Color c) {
     // todo history
-    Style style = Style.styleForWidget(selected);
+    Style style = Style.styleForWidget(selected, false);
     style.setNodeBorderColor(c);
-    MapController().repaint();
+    repaint();
   }
 
   void detachSelctedNode() {
@@ -390,7 +412,7 @@ class MapController {
 
   void saveAsTemplate(NodeWidgetBase widget, name) {
     Log.e("saveAsTemplate");
-    Style style = Style.styleForWidget(widget);
+    Style style = Style.styleForWidget(widget, true);
     style.setName(name);
   }
 
@@ -425,5 +447,12 @@ class MapController {
       MindMap map = MindMap();
       map.Clear();
     }
+  }
+
+  void insertImageForSelected() {
+    FileUtil().loadFileFromFilePicker().then( (file) {
+      Image img = Image.file(file);
+      selected.insertImg(img);
+    });
   }
 }

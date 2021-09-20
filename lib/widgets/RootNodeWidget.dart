@@ -142,13 +142,16 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
               ),
               width: widget.width,
               height: widget.height,
-              child: Text(
+              padding: EdgeInsets.all(3),
+              child: Center(child:Text(
                   widget.label == null ? "" : widget.label,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: widget.fontSize(),
-                    fontWeight: widget.fontWeight(),
-                    fontFamily: widget.fontFamily(),
-                  ))
+                    color: Colors.black,
+                    shadows: [Shadow(color:Colors.black26, offset:Offset(1,1))],
+                    fontSize: 20,
+                  )))
             ),
             onDoubleTap: () {
               Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));

@@ -166,19 +166,23 @@ class MindMapViewState extends State<MindMapView> {
                         // )
                       ],
                     ))),
+            onTap: (me) {
+              bottomToolBar.hide();
+            },
             onMoveStart: (MoveEvent me) {
+              bottomToolBar.hide();
               widget.foreground.onPanStart(me.position);
             },
             onMoveUpdate: (MoveEvent me) {
               widget.foreground.onPanUpdate(me.position);
             },
             onMoveEnd: (MoveEvent me) {
-
               print("move end");
               widget.foreground.onPanEnd(null);
             },
             onScaleStart: (Offset off) {
               print("onScaleStart");
+              bottomToolBar.hide();
               Style s = Settings().defaultStyle();
               init_size = s.fontSize();
             },
@@ -202,9 +206,8 @@ class MindMapViewState extends State<MindMapView> {
               return IconButton(
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
-
                 },
-                icon: Icon(Icons.settings)
+                icon: Icon(Icons.art_track)
               );
             })),
           Container(
@@ -214,9 +217,8 @@ class MindMapViewState extends State<MindMapView> {
               return IconButton(
                 onPressed: () {
                   Scaffold.of(context).openEndDrawer();
-
                 },
-                icon: Icon(Icons.settings)
+                icon: Icon(Icons.view_headline),
               );
             })),
         ]));

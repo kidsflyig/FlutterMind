@@ -97,7 +97,7 @@ class EditingDialogState extends State<EditingDialog> {
                                   icon: Icon(Icons.clear)),
                               IconButton(
                                   onPressed: () {
-                                    print("cacel value = " + value);
+                                    print("cacel value = ");
                                     Navigator.pop(context);
                                     Utils.disableStatusBar();
                                   },

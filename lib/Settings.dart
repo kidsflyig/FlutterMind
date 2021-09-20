@@ -15,7 +15,7 @@ class Settings {
   Color _background_color;
   Color _edge_color;
   Size _default_root_size;
-
+  double _distance = 100;
   Style _default_template;
 
   Settings._privateConstructor() {
@@ -46,7 +46,11 @@ class Settings {
     _default_scale_level = level;
   }
 
-  double get distance => 100 + (_default_scale_level - 5) * 10;
+  double get distance => _distance;
+
+  void setDistanceByFontSize(double size) {
+    _distance = 120 + (size - 20) * 2;
+  }
 
   Color get backgroundColor => _background_color;
 

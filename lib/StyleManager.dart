@@ -73,17 +73,23 @@ class Style extends LinkedListEntry<Style> {
   String _templateName;
   double _fontSize;
   bool _isBold;
+  bool _itaic;
+  bool _underline;
   String _fontFamily;
   Color _bgColor;
   Color _nodeBorderColor;
+  TextAlign _align;
   static int _nextId = 0;
 
   Style(this._templateName) {
     _fontSize = ScreenUtil.getDp(C.plain_text_node_font_size_100p);
     _isBold = false;
+    _itaic = false;
+    _underline = false;
     _fontFamily = "";
     _bgColor = Colors.blue;
     _nodeBorderColor  = Colors.transparent;
+    _align = TextAlign.left;
 
     id = _nextId++;
     if (_templateName != null) {
@@ -91,11 +97,15 @@ class Style extends LinkedListEntry<Style> {
     }
   }
 
-  static Style styleForWidget(NodeWidgetBase widget) {
+  bool isDefault() {
+    return _templateName == "default";
+  }
+
+  static Style styleForWidget(NodeWidgetBase widget, bool create) {
     if (widget == null) {
       return Settings().defaultStyle();
     }
-    return widget.createStyleIfNotExists();
+    return widget.createStyleIfNotExists(create);
   }
 
   String name() {
@@ -123,6 +133,22 @@ class Style extends LinkedListEntry<Style> {
     return _isBold;
   }
 
+  void setFontItalic(bool italic) {
+    _itaic = italic;
+  }
+
+  bool fontIsItalic() {
+    return _itaic;
+  }
+
+  void setFontUnderline(bool underline) {
+    _underline = underline;
+  }
+
+  bool fontHasUnderline() {
+    return _underline;
+  }
+
   FontWeight fontWeight() {
     return _isBold ? FontWeight.bold : FontWeight.normal;
   }
@@ -130,6 +156,14 @@ class Style extends LinkedListEntry<Style> {
   void setFontFamily(familyName) {
     _fontFamily = familyName;
 
+  }
+
+  void setTextAlign(TextAlign align) {
+    _align = align;
+  }
+
+  TextAlign textAlign() {
+    return _align;
   }
 
   String fontFamily() {

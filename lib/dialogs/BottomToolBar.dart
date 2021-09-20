@@ -191,7 +191,16 @@ class BottomToolBarState extends State<BottomToolBar>
             MapController().copy();
             widget.toggle();
         }),
-        LC.getString(context, C.style_selector),
+       "复制",
+        ),
+        BottomButton(menu_exposed,
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 0, 2),
+          wrapper(() {
+            Log.e("click7");
+            MapController().insertImageForSelected();
+            widget.toggle();
+        }),
+       "插入图片",
         ),
       ],
     );

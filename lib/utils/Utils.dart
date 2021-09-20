@@ -58,4 +58,8 @@ class Utils {
       SystemChrome.setEnabledSystemUIOverlays([]);
     }
   }
+
+  static Image default_img() {
+    return Image.asset("assets/image/test.jpg");
+  }
 }

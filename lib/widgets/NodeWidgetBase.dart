@@ -23,6 +23,7 @@ class NodeWidgetBase extends StatefulWidget {
   String _fontFamily;
   Color _bgColor;
   Style _style;
+  Image image;
 
   bool _dirty = true;
   State<NodeWidgetBase> state;
@@ -33,6 +34,7 @@ class NodeWidgetBase extends StatefulWidget {
     this.node
   }) : super(key: key) {
     layout = LayoutController().newLayout(this);
+    _style = Settings().defaultStyle();
   }
 
   static Widget create(node) {
@@ -151,8 +153,8 @@ class NodeWidgetBase extends StatefulWidget {
     repaint();
   }
 
-  Style createStyleIfNotExists() {
-    if (_style == null) {
+  Style createStyleIfNotExists(bool create) {
+    if (create) {
       _style = Style(null);
     }
     return _style;
@@ -182,6 +184,30 @@ class NodeWidgetBase extends StatefulWidget {
     return _style.fontFamily();
   }
 
+  bool fontItalic() {
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.fontIsItalic();
+    }
+    return _style.fontIsItalic();
+  }
+
+  bool fontUnderline() {
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.fontHasUnderline();
+    }
+    return _style.fontHasUnderline();
+  }
+
+  TextAlign textAlign() {
+    if (_style == null) {
+      Style s = Settings().defaultStyle();
+      return s.textAlign();
+    }
+    return _style.textAlign();
+  }
+
   double scaleLevel() {
     Settings s = Settings();
     Log.e("s.default_font_family = " + s.scaleLevel.toString());
@@ -204,6 +230,11 @@ class NodeWidgetBase extends StatefulWidget {
     }
     Log.e("new border color " + _style.nodeBorderColor().toString());
     return _style.nodeBorderColor();
+  }
+
+  void insertImg(img) {
+    image = img;
+    repaint();
   }
 
   void onPanStart(detail) {
