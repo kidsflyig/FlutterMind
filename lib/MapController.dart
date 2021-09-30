@@ -257,6 +257,14 @@ class MapController {
     OpCenterlize(mind_map_view_.foreground, "居中").doAction();
   }
 
+  void centerlizeSelectedWidget() {
+    centerlizeWidget(selected);
+  }
+
+  void centerlizeWidget(NodeWidgetBase w) {
+    mind_map_view_.foreground.centerlizeWidget(w);
+  }
+
   void cloneNodeTree(Node from, Node to, Direction direction) {
     Node cloned = from.clone();
     moveTo(cloned, to, direction);

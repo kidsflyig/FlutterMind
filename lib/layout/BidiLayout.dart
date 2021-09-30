@@ -73,15 +73,16 @@ class BidiLayout extends Layout {
     Log.e("relayoutByDirection " + direction.toString());
     Offset offset = NodeWidgetBase.ToNodeWidgetBase(widget).center();
     double distance = Settings().distance;
-    offset = offset.translate( direction == Side.right ? distance : -distance, -layout_height/2);
-
-    Log.e("relayoutByDirection  init layoutheight: " + layout_height.toString());
+    double w = NodeWidgetBase.ToNodeWidgetBase(widget).width;
+    offset = offset.translate( direction == Side.right ? distance + w/ 2 : -distance-w/2, -layout_height/2);
 
     layout_list.forEach((layout) {
       BidiLayout l = layout;
       double h = (l.layout_height - layout.height) / 2;
 
       // offset = offset.translate(direction == Side.right ? 0 : l.width, 0);
+      // Log.e("relayoutByDirection  layout width: " + l.width.toString());
+
       layout.moveToPosition(offset.translate(direction == Side.right ? 0 : -l.width, h));
       // MapController().update(layout.widget.node);
 

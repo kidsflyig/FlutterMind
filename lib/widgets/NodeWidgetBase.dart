@@ -237,6 +237,14 @@ class NodeWidgetBase extends StatefulWidget {
     repaint();
   }
 
+  void insertIcon(String icon) {
+    // icons.a
+    // Image(
+    //                         width:15,
+    //                         height:15,
+    //                         image: Image.asset("assets/icons/num1.png").image),
+  }
+
   void onPanStart(detail) {
     Log.i("NodeWidgetBase onPanStart");
     // layout.onPanStart(detail);

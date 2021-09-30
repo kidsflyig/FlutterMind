@@ -5,6 +5,7 @@ import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:flutter/material.dart';
 
 import 'MapController.dart';
+import 'dialogs/EditingDialog.dart';
 import 'operations/Operation.dart';
 import 'utils/Utils.dart';
 
@@ -16,11 +17,13 @@ class DetailDrawerView extends StatefulWidget {
 }
 
 class _DetailDrawerViewState extends State<DetailDrawerView> {
+  String tmp = "";
+
   @override
   Widget build(BuildContext context) {
     NodeWidgetBase selected = MapController().getSelected();
     return Container(
-      padding: EdgeInsets.only(left: 17,right: 17),
+      padding: EdgeInsets.only(left: 17, right: 17),
       color: Colors.white,
       height: Utils.screenSize().height,
       width: Utils.screenSize().width / 3,
@@ -28,59 +31,81 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: Text('详情', style: TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.bold),),
+              child: Text(
+                '详情',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
             ),
             SliverToBoxAdapter(
-              child: SizedBox(height: 20,),
+              child: SizedBox(
+                height: 20,
+              ),
             ),
-            SliverGrid(
-                delegate:
-                SliverChildBuilderDelegate((BuildContext context, int index) {
-                  if (index == 0) {
-                    return Container(
-                      child: Text(selected.label)
-                    );
-                  } else if (index == 1) {
-                    return Text(selected.styleName());
-                  } else if (index == 2) {
-                    return selected.image == null ? Text("没有图片") :
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(context, PopRoute(child: Image(
-                              width: 500,
-                              height: 500,
-                              fit: BoxFit.fitWidth,
-                              image: selected.image.image
-                            )));
-                          },
-                          child:Image(
-                        width: 500,
-                        height: 500,
-                        fit: BoxFit.fitWidth,
-                        image: selected.image.image
-                      ));
-                  } else {
-                    return InkWell(
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(0xff, 0xeb, 0xeb, 0xec),
-                            borderRadius: BorderRadius.circular(4)
-                        ),
-                        child: Text("打发打发"),
-                      ),
-                      onTap: () {
-                        print("item " + index.toString() + " clicked");
-                      },
-                    );
-                  }
-                }, childCount: 5),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    crossAxisSpacing: 11,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 1)
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Text("内容"),
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Text(selected.label)),
+                Text("样式"),
+                Container(
+                    height: 30,
+                    decoration: BoxDecoration(
+                        color: Colors.orange,
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Text(selected.styleName())),
+                Text("图片"),
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: selected.image == null
+                        ? Text("没有图片")
+                        : InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  PopRoute(
+                                      child: Image(
+                                          width: 500,
+                                          height: 500,
+                                          fit: BoxFit.fitWidth,
+                                          image: selected.image.image)));
+                            },
+                            child: Image(
+                                width: 500,
+                                height: 500,
+                                fit: BoxFit.fitWidth,
+                                image: selected.image.image))),
+                Text("备注"),
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: InkWell(
+                        child: Text(tmp),
+                        onTap: () {
+                          EditingDialog.showMyDialog(
+                              context,
+                              EditConfig(
+                                  pos: Utils.center(),
+                                  maxLength: 20,
+                                  maxLines: 1,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.done,
+                                  onSubmit: (msg) {
+                                    tmp = msg;
+                                    setState(() {});
+                                  }));
+                        }))
+              ]),
             ),
           ],
         ),

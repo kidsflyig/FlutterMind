@@ -103,6 +103,16 @@ class Foreground extends StatefulWidget {
     _update();
   }
 
+  void centerlizeWidget(NodeWidgetBase w) {
+    Log.e("Foreground centerlize");
+    // var xf = _width / 2 - w.x;
+    // var yf = _height / 2 - w.y;
+    left_ = Utils.screenSize().width / 2  - w.x;
+    top_= Utils.screenSize().height / 2 - w.y;
+
+    _update();
+  }
+
   Color backgroundColor() {
     return Settings().backgroundColor;
   }

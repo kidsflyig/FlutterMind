@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:FlutterMind/Node.dart';
+import 'package:FlutterMind/utils/FileUtil.dart';
+import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:flutter/material.dart';
 
@@ -15,25 +17,46 @@ class ChildrenDrawerView extends StatefulWidget {
 }
 
 class _ChildrenDrawerViewState extends State<ChildrenDrawerView> {
-
   @override
   Widget build(BuildContext context) {
     NodeWidgetBase selected = MapController().getSelected();
     Node node = selected.node;
-    var controller = new ScrollController();
     return Container(
       padding: EdgeInsets.only(left: 17,right: 17),
       color: Colors.white,
       height: Utils.screenSize().height,
       width: Utils.screenSize().width / 3,
-      child: ListView.builder(
-            itemCount: selected.node.children.length,
-            controller: controller,
-            itemBuilder: (BuildContext context, int index) {
-              NodeWidgetBase c = node.children[index].widget();
-              return Text(c.label);
-            },
-          )
+      child: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Text('子节点', style: TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(height: 20,),
+            ),
+            SliverGrid(
+                delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
+                  NodeWidgetBase c = node.children[index].widget();
+                  return InkWell(
+                    onTap: () {
+                      MapController().centerlizeWidget(c);
+                      Navigator.pop(context);
+                    },
+                    child:Text(c.label)
+                  );
+                }, childCount: selected.node.children.length),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    crossAxisSpacing: 11,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1)
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

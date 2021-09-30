@@ -102,6 +102,12 @@ class EditingDialogState extends State<EditingDialog> {
                                     Utils.disableStatusBar();
                                   },
                                   icon: Icon(Icons.cancel)),
+                              IconButton(
+                                  onPressed: () {
+                                    print("cacel value = ");
+
+                                  },
+                                  icon: Icon(Icons.face)),
                             ])),
                     Container(
                       constraints: BoxConstraints(

@@ -9,6 +9,7 @@ import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FileDialog extends StatefulWidget {
   static Future show(BuildContext ctx) async {
@@ -58,7 +59,7 @@ class FileDialogState extends State<FileDialog> {
           ],
         ),
         width: 180,
-        height: 180,
+        height: 250,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -119,6 +120,34 @@ class FileDialogState extends State<FileDialog> {
                 onPressed: () {
                   // TODO, 接入腾讯云开发flutter sdk
                   Navigator.pop(context);
+                },
+              ),
+            ]),
+            Divider(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+              SimpleImageButton(
+                width: width,
+                mode: SIBMode.VERTICAL,
+                normalImage: 'assets/images/icons/icon_file_open.png',
+                pressedImage: 'assets/images/icons/icon_file_open.png',
+                title: '导出图片',
+                onPressed: () {
+                  Navigator.pop(context);
+
+                },
+              ),
+              Container(height: 40, width:1, color:Colors.grey),
+              SimpleImageButton(
+                width: width,
+                mode: SIBMode.VERTICAL,
+                normalImage: 'assets/images/icons/icon_file_login.png',
+                pressedImage: 'assets/images/icons/icon_file_login.png',
+                title: '退出',
+                onPressed: () {
+                  // TODO, 接入腾讯云开发flutter sdk
+                  SystemNavigator.pop();
                 },
               ),
             ]),

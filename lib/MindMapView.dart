@@ -205,6 +205,7 @@ class MindMapViewState extends State<MindMapView> {
             child: Builder(builder: (BuildContext context) {
               return IconButton(
                 onPressed: () {
+                  MapController().centerlizeSelectedWidget();
                   Scaffold.of(context).openDrawer();
                 },
                 icon: Icon(Icons.art_track)
