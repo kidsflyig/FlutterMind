@@ -23,7 +23,7 @@ import 'operations/Operation.dart';
 import 'utils/DragUtil.dart';
 import 'utils/Utils.dart';
 
-class Foreground extends StatefulWidget {
+class Foreground extends StatefulWidget implements LayoutControllerCient {
   List<Widget> widget_list = [];
   List<Widget> node_widget_list = [];
   List<Widget> edge_widget_list = [];
@@ -49,42 +49,7 @@ class Foreground extends StatefulWidget {
     // this.scale = 1.0;
     _width = Utils.screenSize().width * 3;
     _height = Utils.screenSize().height * 3;
-
-    // LayoutController().onForegroundUpdated((Rect r, cb) {
-    //   Log.e("onForegroundUpdated = " + r.toString()+", screen size=" +Utils.screenSize().toString());
-    //   Offset offset = Offset.zero;
-    //   if (r.left < 0) {
-    //     _width += (-r.left);
-    //     offset = offset.translate(-r.left, 0);
-    //   }
-
-    //   if (r.top < 0) {
-    //     _height += (-r.top);
-    //     offset = offset.translate(-r.top, 0);
-    //   }
-
-    //   if (offset.dx > 0 || offset.dy > 0) {
-
-    //     cb(r.translate(offset.dx, offset.dy));
-
-    //     node_widget_list.forEach((e) {
-    //       Log.e("node list moveby " + offset.toString());
-    //       NodeWidgetBase nw = e;
-    //       nw.moveByOffset(offset);
-    //     });
-    //   }
-
-    //   if (r.right > _width) {
-    //     _width += (r.right - _width);
-    //   }
-
-    //   if (r.bottom > _height) {
-    //     _height += (r.bottom - _height);
-    //   }
-
-    //   MapController().repaint();
-    //   _update();
-    // });
+    LayoutController().setCient(this);
   }
 
   // void SetScale(double scale) {
@@ -94,6 +59,39 @@ class Foreground extends StatefulWidget {
   //     nw.SetScale(scale);
   //   });
   // }
+
+  @override
+  void updateRect(Rect r) {
+    Log.e("onForegroundUpdated = " + r.toString()+", screen size=" +Utils.screenSize().toString());
+    Offset offset = Offset.zero;
+    if (r.left < 0) {
+      _width += (-r.left);
+      offset = offset.translate(-r.left, 0);
+    }
+
+    if (r.top < 0) {
+      _height += (-r.top);
+      offset = offset.translate(-r.top, 0);
+    }
+
+    if (r.right > _width) {
+      _width += (r.right - _width);
+    }
+
+    if (r.bottom > _height) {
+      _height += (r.bottom - _height);
+    }
+
+    if (offset.dx > 0 || offset.dy > 0) {
+      LayoutController().translate(offset.dx, offset.dy);
+      node_widget_list.forEach((e) {
+        NodeWidgetBase nw = e;
+        nw.moveByOffset(offset);
+      });
+    }
+
+    _update();
+  }
 
   void centerlize() {
     Log.e("Foreground centerlize");
@@ -309,9 +307,11 @@ class ForegroundState extends State<Foreground> {
     Positioned(
       left: widget.left_,
       top: widget.top_,
+      child: RepaintBoundary(
+                key: widget.globalKey,
+                child: Container(
       width: widget._width,
       height: widget._height,
-      child: Container(
         margin: EdgeInsets.only(left: ml, top: mt),
         color: widget.backgroundColor(),
         // color: Color.fromARGB(0x0, 0, 0, 0),
@@ -331,6 +331,6 @@ class ForegroundState extends State<Foreground> {
           ]
         )
       )
-    );
+    ));
   }
 }

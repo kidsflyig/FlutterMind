@@ -71,6 +71,9 @@ class MindMapView extends StatefulWidget {
     return pngBytes;
   }
 
+  void update() {
+    state.update();
+  }
   @override
   State<StatefulWidget> createState() {
     Log.e("MindMapView createState");
@@ -109,13 +112,21 @@ class MindMapViewState extends State<MindMapView> {
     return true;
   }
 
+  var image_data = null;
+  void update() {
+    widget.foreground.updatePreview((data){
+      image_data = data;
+      setState(() {
+
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     // RenderRepaintBoundary boundary = context.findRenderObject();
     //                     Image image = await boundary.toImage();
     var left_drawer = DetailDrawerView();
     var right_drawer = ChildrenDrawerView();
-
     var w = Scaffold(
         // appBar: new AppBar(
         //   shadowColor: Colors.transparent,
@@ -168,6 +179,7 @@ class MindMapViewState extends State<MindMapView> {
                     ))),
             onTap: (me) {
               bottomToolBar.hide();
+              image_data = null;
             },
             onMoveStart: (MoveEvent me) {
               bottomToolBar.hide();
@@ -222,6 +234,10 @@ class MindMapViewState extends State<MindMapView> {
                 icon: Icon(Icons.view_headline),
               );
             })),
+            image_data == null ? SizedBox() : Image(
+                fit: BoxFit.fitHeight,
+                image: Image.memory(image_data).image
+            )
         ]));
         return w;
   }

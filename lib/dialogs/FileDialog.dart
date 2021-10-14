@@ -135,7 +135,7 @@ class FileDialogState extends State<FileDialog> {
                 title: '导出图片',
                 onPressed: () {
                   Navigator.pop(context);
-
+                  MapController().exportAsImage();
                 },
               ),
               Container(height: 40, width:1, color:Colors.grey),

@@ -10,10 +10,15 @@ import 'BidiLayout.dart';
 import 'Layout.dart';
 import 'StarLayout.dart';
 
+class LayoutControllerCient {
+  void updateRect(Rect r) {}
+}
+
 class LayoutController {
   LayoutController._privateConstructor();
   Rect map_rect;
   Function _fn;
+  LayoutControllerCient _client;
 
   static LayoutController _instance = null;
 
@@ -41,8 +46,22 @@ class LayoutController {
     return l;
   }
 
+  void setCient(LayoutControllerCient client) {
+    _client = client;
+  }
+
   void onForegroundUpdated(Function fn) {
     _fn = fn;
+  }
+
+  void notifyMapRectChanged() {
+    if (_client != null) {
+      _client.updateRect(map_rect);
+    }
+  }
+
+  void translate(dx, dy) {
+    map_rect = map_rect.translate(dx, dy);
   }
 
   void updateMapRect(Rect r) {
@@ -50,12 +69,12 @@ class LayoutController {
       map_rect = r;
     }
     map_rect = map_rect.expandToInclude(r);
-    if (_fn != null) {
-      Log.e("chch before fn " + map_rect.toString());
-      _fn(map_rect, (r) {
-        map_rect = r;
-      });
-      Log.e("chch after fn " + map_rect.toString());
-    }
+    // if (_fn != null) {
+    //   Log.e("chch before fn " + map_rect.toString());
+    //   _fn(map_rect, (r) {
+    //     map_rect = r;
+    //   });
+    //   Log.e("chch after fn " + map_rect.toString());
+    // }
   }
 }

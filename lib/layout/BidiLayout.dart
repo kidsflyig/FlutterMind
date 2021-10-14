@@ -62,6 +62,7 @@ class BidiLayout extends Layout {
       relayoutByDirection(direction, children, layout_height);
     }
     Log.e("relayout end...");
+    LayoutController().notifyMapRectChanged();
     MapController().repaint();
   }
 
@@ -218,6 +219,7 @@ class BidiLayout extends Layout {
   @override
   void moveByOffset(Offset offset) {
     super.moveByOffset(offset);
+
     LayoutController().updateMapRect(
       Rect.fromLTWH(drag_.moveOffset.dx, drag_.moveOffset.dy, width, height));
   }

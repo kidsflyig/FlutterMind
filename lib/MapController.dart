@@ -463,4 +463,11 @@ class MapController {
       selected.insertImg(img);
     });
   }
+
+  void exportAsImage() {
+    // mind_map_view_.foreground.updatePreview((data) {
+    //   FileUtil().writeDataToFile(data, 'test.jpg');
+    // });
+    mind_map_view_.update();
+  }
 }
