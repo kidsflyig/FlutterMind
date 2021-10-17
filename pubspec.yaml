@@ -36,6 +36,8 @@ dependencies:
   fluttertoast: ^4.0.1
   gesture_x_detector: ^0.0.1
   path_drawing: ^0.5.0
+  loading_indicator_view: ^1.1.0
+  url_launcher: ^3.0.0
   #sqflite: ^1.1.6
 
   # image_picker : ^0.8.3

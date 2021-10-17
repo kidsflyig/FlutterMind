@@ -3,6 +3,7 @@ import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'MapController.dart';
 import 'dialogs/EditingDialog.dart';
@@ -83,6 +84,17 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                                 height: 500,
                                 fit: BoxFit.fitWidth,
                                 image: selected.image.image))),
+                Text("链接"),
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: InkWell(
+                        child: Text(selected.url ?? ""),
+                        onTap: () {
+                          launch(selected.url);
+                        })),
                 Text("备注"),
                 Container(
                     height: 100,
@@ -90,7 +102,7 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                         border: Border.all(color: Colors.black12),
                         borderRadius: BorderRadius.circular(4)),
                     child: InkWell(
-                        child: Text(tmp),
+                        child: Text(selected.note ?? ""),
                         onTap: () {
                           EditingDialog.showMyDialog(
                               context,
@@ -101,7 +113,7 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                                   keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.done,
                                   onSubmit: (msg) {
-                                    tmp = msg;
+                                    selected.note = msg;
                                     setState(() {});
                                   }));
                         }))

@@ -112,6 +112,7 @@ class MindMapViewState extends State<MindMapView> {
     return true;
   }
 
+  // for testing
   var image_data = null;
   void update() {
     widget.foreground.updatePreview((data){
@@ -121,6 +122,7 @@ class MindMapViewState extends State<MindMapView> {
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // RenderRepaintBoundary boundary = context.findRenderObject();
@@ -179,7 +181,6 @@ class MindMapViewState extends State<MindMapView> {
                     ))),
             onTap: (me) {
               bottomToolBar.hide();
-              image_data = null;
             },
             onMoveStart: (MoveEvent me) {
               bottomToolBar.hide();
@@ -234,10 +235,10 @@ class MindMapViewState extends State<MindMapView> {
                 icon: Icon(Icons.view_headline),
               );
             })),
-            image_data == null ? SizedBox() : Image(
-                fit: BoxFit.fitHeight,
-                image: Image.memory(image_data).image
-            )
+            // image_data == null ? SizedBox() : Image(
+            //     fit: BoxFit.fitHeight,
+            //     image: Image.memory(image_data).image
+            // )
         ]));
         return w;
   }

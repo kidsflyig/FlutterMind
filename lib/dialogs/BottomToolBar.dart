@@ -202,6 +202,15 @@ class BottomToolBarState extends State<BottomToolBar>
         }),
        "插入图片",
         ),
+        BottomButton(menu_exposed,
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 1, 2),
+          wrapper(() {
+            Log.e("click8");
+            MapController().insertUrlForSelected(context);
+            widget.toggle();
+        }),
+       "插入链接",
+        ),
       ],
     );
   }

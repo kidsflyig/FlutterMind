@@ -25,7 +25,7 @@ class OpWriteToFile extends Operation {
     String data = MindMap().toJson();
     String file_name = new_file_name;
     if (new_file_name == null || new_file_name.isEmpty) {
-      file_name = "未命名";
+      file_name = "default";
       int id = 1;
       while (await FileUtil().exists(file_name)) {
         file_name = file_name + "_$id";

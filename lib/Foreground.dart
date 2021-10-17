@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
@@ -279,11 +280,30 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
   }
 
   Future<Uint8List> toImage() async  {
-   RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject();
+    RenderRepaintBoundary boundary =
+        globalKey.currentContext.findRenderObject();
     var dpr = ui.window.devicePixelRatio;
-    ui.Image image = await boundary.toImage(pixelRatio: dpr);
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    print("chch  dpr = " + dpr.toString());
+    ui.Image image = await boundary.toImage();
+
+    PictureRecorder recorder = new PictureRecorder();
+    Canvas c = Canvas(recorder);
+    Paint p = Paint();
+    Rect r = LayoutController().map_rect;
+    c.drawImageRect(
+        image,
+        Rect.fromLTWH(r.left - 30, r.top - 30, r.width + 60, r.height + 60),
+        Rect.fromLTWH(0, 0, r.width + 60, r.height + 60),
+        p);
+    Picture picture = recorder.endRecording();
+
+    ui.Image img = await picture.toImage(
+        LayoutController().map_rect.width.toInt() + 60,
+        LayoutController().map_rect.height.toInt() + 60);
+
+    ByteData byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData.buffer.asUint8List();
+
     return pngBytes;
   }
 

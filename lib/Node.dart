@@ -223,6 +223,8 @@ class Node {
     children.clear();
     from_edges.clear();
     _widget = null;
+    left = 0;
+    right = 0;
   }
 
   Node root() {

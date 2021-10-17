@@ -1,11 +1,13 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/MindMapBrowser.dart';
+import 'package:FlutterMind/dialogs/LoadingDialog.dart';
 import 'package:FlutterMind/operations/OpCreateNew.dart';
 import 'package:FlutterMind/operations/OpLoadFromFile.dart';
 import 'package:FlutterMind/operations/OpWriteToFile.dart';
 import 'package:FlutterMind/third_party/SimpleImageButton.dart';
 import 'package:FlutterMind/utils/Constants.dart';
 import 'package:FlutterMind/utils/FileUtil.dart';
+import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +137,11 @@ class FileDialogState extends State<FileDialog> {
                 title: '导出图片',
                 onPressed: () {
                   Navigator.pop(context);
-                  MapController().exportAsImage();
+                  LoadingDialog loading = LoadingDialog.show(context);
+                  MapController().exportAsImage(() {
+                    Log.e("exportAsImage done");
+                    loading.hide();
+                  });
                 },
               ),
               Container(height: 40, width:1, color:Colors.grey),

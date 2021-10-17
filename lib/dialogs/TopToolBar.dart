@@ -70,13 +70,15 @@ class TopToolBar extends StatelessWidget {
   Widget build(BuildContext context) {
     var bg_color = Colors.black45;
     var width = ScreenUtil.getDp(C.top_toolbar_btn_width);
-    return Align(
+    return Padding(
+      padding : EdgeInsets.only(top: 6),
+      child: Align(
         alignment: Alignment.topCenter,
         child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                    padding: EdgeInsets.only(top: 5, left: 10, bottom: 5, right: 5),
+                    padding: EdgeInsets.only(top: 10, left: 10, bottom: 10, right: 10),
                     decoration: BoxDecoration(
                       color: bg_color,
                       borderRadius: BorderRadius.only(
@@ -93,7 +95,7 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
-                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 5),
+                    padding: EdgeInsets.only(top: 10, left: 5, bottom: 10, right: 5),
                     decoration: BoxDecoration(
                       color: bg_color,
                     ),
@@ -108,7 +110,7 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
-                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 5),
+                    padding: EdgeInsets.only(top: 10, left: 5, bottom: 10, right: 5),
                     decoration: BoxDecoration(
                       color: bg_color,
                     ),
@@ -121,7 +123,7 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
                 Container(
-                    padding: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 10),
+                    padding: EdgeInsets.only(top: 10, left: 5, bottom: 10, right: 10),
                     decoration: BoxDecoration(
                         color: bg_color,
                         borderRadius: BorderRadius.only(
@@ -136,6 +138,6 @@ class TopToolBar extends StatelessWidget {
                       },
                     )),
               ],
-            ));
+            )));
   }
 }

@@ -1,6 +1,7 @@
 import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/layout/Layout.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
@@ -14,7 +15,7 @@ import '../utils/DragUtil.dart';
 import 'NodeWidget.dart';
 import 'RootNodeWidget.dart';
 
-class NodeWidgetBase extends StatefulWidget {
+class NodeWidgetBase extends StatefulWidget with TreeNode {
   Node node;
   // DragUtil drag_ = DragUtil();
   double scale_ = 1.0;
@@ -24,6 +25,8 @@ class NodeWidgetBase extends StatefulWidget {
   Color _bgColor;
   Style _style;
   Image image;
+  String url;
+  String _note;
 
   bool _dirty = true;
   State<NodeWidgetBase> state;
@@ -132,6 +135,14 @@ class NodeWidgetBase extends StatefulWidget {
     node.label = l;
   }
 
+  String get note => _note;
+
+  set note(String l) {
+    _note = l;
+    repaint();
+  }
+
+  
   void set width(double width) {
     layout.width = width;
   }
@@ -234,6 +245,11 @@ class NodeWidgetBase extends StatefulWidget {
 
   void insertImg(img) {
     image = img;
+    repaint();
+  }
+
+  void insertUrl(_url) {
+    url = _url;
     repaint();
   }
 

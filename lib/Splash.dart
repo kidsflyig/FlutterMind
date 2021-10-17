@@ -18,7 +18,7 @@ class Splash extends StatefulWidget {
 }
 
 class SplashState extends State<Splash> {
-  final int timelimit = 5;
+  final int timelimit = 3;
   int current ;
   var time;
   SplashState() {
@@ -35,11 +35,18 @@ class SplashState extends State<Splash> {
           print('执行');
           if (--current < 0) {
             t.cancel();
-            Navigator.push( context,
-              MaterialPageRoute(
-                builder: (context) {
+
+            Navigator.push(context,
+              PageRouteBuilder(
+                opaque: true,
+                transitionDuration: Duration(milliseconds: 1000),
+                transitionsBuilder: (ctx, anim1, anim2, child) {
+                  return FadeTransition(opacity: Tween(begin: 0.0, end:1.0).animate(CurvedAnimation(parent: anim1, curve: Curves.fastOutSlowIn)), child:child);
+                },
+                pageBuilder: (ctx, animation, secondanimation) {
                   return MindMapView();
-                }));
+                }
+                ));
           } else {
             setState((){
             });

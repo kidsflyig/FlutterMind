@@ -315,7 +315,13 @@ class NodeWidgetState extends State<NodeWidget> {
                           image: widget.image.image,
                           width: 50,
                           height: 50,
-                        )
+                        ),
+                        Row(children: [
+                          widget.url == null ? SizedBox() :
+                          Icon(Icons.link),
+                          widget.note == null ? SizedBox() :
+                          Icon(Icons.note),
+                        ])
                         ])),
                 Visibility(
                     visible: widget.children_dettached &&

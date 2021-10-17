@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/dialogs/StyleSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/operations/OpCreateNew.dart';
@@ -21,6 +22,7 @@ import 'MindMap.dart';
 import 'Edge.dart';
 import 'MindMapView.dart';
 import 'Node.dart';
+import 'dialogs/EditingDialog.dart';
 import 'operations/OpCenterlize.dart';
 import 'operations/OpSetBgColor.dart';
 import 'operations/OpSetEdgeColor.dart';
@@ -99,7 +101,8 @@ class MapController {
     }
     var n = null;
 
-    String title = data["title"];
+    String title = data["label"];
+    if (title == null) title="NA";
     if (p == null) {
       n = Node.create(NodeType.rootNode);
       // n.left = Center().dx;
@@ -108,6 +111,10 @@ class MapController {
       n = Node.create(NodeType.plainText);
       n.data = title;
       p.addChild(n, p.direction);
+      NodeWidgetBase nwb = n.widget();
+      nwb.label = title;
+      nwb.url = data["url"];
+      nwb.note = data["note"];
     }
     // n.left = CalcNewLocation(n).dx;
     // n.top = CalcNewLocation(n).dy;
@@ -121,6 +128,30 @@ class MapController {
     return n;
   }
 
+  /* format:
+   * {
+   *   label:"root",
+   *   children: [
+   *     {
+   *       label: "node1",
+   *       url: "https://xxx",
+   *       image: "d:\xxx.jpg",
+   *       note: "",
+   *       style: "name",
+   *       children: {
+   *         ...
+   *       }
+   *     },
+   *     {
+   *       label: "node2"
+   *       children: {
+   *         ...
+   *       }
+   *     },
+   *   ]
+   * }
+   *
+  */
   Map<String, dynamic> createJsonFromNode(Node node) {
     if (node == null) {
       return null;
@@ -129,9 +160,12 @@ class MapController {
     Map<String, dynamic> result = new Map<String, dynamic>();
     if (node.type == NodeType.plainText) {
       TextNode tn = node;
-      result["title"] = tn.data;
+      NodeWidgetBase nwb = tn.widget();
+      result["label"] = nwb.label;
+      result["url"] = nwb.url;
+      result["note"] = nwb.note;
     } else if (node.type == NodeType.rootNode) {
-      result["title"] = "root";
+      result["label"] = "root";
     }
 
     if (node.children != null) {
@@ -464,10 +498,23 @@ class MapController {
     });
   }
 
-  void exportAsImage() {
-    // mind_map_view_.foreground.updatePreview((data) {
-    //   FileUtil().writeDataToFile(data, 'test.jpg');
-    // });
-    mind_map_view_.update();
+  void insertUrlForSelected(context) {
+    EditingDialog.showMyDialog(
+        context,
+        EditConfig(
+            pos: Utils.center(),
+            maxLength: 240,
+            maxLines: 1,
+            keyboardType: TextInputType.url,
+            textInputAction: TextInputAction.done,
+            onSubmit: (msg) {
+              selected.insertUrl(msg);
+            }));
+  }
+
+  void exportAsImage(cb) {
+    mind_map_view_.foreground.updatePreview((data) {
+      FileUtil().writeDataToGallery(data, 'test.jpg').then((value) => cb());
+    });
   }
 }

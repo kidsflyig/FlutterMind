@@ -25,6 +25,11 @@ class FileUtil {
     return root_path;
   }
 
+  Future<Directory> get _galleryPath async {
+    List<Directory> root_path = await getExternalStorageDirectories(type:StorageDirectory.pictures);
+    return root_path[0];
+  }
+
   Future<bool> exists(String name) async {
     File file = await mkFile(name);
     bool res = await file.exists();
@@ -97,6 +102,18 @@ class FileUtil {
     if (name == null || name.isEmpty) return;
     File file = await mkFile(name);
     file.delete();
+  }
+
+  Future<bool> writeDataToGallery(data, String file_name) async {
+    final path = await _galleryPath;
+    String path_str = path.path;
+    File f = File('$path_str/' + file_name);
+    if (f != null) {
+      f.writeAsBytes(data);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<bool> writeDataToFile(data, String file_name) async {

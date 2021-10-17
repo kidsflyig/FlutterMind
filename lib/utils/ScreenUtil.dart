@@ -33,7 +33,7 @@ class ScreenUtil {
     screen[C.plain_text_node_font_size_100p] = 10;
     screen[C.bottom_toolbar_toggle_button_width] = 50;
     screen[C.bottom_toolbar_item_bg_width] = 50;
-    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.top_toolbar_btn_width] = 30;
     screen[C.dialog_file_btn_width] = 50;
   }
 
@@ -43,7 +43,7 @@ class ScreenUtil {
     screen[C.plain_text_node_font_size_100p] = 20;
     screen[C.bottom_toolbar_toggle_button_width] = 50;
     screen[C.bottom_toolbar_item_bg_width] = 50;
-    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.top_toolbar_btn_width] = 30;
     screen[C.dialog_file_btn_width] = 50;
   }
 
@@ -53,7 +53,7 @@ class ScreenUtil {
     screen[C.plain_text_node_font_size_100p] = 30;
     screen[C.bottom_toolbar_toggle_button_width] = 50;
     screen[C.bottom_toolbar_item_bg_width] = 50;
-    screen[C.top_toolbar_btn_width] = 40;
+    screen[C.top_toolbar_btn_width] = 30;
     screen[C.dialog_file_btn_width] = 50;
   }
 }

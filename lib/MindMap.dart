@@ -42,8 +42,9 @@ class MindMap {
   void Clear() {
     if (root == null) {
       root = Node.create(NodeType.rootNode);
+    } else {
+      root.Clear();
     }
-    root.Clear();
     MapController().rebuild();
   }
 
