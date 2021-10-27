@@ -4,31 +4,34 @@ import 'dart:math';
 
 import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/layout/BidiLayout.dart';
-import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/layout/LayoutController.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/third_party/dotted_border/dotted_border.dart';
 import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 import 'package:flutter/material.dart';
 
-import '../Edge.dart';
-import 'EdgeWidget.dart';
+import 'LinedEdge.dart';
 import '../MapController.dart';
-import '../Node.dart';
-import 'EdgeWidgetBase.dart';
+import 'Edge.dart';
 
 class NodeWidget extends NodeWidgetBase {
   bool children_dettached = false;
-  NodeWidget({Key key, Node node}) : super(key: key, node: node) {}
+  NodeWidget({Key key}) : super(key: key) {
+    layout = LayoutController().newLayout(this);
+  }
 
-  Widget clone() {
+  TreeNode clone() {
     NodeWidget w = super.clone();
     return w;
   }
@@ -48,20 +51,21 @@ class NodeWidget extends NodeWidgetBase {
 
   @override
   void moveToPosition(Offset dst) {
-    super.moveToPosition(dst);
+    layout.moveToPosition(dst);
 
     setNeedsRepaint();
     repaint();
   }
 
-  @override
   void SetSize(Size size) {
-    if (width == size.width && height == size.height) {
+    Log.e("NodeWidget.SetSize");
+    if (layout.width == size.width && layout.height == size.height) {
       Log.i("no need to update size");
       return;
     }
-    width = size.width;
-    height = size.height;
+
+    layout.width = size.width;
+    layout.height = size.height;
     MapController().relayout();
     setNeedsRepaint();
     repaint();
@@ -121,15 +125,16 @@ class NodeWidget extends NodeWidgetBase {
 
   void resizeTextBox(String msg) {
     if (msg.length > 10) {
-      this.width += 50;
+      layout.width += 50;
       setNeedsRepaint();
       repaint();
     }
   }
 
-  Side direction() {
-    BidiLayout l = layout;
-    return l.direction;
+  Direction getDirection() {
+    // BidiLayout l = layout;
+    // return l.direction;
+    return direction;
   }
 
   @override
@@ -142,38 +147,38 @@ class NodeWidget extends NodeWidgetBase {
   @override
   void detach() {
     super.detach();
-    BidiLayout l = layout;
+    // BidiLayout l = layout;
     children_dettached = true;
     repaint();
   }
 
-  @override
-  void addChild(Node node) {
-    dynamic w = node.widget();
-    Layout l = w.layout;
-    layout.addChild(l, node.direction);
-    setNeedsRepaint();
-    repaint();
-  }
+  // @override
+  // addChild(TreeNode node, Direction direction) {
+  //   dynamic w = node.widget();
+  //   Layout l = w.layout;
+  //   layout.addChild(l, node.direction);
+  //   setNeedsRepaint();
+  //   repaint();
+  // }
 
   void updateEdges() {
     Log.i("NodeWidget updateEdges");
-    HashSet<Edge> from_edges = node.from_edges;
+    HashSet<Edge> from_edges = super.from_edges;
 
     if (from_edges != null) {
       from_edges.forEach((e) {
-        EdgeWidgetBase edge = e.widget();
-        edge.update(null);
+        Edge edge = e;
+        edge.repaint();
       });
     } else {
       Log.e("NodeWidget updateEdges from_edges is null");
     }
 
-    HashSet<Edge> to_edges = node.to_edges;
+    HashSet<Edge> to_edges = super.to_edges;
     if (to_edges != null) {
       to_edges.forEach((e) {
-        EdgeWidgetBase edge = e.widget();
-        edge.update(null);
+        Edge edge = e;
+        edge.repaint();
       });
     } else {
       Log.e("NodeWidget updateEdges to_edges is null");
@@ -199,6 +204,12 @@ class NodeWidgetState extends State<NodeWidget> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    Log.e("dispose " + this.hashCode.toString());
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((mag) {
       RenderBox box = context.findRenderObject();
@@ -206,12 +217,12 @@ class NodeWidgetState extends State<NodeWidget> {
       //  MapController().repaint();
     });
 
-    Log.e("node widget repaint");
+    Log.e("node widget repaint " + selected_.toString()+", this="+this.hashCode.toString()+", widget="+widget.hashCode.toString());
     return Positioned(
         //margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
         //color: Colors.purple,
-        left: widget.x,
-        top: widget.y,
+        left: widget.layout.x,
+        top: widget.layout.y,
         child: Container(
           child: GestureDetector(
               behavior: HitTestBehavior.deferToChild,
@@ -233,7 +244,7 @@ class NodeWidgetState extends State<NodeWidget> {
               },
               onDoubleTap: () {
                 Offset screen_pos =
-                    widget.posInScreen(Offset(widget.x, widget.y));
+                    widget.posInScreen(Offset(widget.layout.x, widget.layout.y));
                 Log.e("chch " +
                     screen_pos.dx.toString() +
                     "," +
@@ -266,11 +277,11 @@ class NodeWidgetState extends State<NodeWidget> {
               child: Row(children: [
                 Visibility(
                     visible: widget.children_dettached &&
-                        widget.direction() == Side.left,
+                        widget.getDirection() == Direction.left,
                     child:
                         Icon(Icons.add_circle_outline, size: 10)),
                 DottedBorder(
-                    color: selected_ ? Colors.red : widget.borderColor(),
+                    color: selected_ ? Colors.red : Colors.black, //widget.borderColor(),
                     bgcolor: widget.bgColor(),
                     dashPattern: selected_ ? [8, 0] : [8, 4],
                     strokeWidth: selected_ ? 4 : 2,
@@ -325,7 +336,7 @@ class NodeWidgetState extends State<NodeWidget> {
                         ])),
                 Visibility(
                     visible: widget.children_dettached &&
-                        widget.direction() == Side.right,
+                        widget.getDirection() == Direction.right,
                     child:
                         Icon(Icons.add_circle_outline, size: 10)),
               ])),

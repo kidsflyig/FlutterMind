@@ -1,72 +1,63 @@
 import 'dart:math';
 
-import 'package:FlutterMind/Edge.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/material.dart';
 
-import '../Node.dart';
-import 'EdgeWidgetBase.dart';
+import 'Edge.dart';
 import 'NodeWidgetBase.dart';
 import '../utils/Utils.dart';
 
-class BezierEdgeWidget extends EdgeWidgetBase {
+class BezierEdge extends Edge {
   double width = 0;
   double height = 0;
   double l = 0;
   double t = 0;
   Offset ll = Offset(0, 0);
   Offset lt = Offset(0, 0);
-  BezierEdgeWidgetState _state;
+  BezierEdgeState _state;
 
-  BezierEdgeWidget({
-    Key key,
-    Edge edge
-  }) : super(key: key, edge:edge) {
+  BezierEdge({
+    Key key
+  }) : super(key: key) {
   }
 
   @override
-  void update(Edge e) {
+  void repaint() {
     // print("In EdgeWidget update " + this.hashCode.toString()+" , state="+_state.toString());
-    if (e != null) {
-      this.edge = e;
-      Log.e("edge update final " + e.toString());
-    } else {
-      Log.e("edge update e is null");
-    }
-    UpdateStyle();
-  }
-
-  void UpdateStyle() {
-    if (edge == null) {
-      Log.e("EdgeWidget update edge is null");
-      return;
-    }
-    NodeWidgetBase fnw = edge.from.widget();
-    NodeWidgetBase tnw = edge.to.widget();
-
-    width = (fnw.x - tnw.x).abs();
-    height = (fnw.y - tnw.y).abs();
-
-    l = min(fnw.x , tnw.x);
-    t = min(fnw.y , tnw.y);
-
-    ll = fnw.center().translate(-l, -t);
-    lt = tnw.center().translate(-l, -t);
+    updateStyle();
 
     if (_state != null && _state.mounted) {
       _state.setState(() {});
     }
   }
 
+  void updateStyle() {
+    LayoutObject fl = from.layout;
+    LayoutObject tl = to.layout;
+
+    NodeWidgetBase fnw = from;
+    NodeWidgetBase tnw = to;
+
+    width = (fl.x - tl.x).abs();
+    height = (fl.y - tl.y).abs();
+
+    l = min(fl.x , tl.x);
+    t = min(fl.y , tl.y);
+
+    ll = fnw.center().translate(-l, -t);
+    lt = tnw.center().translate(-l, -t);
+  }
+
   @override
   State<StatefulWidget> createState() {
-    _state = BezierEdgeWidgetState();
-    UpdateStyle();
+    _state = BezierEdgeState();
+    updateStyle();
     return _state;
   }
 }
 
-class BezierEdgeWidgetState extends State<BezierEdgeWidget> {
+class BezierEdgeState extends State<BezierEdge> {
 
   @override
   void initState() {
@@ -99,7 +90,7 @@ class BezierEdgeWidgetState extends State<BezierEdgeWidget> {
 class TouchMovePainter extends CustomPainter {
   var painter = Paint();
   var painterColor = Color.fromARGB(0xFF, 0xff, 0, 0);
-  BezierEdgeWidget widget;
+  BezierEdge widget;
   Offset l;
   Offset t;
   var w;

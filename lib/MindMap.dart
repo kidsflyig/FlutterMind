@@ -2,12 +2,13 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/widgets/Edge.dart';
 import 'package:flutter/widgets.dart';
 
-import 'Edge.dart';
 import 'MapController.dart';
-import 'Node.dart';
+// import 'Node.dart';
 
 class MindMap {
   MindMap._privateConstructor();
@@ -21,7 +22,7 @@ class MindMap {
     return _instance;
   }
 
-  Node root;
+  TreeNode root;
   String file_name;
 
   fromJson(data) {
@@ -41,30 +42,30 @@ class MindMap {
 
   void Clear() {
     if (root == null) {
-      root = Node.create(NodeType.rootNode);
+      root = TreeNode.create(NodeType.rootNode);
     } else {
       root.Clear();
     }
     MapController().rebuild();
   }
 
-  GenerateNodes() {
-    root = new Node(NodeType.rootNode);
-    root.map = this;
-    // root.left = 100;
-    // root.top = 100;
-    var textNode = Node.create(NodeType.plainText);
-    // textNode.left = 200;
-    // textNode.top = 200;
-    root.addChild(textNode, root.direction);
+  // GenerateNodes() {
+  //   root = new Node(NodeType.rootNode);
+  //   root.map = this;
+  //   // root.left = 100;
+  //   // root.top = 100;
+  //   var textNode = Node.create(NodeType.plainText);
+  //   // textNode.left = 200;
+  //   // textNode.top = 200;
+  //   root.addChild(textNode, root.direction);
 
-    var textNode1 = Node.create(NodeType.plainText);
-    // textNode1.left = 300;
-    // textNode1.top = 300;
-    root.addChild(textNode1, root.direction);
-  }
+  //   var textNode1 = Node.create(NodeType.plainText);
+  //   // textNode1.left = 300;
+  //   // textNode1.top = 300;
+  //   root.addChild(textNode1, root.direction);
+  // }
 
-  GatherNodeWidgets(Node node, List<Widget> list) {
+  GatherNodeWidgets(TreeNode node, List<Widget> list) {
     if (node.attached) {
       list.add(node.widget());
     }
@@ -74,14 +75,14 @@ class MindMap {
     }
   }
 
-  GatherEdgeWidgets(Node node, List<Widget> list) {
+  GatherEdgeWidgets(TreeNode node, List<Widget> list) {
     HashSet<Edge> edges = node.from_edges;
     if (edges != null) {
       edges.forEach((e) {
 
         print("GatherEdgeWidgets " + e.hashCode.toString());
         if (e.to.attached) {
-          list.insert(0, e.widget());
+          list.insert(0, e);
         }
       });
     }

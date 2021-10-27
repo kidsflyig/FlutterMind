@@ -2,7 +2,7 @@ import 'package:FlutterMind/MapController.dart';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/TreeNode.dart';
-import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
@@ -10,13 +10,13 @@ import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/utils/base.dart';
 import 'package:flutter/material.dart';
 
-import '../Node.dart';
+// import '../Node.dart';
 import '../utils/DragUtil.dart';
 import 'NodeWidget.dart';
 import 'RootNodeWidget.dart';
 
 class NodeWidgetBase extends StatefulWidget with TreeNode {
-  Node node;
+  // Node node;
   // DragUtil drag_ = DragUtil();
   double scale_ = 1.0;
   double _fontSize;
@@ -24,38 +24,38 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   String _fontFamily;
   Color _bgColor;
   Style _style;
+  String _label;
   Image image;
   String url;
   String _note;
 
   bool _dirty = true;
   State<NodeWidgetBase> state;
-  Layout layout;
 
   NodeWidgetBase({
-    Key key,
-    this.node
+    Key key
   }) : super(key: key) {
-    layout = LayoutController().newLayout(this);
     _style = Settings().defaultStyle();
+    _label = "TODO";
   }
 
-  static Widget create(node) {
-    // Node n = node.clone(); // why clone? floating node need a differenct key
-    var key = UniqueKey();
-    if (node.type == NodeType.rootNode) {
-      return RootNodeWidget(key:key, node:node);
-    } else if (node.type == NodeType.plainText) {
-      return NodeWidget(key:key, node:node);
-    }
-  }
+  // static Widget create(node) {
+  //   // Node n = node.clone(); // why clone? floating node need a differenct key
+  //   var key = UniqueKey();
+  //   if (node.type == NodeType.rootNode) {
+  //     return RootNodeWidget(key:key, node:node);
+  //   } else if (node.type == NodeType.plainText) {
+  //     return NodeWidget(key:key, node:node);
+  //   }
+  // }
 
-  Widget clone() {
-    NodeWidgetBase w = create(node);
-    w.width = width;
-    w.height = height;
+  TreeNode clone() {
+    NodeWidgetBase w = TreeNode.create(type);
+    LayoutObject obj = w.layout;
+    obj.width = layout.width;
+    obj.height = layout.height;
     w.scale_ = scale_;
-    w.layout.drag_ = layout.drag_.clone();
+    obj.drag_ = layout.drag_.clone();
     return w;
   }
 
@@ -70,13 +70,13 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   void setSelected(selected) {
   }
 
-  void moveToPosition(Offset dst) {
-    layout.moveToPosition(dst);
-  }
+  // void moveToPosition(Offset dst) {
+  //   layout.moveToPosition(dst);
+  // }
 
-  void moveByOffset(Offset offset) {
-    layout.moveByOffset(offset);
-  }
+  // void moveByOffset(Offset offset) {
+  //   layout.moveByOffset(offset);
+  // }
 
   // void SetScale(double scale) {
   //   if (scale_ == scale) {
@@ -107,7 +107,7 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   // }
 
   Offset center() {
-    return offset.translate(width / 2, height / 2);
+    return offset.translate(layout.width / 2, layout.height / 2);
   }
 
   @override
@@ -122,17 +122,17 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
     return null;
   }
 
-  double get x => layout.x;
-  double get y => layout.y;
-  Offset get offset => Offset(x, y);
+  // double get x => layout.x;
+  // double get y => layout.y;
+  Offset get offset => Offset(layout.x, layout.y);
 
-  double get width => layout.width;
-  double get height => layout.height;
+  // double get width => layout.width;
+  // double get height => layout.height;
 
-  String get label => node.label;
+  String get label => _label;
 
   set label(String l) {
-    node.label = l;
+    _label = l;
   }
 
   String get note => _note;
@@ -143,13 +143,13 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   }
 
   
-  void set width(double width) {
-    layout.width = width;
-  }
+  // void set width(double width) {
+  //   layout.width = width;
+  // }
 
-  void set height(double height) {
-    layout.height = height;
-  }
+  // void set height(double height) {
+  //   layout.height = height;
+  // }
 
   String styleName() {
     if (_style != null)
@@ -276,78 +276,25 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
 
   void updateEdges() {}
 
-  void addChild(Node node) {
-    dynamic w = node.widget();
-    Layout l = w.layout;
-    layout.addChild(l, Direction.auto);
+  @override
+  addChild(TreeNode node) {
+    Log.e("NodeWidgetBase addChild1 direction="+direction.toString());
+    super.addChild(node);
     setNeedsRepaint();
     repaint();
   }
 
-  void removeChild(Node node) {
-    dynamic w = node.widget();
-    Layout l = w.layout;
-    layout.removeChild(l);
-    setNeedsRepaint();
-    repaint();
-  }
+  // void attach() {
+  //   layout.attach();
+  // }
 
-  void removeFromParent() {
-    if (layout == null) {
-      Log.e("removeFromParent layout is null");
-      return;
-    }
+  // void detach() {
+  //   layout.detach();
+  // }
 
-    layout.removeFromParent();
-    setNeedsRepaint();
-    repaint();
-  }
-
-  void insertBefore(node, target) {
-    Log.e("NodeWidgetBase insertBefore " + target.hashCode.toString());
-    if (layout == null) {
-      Log.e("NodeWidgetBase insertBefore layout is null");
-      return;
-    }
-
-    dynamic w1 = node.widget();
-    Layout l1 = w1.layout;
-
-    dynamic w2 = target.widget();
-    Layout l2 = w2.layout;
-    layout.insertBefore(l1, l2);
-    setNeedsRepaint();
-    repaint();
-  }
-
-  void insertAfter(node, target) {
-    Log.e("NodeWidgetBase insertAfter " + target.hashCode.toString());
-    if (layout == null) {
-      Log.e("NodeWidgetBase insertAfter layout is null");
-      return;
-    }
-
-    dynamic w1 = node.widget();
-    Layout l1 = w1.layout;
-
-    dynamic w2 = target.widget();
-    Layout l2 = w2.layout;
-    layout.insertAfter(l1, l2);
-    setNeedsRepaint();
-    repaint();
-  }
-
-  void attach() {
-    layout.attach();
-  }
-
-  void detach() {
-    layout.detach();
-  }
-
-  void clear() {
-    layout.clear();
-  }
+  // void clear() {
+  //   layout.clear();
+  // }
 
   void setNeedsRepaint() {
     if (!_dirty) {
@@ -359,13 +306,15 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
     if (_dirty || true) {
       if (state != null && state.mounted) {
         state.setState(() {});
+      } else {
+        Log.e("state not mounted");
       }
       updateEdges();
       _dirty = false;
     }
   }
 
-  void relayout() {
-    layout.relayout();
-  }
+  // void relayout() {
+  //   layout.relayout();
+  // }
 }

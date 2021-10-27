@@ -2,51 +2,53 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:FlutterMind/Settings.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
-import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/layout/LayoutController.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
+import 'package:FlutterMind/utils/base.dart';
 import 'package:FlutterMind/widgets/NodeWidget.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
 import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:flutter/material.dart';
 
-import '../Edge.dart';
-import 'EdgeWidget.dart';
+import 'LinedEdge.dart';
 import '../MapController.dart';
-import '../Node.dart';
-import 'EdgeWidgetBase.dart';
+import 'Edge.dart';
 
 class RootNodeWidget extends NodeWidgetBase {
-  RootNodeWidget({Key key, Node node}) : super(key: key, node: node) {
+  RootNodeWidget({Key key, TreeNode node}) : super(key: key) {
+    layout = LayoutController().newLayout(this);
     SetSize(Settings().rootNodeSize);
   }
 
   @override
   void SetSize(Size size) {
-    width = size.width;
-    height = size.height;
+    layout.width = size.width;
+    layout.height = size.height;
 
     setNeedsRepaint();
     // repaint();
   }
 
   Offset center() {
-    return offset.translate(super.width / 2, super.height / 2);
+    return offset.translate(layout.width / 2, layout.height / 2);
   }
 
-  @override
-  void addChild(Node node) {
-    dynamic w = node.widget();
-    Layout l = w.layout;
-    layout.addChild(l, node.direction);
-    setNeedsRepaint();
-    repaint();
-  }
+  // @override
+  // addChild(TreeNode node, Direction direction) {
+  //   dynamic w = node.widget();
+  //   Layout l = w.layout;
+  //   layout.addChild(l, node.direction);
+  //   setNeedsRepaint();
+  //   repaint();
+  // }
 
   @override
   void moveToPostion(Offset dst) {
-    dst = dst.translate(-width / 2, -height / 2);
-    super.moveToPosition(dst);
+    dst = dst.translate(-layout.width / 2, -layout.height / 2);
+    layout.moveToPosition(dst);
     setNeedsRepaint();
     repaint();
   }
@@ -86,19 +88,19 @@ class RootNodeWidget extends NodeWidgetBase {
   }
 
   void updateEdges() {
-    HashSet<Edge> from_edges = node.from_edges;
+    HashSet<Edge> from_edges = super.from_edges;
     if (from_edges != null) {
       from_edges.forEach((e) {
-        EdgeWidgetBase edge = e.widget();
-        edge.update(null);
+        Edge edge = e;
+        edge.repaint();
       });
     }
 
-    HashSet<Edge> to_edges = node.to_edges;
+    HashSet<Edge> to_edges = super.to_edges;
     if (to_edges != null) {
       to_edges.forEach((e) {
-        EdgeWidgetBase edge = e.widget();
-        edge.update(null);
+        Edge edge = e;
+        edge.repaint();
       });
     }
   }
@@ -125,8 +127,8 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
     return Positioned(
         //margin: EdgeInsets.only(left: widget.moveOffset.dx, top: widget.moveOffset.dy),
         //color: Colors.purple,
-        left: widget.x,
-        top: widget.y,
+        left: widget.layout.x,
+        top: widget.layout.y,
         child: GestureDetector(
             behavior: HitTestBehavior.deferToChild,
             onTap: () {
@@ -140,8 +142,8 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 color: Colors.indigo,
               ),
-              width: widget.width,
-              height: widget.height,
+              width: widget.layout.width,
+              height: widget.layout.height,
               padding: EdgeInsets.all(3),
               child: Center(child:Text(
                   widget.label == null ? "" : widget.label,
@@ -154,7 +156,7 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
                   )))
             ),
             onDoubleTap: () {
-              Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));
+              Offset screen_pos = widget.posInScreen(Offset(widget.layout.x, widget.layout.y));
               EditingDialog.showMyDialog(context, EditConfig(
                   pos: screen_pos,
                   maxLength: 999,

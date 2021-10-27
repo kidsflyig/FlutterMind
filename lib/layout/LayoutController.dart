@@ -7,7 +7,7 @@ import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 import '../Document.dart';
 import '../Settings.dart';
 import 'BidiLayout.dart';
-import 'Layout.dart';
+import 'LayoutObject.dart';
 import 'StarLayout.dart';
 
 class LayoutControllerCient {
@@ -29,20 +29,15 @@ class LayoutController {
     return _instance;
   }
 
-  Layout root;
-
-  Layout newLayout(NodeWidgetBase w) {
+  LayoutObject newLayout(NodeWidgetBase widget) {
     Settings s = Document().s;
-    Layout l;
+    LayoutObject l;
     if (s.mode == MapMode.bidi) {
-      l = BidiLayout(w);
+      l = BidiLayout(widget);
     } else if (s.mode == MapMode.star) {
-      l = StarLayout(w);
+      l = StarLayout(widget);
     }
 
-    if (w is RootNodeWidget) {
-      root = l;
-    }
     return l;
   }
 
@@ -57,6 +52,15 @@ class LayoutController {
   void notifyMapRectChanged() {
     if (_client != null) {
       _client.updateRect(map_rect);
+    }
+  }
+
+  void relayout(dynamic obj) {
+    if (obj is LayoutObject) {
+      obj?.relayout();
+    } else if (obj is NodeWidgetBase) {
+      LayoutObject o = obj.layout;
+      o.relayout();
     }
   }
 

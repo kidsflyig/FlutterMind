@@ -2,14 +2,13 @@ import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
+import 'LayoutObject.dart';
 
-import '../Node.dart';
-import 'Layout.dart';
-
-class StarLayout extends Layout {
+class StarLayout extends LayoutObject {
   final double PI = 3.14159;
   double divider = 4;
   double direction = -1;
@@ -17,73 +16,69 @@ class StarLayout extends Layout {
   Set<int> positioned = new HashSet<int>();
 
   StarLayout(widget) : super(widget) {
-    if (widget is RootNodeWidget) {
-      divider = 4;
-    } else {
-      divider = 15; // node
-    }
+    divider = 4;
   }
 
-  StarLayout ToStarLayout(Layout l) {
-    if (l is StarLayout) {
-      return l;
-    }
+  StarLayout ToStarLayout(LayoutObject l) {
+    // if (l is StarLayout) {
+    //   return l;
+    // }
 
     return null;
   }
 
   void relayoutAll(angle) {
-    positioned.clear();
-    children?.forEach((e) {
-    if (ToStarLayout(e).direction > 0) {
-      positioned.add((ToStarLayout(e).direction - angle) ~/ divider);
-      print("child take direction in " + (ToStarLayout(e).direction ~/ divider).toString());
-      return;
-    }});
+    // positioned.clear();
+    // children?.forEach((e) {
+    // if (ToStarLayout(e).direction > 0) {
+    //   positioned.add((ToStarLayout(e).direction - angle) ~/ divider);
+    //   print("child take direction in " + (ToStarLayout(e).direction ~/ divider).toString());
+    //   return;
+    // }});
   }
 
-  void layoutRootChildren(Node child) {
-    print("layoutInternal1 " + divider.toString());
-    for (int i = 0; i<divider; i++) {
-      if (positioned.lookup(i) == null) {
-        print("layoutInternal2 " + i.toString());
-        positioned.add(i); // a position found!
-        ToStarLayout(child.layout).direction = (360 / divider) * i;
-        Offset pos = NodeWidgetBase.ToNodeWidgetBase(widget).offset;
-        var left = pos.dx + distance * cos(PI / 180 * ToStarLayout(child.layout).direction);
-        var top = pos.dy + distance * sin(PI / 180 * ToStarLayout(child.layout).direction);
-        NodeWidgetBase.ToNodeWidgetBase(child.widget()).moveToPosition(Offset(left, top));
-        print("layoutInternal3 " + NodeWidgetBase.ToNodeWidgetBase(child.widget()).offset.toString());
-        return;
-      }
-    }
+  void layoutRootChildren(TreeNode child) {
+    // print("layoutInternal1 " + divider.toString());
+    // for (int i = 0; i<divider; i++) {
+    //   if (positioned.lookup(i) == null) {
+    //     print("layoutInternal2 " + i.toString());
+    //     positioned.add(i); // a position found!
+    //     ToStarLayout(child.layout).direction = (360 / divider) * i;
+    //     Offset pos = NodeWidgetBase.ToNodeWidgetBase(widget).offset;
+    //     var left = pos.dx + distance * cos(PI / 180 * ToStarLayout(child.layout).direction);
+    //     var top = pos.dy + distance * sin(PI / 180 * ToStarLayout(child.layout).direction);
+    //     NodeWidgetBase.ToNodeWidgetBase(child.widget()).moveToPosition(Offset(left, top));
+    //     print("layoutInternal3 " + NodeWidgetBase.ToNodeWidgetBase(child.widget()).offset.toString());
+    //     return;
+    //   }
+    // }
   }
 
   void layoutLeafChildren(child) {
     print("layoutLeafChildren1 " + divider.toString());
-    int alg = 0;
-    int i = 0;
-    double angle = 0;
-    while(positioned.lookup(i) != null) {
-      if (alg == 0) {
-        angle = (-angle) + divider;
-        alg = 1;
-      } else {
-        angle = -angle;
-        alg = 0;
-      }
-      i = angle ~/ divider;
-    }
-    positioned.add(i); // a position found!
+    // int alg = 0;
+    // int i = 0;
+    // double angle = 0;
+    // while(positioned.lookup(i) != null) {
+    //   if (alg == 0) {
+    //     angle = (-angle) + divider;
+    //     alg = 1;
+    //   } else {
+    //     angle = -angle;
+    //     alg = 0;
+    //   }
+    //   i = angle ~/ divider;
+    // }
+    // positioned.add(i); // a position found!
 
-    print("layoutLeafChildren2 " + i.toString()+" , angle=" + angle.toString());
-    print("node direction = " + ToStarLayout(child.layout).direction.toString());
-    ToStarLayout(child.layout).direction = ToStarLayout(child.layout).direction + angle;
-    Offset pos = NodeWidgetBase.ToNodeWidgetBase(widget).offset;
-    var left = pos.dx + distance * cos(PI / 180 * ToStarLayout(child.layout).direction);
-    var top = pos.dy + distance * sin(PI / 180 * ToStarLayout(child.layout).direction);
+    // print("layoutLeafChildren2 " + i.toString()+" , angle=" + angle.toString());
+    // print("node direction = " + ToStarLayout(child.layout).direction.toString());
+    // ToStarLayout(child.layout).direction = ToStarLayout(child.layout).direction + angle;
+    // Offset pos = NodeWidgetBase.ToNodeWidgetBase(widget).offset;
+    // var left = pos.dx + distance * cos(PI / 180 * ToStarLayout(child.layout).direction);
+    // var top = pos.dy + distance * sin(PI / 180 * ToStarLayout(child.layout).direction);
 
-    NodeWidgetBase.ToNodeWidgetBase(widget).moveToPosition(Offset(left, top));
+    // NodeWidgetBase.ToNodeWidgetBase(widget).moveToPosition(Offset(left, top));
     return;
   }
 

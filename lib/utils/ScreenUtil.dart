@@ -15,7 +15,7 @@ class ScreenUtil {
       initScreenlt720();
     } else if (width <= 1048) {
       initScreenlt1048();
-    } else if (width <= 1366) {
+    } else if (width <= 1536) {
       initScreenlt1366();
     } else {
       print("no fitfull size config"+width.toString());

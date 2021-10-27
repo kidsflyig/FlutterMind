@@ -4,14 +4,16 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:FlutterMind/MapController.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/layout/LayoutController.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
+import 'package:FlutterMind/widgets/Edge.dart';
 import 'package:FlutterMind/widgets/PopupWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'Edge.dart';
-import 'Node.dart';
+// import 'Node.dart';
 import 'Settings.dart';
 import 'widgets/NodeWidget.dart';
 import 'dart:ui' as ui;
@@ -87,7 +89,7 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
       LayoutController().translate(offset.dx, offset.dy);
       node_widget_list.forEach((e) {
         NodeWidgetBase nw = e;
-        nw.moveByOffset(offset);
+        nw.layout.moveByOffset(offset);
       });
     }
 
@@ -106,8 +108,9 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
     Log.e("Foreground centerlize");
     // var xf = _width / 2 - w.x;
     // var yf = _height / 2 - w.y;
-    left_ = Utils.screenSize().width / 2  - w.x;
-    top_= Utils.screenSize().height / 2 - w.y;
+    LayoutObject obj = w.layout;
+    left_ = Utils.screenSize().width / 2  - obj.x;
+    top_= Utils.screenSize().height / 2 - obj.y;
 
     _update();
   }
@@ -178,37 +181,42 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
     HashSet<Edge> edges = node.to_edges;
     if (edges != null) {
       edges.forEach((e) {
-        edge_widget_list.insert(0, e.widget());
+        edge_widget_list.insert(0, e);
         // state_.widget_list.insert(0, e.widget());
       });
     }
     repaint();
   }
 
-  void removeNode(node) {
+  void removeNode(TreeNode node) {
     Log.v("Foreground: removeNode");
     if (node.children != null) {
       node.children.forEach((e) {
+        Log.v("Foreground: removeNode1");
         removeNode(e);
       });
     }
+
+    // Log.e("Foregroudn remove node " + node.hashCode.toString()+
+    //   ", it's state = " + node.widget().state.hashCode.toString());
 
     node_widget_list.remove(node.widget());
     HashSet<Edge> edges = node.to_edges;
     if (edges != null) {
       edges.forEach((e) {
-        edge_widget_list.remove(e.widget());
+        edge_widget_list.remove(e);
       });
     }
 
     _update();
   }
 
-  void _showPopup(NodeWidgetBase widget, Function cb) {
-    popup_x = widget.x;
-    popup_y = widget.y;
-    popup_width = widget.width;
-    popup_height = widget.height;
+  void _showPopup(NodeWidgetBase w, Function cb) {
+    LayoutObject obj = w.layout;
+    popup_x = obj.x;
+    popup_y = obj.y;
+    popup_width = obj.width;
+    popup_height = obj.height;
     this.popup_cb = cb;
     _update();
   }
@@ -228,6 +236,7 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
 
   void repaint() {
     _update();
+    // updatePreview(null);
   }
 
   void _update() {
@@ -255,10 +264,9 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
     edge_widget_list.clear();
     map.GatherNodeWidgets(map.root, node_widget_list);
     map.GatherEdgeWidgets(map.root, edge_widget_list);
-    dynamic w = map.root.widget();
-    w.relayout();
-    MapController().repaint();
-    _update();
+    dynamic w = map.root;
+    LayoutController().relayout(w);
+    repaint();
   }
 
   void Clear() {
@@ -268,7 +276,7 @@ class Foreground extends StatefulWidget implements LayoutControllerCient {
 
   void test() {
     MindMap map = MindMap();
-    map.GenerateNodes();
+    // map.GenerateNodes();
   }
 
   void updatePreview(cb) {

@@ -154,7 +154,7 @@ class BottomToolBarState extends State<BottomToolBar>
           idxToPos(init_x, init_y, item_bg_width, animation?.value, 1, 0),
             wrapper(() {
             Log.e("click2");
-            MapController().removeSelctedNode();
+            MapController().removeSelectedNode();
             widget.toggle();
         }),
         LC.getString(context, C.remove_node),

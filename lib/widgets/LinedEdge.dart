@@ -1,25 +1,32 @@
 import 'dart:math';
 
-import 'package:FlutterMind/Edge.dart';
+import 'package:FlutterMind/TreeNode.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:flutter/material.dart';
 
-import '../Node.dart';
-import 'EdgeWidgetBase.dart';
+import 'Edge.dart';
 import 'NodeWidgetBase.dart';
 import '../utils/Utils.dart';
 
-class EdgeWidget extends EdgeWidgetBase {
-  EdgeWidget({
-    Key key,
-    Edge edge
-  }) : super(key: key, edge:edge);
+class LinedEdge extends Edge {
+  LinedEdge({
+    Key key
+  }) : super(key: key);
   EdgeWidgetState _state;
 
   @override
-  void update(Edge e) {
+  void repaint() {
     Log.i("In EdgeWidget update " + this.hashCode.toString()+" , state="+_state.toString());
     _state?.setState(() {});
+  }
+
+  void update(TreeNode f, TreeNode t) {
+    Log.e("edge update");
+    this.from = f;
+    this.to = t;
+    f.addEdge(this, true);
+    t.addEdge(this, false);
   }
 
   @override
@@ -30,7 +37,7 @@ class EdgeWidget extends EdgeWidgetBase {
   }
 }
 
-class EdgeWidgetState extends State<EdgeWidget> {
+class EdgeWidgetState extends State<LinedEdge> {
   @override
   void initState() {
     super.initState();
@@ -38,14 +45,16 @@ class EdgeWidgetState extends State<EdgeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    NodeWidgetBase fnw = widget.edge.from.widget();
-    NodeWidgetBase tnw = widget.edge.to.widget();
+    LayoutObject fl = widget.from.layout;
+    LayoutObject tl = widget.to.layout;
+    NodeWidgetBase fnw = widget.from;
+    NodeWidgetBase tnw = widget.from;
 
-    var width = (fnw.x - tnw.x).abs();
-    var height = (fnw.y - tnw.y).abs();
+    var width = (fl.x - tl.x).abs();
+    var height = (fl.y - tl.y).abs();
 
-    var l = min(fnw.x , tnw.x);
-    var t = min(fnw.y , tnw.y);
+    var l = min(fl.x , tl.x);
+    var t = min(fl.y , tl.y);
 
     Offset ll = fnw.center().translate(-l, -t);
     Offset lt = tnw.center().translate(-l, -t);
@@ -67,7 +76,7 @@ class EdgeWidgetState extends State<EdgeWidget> {
 class TouchMovePainter extends CustomPainter {
   var painter = Paint();
   var painterColor = Color.fromARGB(0xFF, 0xff, 0, 0);
-  EdgeWidget widget;
+  LinedEdge widget;
   Offset l;
   Offset t;
   var w;

@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:FlutterMind/Node.dart';
+import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/utils/FileUtil.dart';
 import 'package:FlutterMind/utils/PopRoute.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
@@ -20,7 +20,7 @@ class _ChildrenDrawerViewState extends State<ChildrenDrawerView> {
   @override
   Widget build(BuildContext context) {
     NodeWidgetBase selected = MapController().getSelected();
-    Node node = selected.node;
+    TreeNode node = selected;
     return Container(
       padding: EdgeInsets.only(left: 17,right: 17),
       color: Colors.white,
@@ -47,7 +47,7 @@ class _ChildrenDrawerViewState extends State<ChildrenDrawerView> {
                     },
                     child:Text(c.label)
                   );
-                }, childCount: selected.node.children.length),
+                }, childCount: selected.children.length),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
                     crossAxisSpacing: 11,

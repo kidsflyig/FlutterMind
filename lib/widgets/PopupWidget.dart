@@ -4,7 +4,8 @@ import 'dart:math';
 
 import 'package:FlutterMind/Foreground.dart';
 import 'package:FlutterMind/layout/BidiLayout.dart';
-import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/layout/LayoutController.dart';
+import 'package:FlutterMind/layout/LayoutObject.dart';
 import 'package:FlutterMind/utils/HitTestResult.dart';
 import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
@@ -15,11 +16,9 @@ import 'package:FlutterMind/utils/ScreenUtil.dart';
 import 'package:FlutterMind/widgets/RootNodeWidget.dart';
 import 'package:flutter/material.dart';
 
-import '../Edge.dart';
-import 'EdgeWidget.dart';
+import 'LinedEdge.dart';
 import '../MapController.dart';
-import '../Node.dart';
-import 'EdgeWidgetBase.dart';
+import 'Edge.dart';
 
 enum PopupMode {
   HIDE,
@@ -28,8 +27,8 @@ enum PopupMode {
 }
 
 class PopupWidget extends NodeWidgetBase {
-  double left;
-  double top;
+  double l;
+  double t;
   Offset origin = Offset(0, 0);
   Offset offset = Offset(0, 0);
   Size size;
@@ -41,25 +40,26 @@ class PopupWidget extends NodeWidgetBase {
   bool left_enabled = true;
 
   PopupWidget(PopupMode mode, x, y, w, h, cb) {
-    this.left = x;
-    this.top = y;
-    width = w;
-    height = h;
+    layout = LayoutController().newLayout(this);
+    this.l = x;
+    this.t = y;
+    layout.width = w;
+    layout.height = h;
     this.mode = mode;
     this.cb = cb;
     if (mode == PopupMode.Editing) {
-      width = Utils.screenSize().width / 2;
+      layout.width = Utils.screenSize().width / 2;
     } else if (mode == PopupMode.Pasting) {
-      width = w + 20;
-      height = h + 20;
-      this.left -= 10;
-      this.top -= 10;
+      layout.width = w + 20;
+      layout.height = h + 20;
+      this.l -= 10;
+      this.t -= 10;
       NodeWidgetBase widget = MapController().getSelected();
       if (widget is RootNodeWidget) {
         top_enabled = bottom_enabled = false;
       } else {
-        BidiLayout l = widget.layout;
-        if (l.direction == Side.right) {
+        // BidiLayout l = widget;
+        if (widget.direction == Direction.right) {
           left_enabled = false;
         } else {
           right_enabled = false;
@@ -86,10 +86,10 @@ class PopupWidgetState extends State<PopupWidget> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: widget.left,
-      top: widget.top,
-      width: widget.width,
-      height: widget.height,
+      left: widget.l,
+      top: widget.t,
+      width: widget.layout.width,
+      height: widget.layout.height,
       child: Stack(children: [
         Visibility(
             visible: widget.mode == PopupMode.Editing,

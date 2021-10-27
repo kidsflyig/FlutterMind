@@ -5,6 +5,7 @@ import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/TreeNode.dart';
 import 'package:FlutterMind/dialogs/StyleSelector.dart';
+import 'package:FlutterMind/layout/LayoutController.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/operations/OpCreateNew.dart';
 import 'package:FlutterMind/operations/OpDeleteFile.dart';
@@ -16,12 +17,12 @@ import 'package:FlutterMind/utils/Log.dart';
 import 'package:FlutterMind/utils/Utils.dart';
 import 'package:FlutterMind/dialogs/StyleEditorDialog.dart';
 import 'package:FlutterMind/utils/base.dart';
+import 'package:FlutterMind/widgets/Edge.dart';
 import 'package:flutter/material.dart';
 
 import 'MindMap.dart';
-import 'Edge.dart';
 import 'MindMapView.dart';
-import 'Node.dart';
+// import 'Node.dart';
 import 'dialogs/EditingDialog.dart';
 import 'operations/OpCenterlize.dart';
 import 'operations/OpSetBgColor.dart';
@@ -45,7 +46,7 @@ class MapController {
 
   static Map<MindMap, MapController> controllers;
   MindMapView mind_map_view_;
-  Map<Node, Edge> edges;
+  Map<TreeNode, Edge> edges;
   NodeWidgetBase selected;
 
   NodeWidgetBase cutted;
@@ -95,7 +96,7 @@ class MapController {
     mind_map_view_.foreground.hideInputPanel();
   }
 
-  Node addNodeFromJson(Map<String, dynamic> data, Node p) {
+  TreeNode addNodeFromJson(Map<String, dynamic> data, TreeNode p) {
     if (data == null) {
       return null;
     }
@@ -104,13 +105,13 @@ class MapController {
     String title = data["label"];
     if (title == null) title="NA";
     if (p == null) {
-      n = Node.create(NodeType.rootNode);
+      n = TreeNode.create(NodeType.rootNode);
       // n.left = Center().dx;
       // n.top = Center().dy;
     } else {
-      n = Node.create(NodeType.plainText);
+      n = TreeNode.create(NodeType.plainText);
       n.data = title;
-      p.addChild(n, p.direction);
+      p.addChild(n);
       NodeWidgetBase nwb = n.widget();
       nwb.label = title;
       nwb.url = data["url"];
@@ -152,15 +153,14 @@ class MapController {
    * }
    *
   */
-  Map<String, dynamic> createJsonFromNode(Node node) {
+  Map<String, dynamic> createJsonFromNode(TreeNode node) {
     if (node == null) {
       return null;
     }
 
     Map<String, dynamic> result = new Map<String, dynamic>();
     if (node.type == NodeType.plainText) {
-      TextNode tn = node;
-      NodeWidgetBase nwb = tn.widget();
+      NodeWidgetBase nwb = node;
       result["label"] = nwb.label;
       result["url"] = nwb.url;
       result["note"] = nwb.note;
@@ -194,18 +194,32 @@ class MapController {
 
   void relayout() {
     MindMap map = MindMap();
-    dynamic w = map.root.widget();
-    w.relayout();
+    dynamic w = map.root;
+    LayoutController().relayout(w);
+    repaint();
   }
 
-  void _repaint(Node n) {
-    NodeWidgetBase w = n.widget();
+  void _repaint(TreeNode n) {
+    NodeWidgetBase w = n;
     w.repaint();
-    n.children?.forEach((Node v) {
-      NodeWidgetBase w = v.widget();
-      w.repaint();
-      _repaint(v);
-    });
+    if (w.isRoot) {
+      n.left?.forEach((TreeNode v) {
+        NodeWidgetBase w = v;
+        w.repaint();
+        _repaint(v);
+      });
+      n.right?.forEach((TreeNode v) {
+        NodeWidgetBase w = v;
+        w.repaint();
+        _repaint(v);
+      });
+    } else {
+      n.children?.forEach((TreeNode v) {
+        NodeWidgetBase w = v;
+        w.repaint();
+        _repaint(v);
+      });
+    }
   }
 
   void repaint() {
@@ -222,16 +236,13 @@ class MapController {
     // });
   }
 
-  void addNodeForNode(Node p, Node c) {
-    Node node = p;
-    node.addChild(c, p.direction);
+  void addNodeForNode(TreeNode p, TreeNode c) {
+    p.addChild(c);
 
-    dynamic w = node.root().widget();
-    w.relayout();
-    MapController().repaint();
-
+    LayoutController().relayout(p.root());
     mind_map_view_.foreground.addNode(c);
-    mind_map_view_.updatePreview(null);
+
+    repaint();
   }
 
   void addNewNodeForSelected() {
@@ -240,15 +251,15 @@ class MapController {
       return;
     }
 
-    var n = Node.create(NodeType.plainText);
-    addNodeForNode(selected.node, n);
+    var n = TreeNode.create(NodeType.plainText);
+    addNodeForNode(selected, n);
   }
 
-  void addChild(Node parent, Node child) {
+  void addChild(TreeNode parent, TreeNode child) {
     if (parent.parent == null) {
 
     } else {
-      parent.addChild(child, parent.direction);
+      parent.addChild(child);
     }
   }
 
@@ -275,16 +286,16 @@ class MapController {
     Log.e("paste " + direction.toString());
     hidePopup();
     if (cutted != null) {
-      moveTo(cutted.node, selected.node, direction);
+      moveTo(cutted, selected, direction);
       cutted = null;
     } else if (copied != null) {
-      cloneNodeTree(copied.node, selected.node, direction);
+      cloneNodeTree(copied, selected, direction);
       copied = null;
     }
 
-    dynamic w = selected.node.root().widget();
-    w.relayout();
-    MapController().repaint();
+    dynamic w = selected.root();
+    LayoutController().relayout(w);
+    repaint();
   }
 
   void centerlize() {
@@ -299,8 +310,8 @@ class MapController {
     mind_map_view_.foreground.centerlizeWidget(w);
   }
 
-  void cloneNodeTree(Node from, Node to, Direction direction) {
-    Node cloned = from.clone();
+  void cloneNodeTree(TreeNode from, TreeNode to, Direction direction) {
+    TreeNode cloned = from.clone();
     moveTo(cloned, to, direction);
     mind_map_view_.foreground.addNode(cloned);
     var children = from.children;
@@ -311,9 +322,9 @@ class MapController {
     }
   }
 
-  void moveTo(Node from, Node to, Direction direction) {
+  void moveTo(TreeNode from, TreeNode to, Direction direction) {
     if (direction == Direction.left || direction == Direction.right) {
-      to.addChild(from, direction);
+      to.addChild(from);
     } else if (direction == Direction.top) {
       to.parent.insertBefore(from, to);
     } else if (direction == Direction.bottom) {
@@ -321,21 +332,20 @@ class MapController {
     }
   }
 
-  void removeSelctedNode() {
+  void removeSelectedNode() {
     if (selected == null) {
       return;
     }
-    Node node = selected.node;
+    TreeNode node = selected;
     mind_map_view_.foreground.removeNode(node);
-    if (selected == node.widget()) {
-      selected = null;
-    }
-    Node root = node.root();
     node.removeFromParent();
+
+    TreeNode root = node.root();
     // relayout
-    dynamic w = root.widget();
-    w.relayout();
-    MapController().repaint();
+    // LayoutController().relayout(root);
+
+    // selected = null;    
+    repaint();
   }
 
   // void update(Node node) {
@@ -350,7 +360,7 @@ class MapController {
   //   }
   // }
 
-  void input(Node node, Function cb) {
+  void input(TreeNode node, Function cb) {
     mind_map_view_.foreground.showInput(node.widget(), cb);
   }
 
@@ -420,11 +430,11 @@ class MapController {
   }
 
   void detachSelctedNode() {
-    if (selected.node.children_attached) {
-      selected.node.detach();
+    if (selected.children_attached) {
+      selected.detach();
       selected.detach();
     } else {
-      selected.node.attach();
+      selected.attach();
       selected.attach();
     }
     // selected.node.detach();
