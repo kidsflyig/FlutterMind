@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
         Locale("zh")
       ],
       locale: Locale("zh"),
-      home: Splash(),
-      // home: MindMapView()
+      // home: Splash(),
+      home: MindMapView()
       // home: TestView()
     );
   }

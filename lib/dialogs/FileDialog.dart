@@ -72,8 +72,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_new.png',
-                pressedImage: 'assets/images/icons/icon_file_new.png',
+                normalImage: 'assets/icons/icon_file_new.png',
+                pressedImage: 'assets/icons/icon_file_new.png',
                 title: '新建',
                 onPressed: () {
                   MapController().createNew();
@@ -84,8 +84,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_save.png',
-                pressedImage: 'assets/images/icons/icon_file_save.png',
+                normalImage: 'assets/icons/icon_file_save.png',
+                pressedImage: 'assets/icons/icon_file_save.png',
                 title: '保存',
                 onPressed: () {
                   MapController().save();
@@ -100,8 +100,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_open.png',
-                pressedImage: 'assets/images/icons/icon_file_open.png',
+                normalImage: 'assets/icons/icon_file_open.png',
+                pressedImage: 'assets/icons/icon_file_open.png',
                 title: '打开',
                 onPressed: () {
                   Navigator.pop(context);
@@ -116,8 +116,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_login.png',
-                pressedImage: 'assets/images/icons/icon_file_login.png',
+                normalImage: 'assets/icons/icon_file_login.png',
+                pressedImage: 'assets/icons/icon_file_login.png',
                 title: '登录',
                 onPressed: () {
                   // TODO, 接入腾讯云开发flutter sdk
@@ -132,8 +132,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_open.png',
-                pressedImage: 'assets/images/icons/icon_file_open.png',
+                normalImage: 'assets/icons/icon_file_open.png',
+                pressedImage: 'assets/icons/icon_file_open.png',
                 title: '导出图片',
                 onPressed: () {
                   Navigator.pop(context);
@@ -148,8 +148,8 @@ class FileDialogState extends State<FileDialog> {
               SimpleImageButton(
                 width: width,
                 mode: SIBMode.VERTICAL,
-                normalImage: 'assets/images/icons/icon_file_login.png',
-                pressedImage: 'assets/images/icons/icon_file_login.png',
+                normalImage: 'assets/icons/icon_file_login.png',
+                pressedImage: 'assets/icons/icon_file_login.png',
                 title: '退出',
                 onPressed: () {
                   // TODO, 接入腾讯云开发flutter sdk

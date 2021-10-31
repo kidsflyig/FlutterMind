@@ -60,6 +60,15 @@ class _DetailDrawerViewState extends State<DetailDrawerView> {
                         border: Border.all(color: Colors.black12),
                         borderRadius: BorderRadius.circular(4)),
                     child: Text(selected.styleName())),
+
+                Text("图标"),
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Row(children:selected.icons)
+                ),
                 Text("图片"),
                 Container(
                     height: 100,

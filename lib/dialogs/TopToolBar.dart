@@ -86,8 +86,8 @@ class TopToolBar extends StatelessWidget {
                           bottomLeft: Radius.circular(6.0))),
                     child: SimpleImageButton(
                       width: width,
-                      normalImage: 'assets/images/icons/icon_file.png',
-                      pressedImage: 'assets/images/icons/icon_file.png',
+                      normalImage: 'assets/icons/icon_file.png',
+                      pressedImage: 'assets/icons/icon_file.png',
                       onPressed: () {
                         FileDialog.showMyDialog(context).then((value) {
                           // created or closed?
@@ -101,8 +101,8 @@ class TopToolBar extends StatelessWidget {
                     ),
                     child: SimpleImageButton(
                       width: width,
-                      normalImage: 'assets/images/icons/icon_style_editor.png',
-                      pressedImage: 'assets/images/icons/icon_style_editor.png',
+                      normalImage: 'assets/icons/icon_style_editor.png',
+                      pressedImage: 'assets/icons/icon_style_editor.png',
                       onPressed: () {
                         StyleEditorDialog.show(context, null).then((value) {
                           // created or closed?
@@ -116,8 +116,8 @@ class TopToolBar extends StatelessWidget {
                     ),
                     child: SimpleImageButton(
                       width: width,
-                      normalImage: 'assets/images/icons/icon_undo.png',
-                      pressedImage: 'assets/images/icons/icon_undo.png',
+                      normalImage: 'assets/icons/icon_undo.png',
+                      pressedImage: 'assets/icons/icon_undo.png',
                       onPressed: () {
                         MapController().undo();
                       },
@@ -131,8 +131,8 @@ class TopToolBar extends StatelessWidget {
                             bottomRight: Radius.circular(6.0))),
                     child: SimpleImageButton(
                       width: width,
-                      normalImage: 'assets/images/icons/icon_redo.png',
-                      pressedImage: 'assets/images/icons/icon_redo.png',
+                      normalImage: 'assets/icons/icon_redo.png',
+                      pressedImage: 'assets/icons/icon_redo.png',
                       onPressed: () {
                         MapController().redo();
                       },

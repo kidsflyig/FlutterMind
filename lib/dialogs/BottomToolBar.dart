@@ -1,3 +1,4 @@
+import 'package:FlutterMind/dialogs/IconSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/third_party/SimpleImageButton.dart';
 import 'package:FlutterMind/utils/Log.dart';
@@ -12,6 +13,13 @@ import '../MapController.dart';
 
 class BottomToolBar extends StatefulWidget {
   BottomToolBarState _state;
+  bool enabled = false;
+
+  void SetEnabled(bool flag) {
+    enabled = flag;
+    _state.setState(() {
+    });
+  }
 
   void hide() {
     if (_state != null) {
@@ -24,6 +32,7 @@ class BottomToolBar extends StatefulWidget {
       _state.toggle();
     }
   }
+
 
   BottomToolBar();
   @override
@@ -49,8 +58,8 @@ class BottomButton extends StatelessWidget {
           top: pos.dy,
           child:
           SimpleImageButton(
-            normalImage: 'assets/images/icons/item_bg.png',
-            pressedImage: 'assets/images/icons/item_bg.png',
+            normalImage: 'assets/icons/item_bg.png',
+            pressedImage: 'assets/icons/item_bg.png',
             width: ScreenUtil.getDp(C.bottom_toolbar_item_bg_width),
             title : title,
             onPressed: () {
@@ -132,14 +141,16 @@ class BottomToolBarState extends State<BottomToolBar>
         Align(
           alignment: Alignment.bottomCenter,
           child:
+          Visibility(visible: widget.enabled, 
+          child:
           SimpleImageButton(
-            normalImage: 'assets/images/icons/bottom_toogle_normal.png',
-            pressedImage: 'assets/images/icons/bottom_toogle_pressed.png',
+            normalImage: 'assets/icons/bottom_toogle_normal.png',
+            pressedImage: 'assets/icons/bottom_toogle_pressed.png',
             width: 54,
             onPressed: () {
               widget.toggle();
             },
-          ),
+          )),
         ),
         BottomButton(menu_exposed,
           idxToPos(init_x, init_y, item_bg_width, animation?.value, 0, 0),
@@ -210,6 +221,15 @@ class BottomToolBarState extends State<BottomToolBar>
             widget.toggle();
         }),
        "插入链接",
+        ),
+        BottomButton(menu_exposed,
+          idxToPos(init_x, init_y, item_bg_width, animation?.value, 2, 2),
+          wrapper(() {
+            Log.e("click8");
+            MapController().insertIconForSelected(context);
+            widget.toggle();
+        }),
+       "插入图标",
         ),
       ],
     );

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/StyleManager.dart';
 import 'package:FlutterMind/TreeNode.dart';
+import 'package:FlutterMind/dialogs/IconSelector.dart';
 import 'package:FlutterMind/dialogs/StyleSelector.dart';
 import 'package:FlutterMind/operations/History.dart';
 import 'package:FlutterMind/operations/OpCreateNew.dart';
@@ -75,6 +76,7 @@ class MapController {
     }
     selected = nw;
     nw.setSelected(true);
+    mind_map_view_.enableButtonToolBar(true);
 
     if (cutted != null || copied != null) {
       showPastePopup();
@@ -329,6 +331,7 @@ class MapController {
     mind_map_view_.foreground.removeNode(node);
     if (selected == node.widget()) {
       selected = null;
+      mind_map_view_.enableButtonToolBar(false);
     }
     Node root = node.root();
     node.removeFromParent();
@@ -510,6 +513,14 @@ class MapController {
             onSubmit: (msg) {
               selected.insertUrl(msg);
             }));
+  }
+
+  void insertIconForSelected(context) {
+    IconSelector.showDialog(context, (idx) {
+      String path = IconSelector.getIconPathById(idx);
+      Log.e("to insert icon path=" + path);
+      selected.insertIcon(path);
+    });
   }
 
   void exportAsImage(cb) {

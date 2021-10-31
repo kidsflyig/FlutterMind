@@ -15,8 +15,8 @@ class ScreenUtil {
       initScreenlt720();
     } else if (width <= 1048) {
       initScreenlt1048();
-    } else if (width <= 1366) {
-      initScreenlt1366();
+    } else if (width <= 1666) {
+      initScreenlt1666();
     } else {
       print("no fitfull size config"+width.toString());
     }
@@ -47,7 +47,7 @@ class ScreenUtil {
     screen[C.dialog_file_btn_width] = 50;
   }
 
-  static void initScreenlt1366() {
+  static void initScreenlt1666() {
     screen[C.main_menu_padding_left] = 50;
     screen[C.plain_text_node_width] = 100;
     screen[C.plain_text_node_font_size_100p] = 30;

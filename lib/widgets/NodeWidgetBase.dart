@@ -15,7 +15,7 @@ import '../utils/DragUtil.dart';
 import 'NodeWidget.dart';
 import 'RootNodeWidget.dart';
 
-class NodeWidgetBase extends StatefulWidget with TreeNode {
+class NodeWidgetBase extends StatefulWidget {
   Node node;
   // DragUtil drag_ = DragUtil();
   double scale_ = 1.0;
@@ -26,6 +26,7 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   Style _style;
   Image image;
   String url;
+  List<Widget> icons = List<Widget>();
   String _note;
 
   bool _dirty = true;
@@ -254,11 +255,10 @@ class NodeWidgetBase extends StatefulWidget with TreeNode {
   }
 
   void insertIcon(String icon) {
-    // icons.a
-    // Image(
-    //                         width:15,
-    //                         height:15,
-    //                         image: Image.asset("assets/icons/num1.png").image),
+    icons.add(Image(width:15,
+                                height:15,
+                                image: Image.asset(icon).image));
+    repaint();
   }
 
   void onPanStart(detail) {

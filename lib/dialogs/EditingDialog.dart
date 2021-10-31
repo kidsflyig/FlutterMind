@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'IconSelector.dart';
+
 class EditConfig {
   Offset pos;
   Function onSubmit;
@@ -30,7 +32,41 @@ class EditingDialog extends StatefulWidget {
   EditingDialog(this.config);
 
   static Future showMyDialog(BuildContext context, EditConfig config) async {
-    Navigator.push(context, PopRoute(child: EditingDialog(config)));
+    // Navigator.push(context, PopRoute(child: EditingDialog(config)));
+
+    Navigator.push(context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible:true,
+        transitionDuration: Duration(milliseconds: 1000),
+        transitionsBuilder: (ctx, anim1, anim2, child) {
+          // return FadeTransition(opacity: Tween(begin: 0.0, end:1.0).
+          //   animate(CurvedAnimation(parent: anim1, curve: Curves.fastOutSlowIn)), child:child);
+
+          return new ScaleTransition(
+            scale: new Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(
+                CurvedAnimation(
+                  parent: anim1,
+                  curve: Interval(
+                    0.00,
+                    0.25,
+                    curve: Curves.linear,
+                  ),
+                ),
+              ),
+            child: child,
+           );
+        },
+        pageBuilder: (ctx, animation, secondanimation) {
+          return EditingDialog(config);
+        }
+
+
+
+        ));
   }
 
   @override
@@ -84,30 +120,34 @@ class EditingDialogState extends State<EditingDialog> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              Expanded(flex: 1, child: 
                               IconButton(
                                   onPressed: () {
                                     print("submit value = " + value);
                                     onSubmitWapper(value);
                                   },
-                                  icon: Icon(Icons.check)),
+                                  icon: Icon(Icons.check))),
+                              Expanded(flex: 1, child: 
                               IconButton(
                                   onPressed: () {
                                     onSubmitWapper("");
                                   },
-                                  icon: Icon(Icons.clear)),
+                                  icon: Icon(Icons.clear))),
+                              Expanded(flex: 12, child: SizedBox()),
+                              Expanded(flex: 1, child: 
                               IconButton(
                                   onPressed: () {
                                     print("cacel value = ");
                                     Navigator.pop(context);
                                     Utils.disableStatusBar();
                                   },
-                                  icon: Icon(Icons.cancel)),
-                              IconButton(
-                                  onPressed: () {
-                                    print("cacel value = ");
-
-                                  },
-                                  icon: Icon(Icons.face)),
+                                  icon: Icon(Icons.cancel))),
+                              // IconButton(
+                              //     onPressed: () {
+                              //       print("icon value = ");
+                              //       IconSelector.showDialog(context);
+                              //     },
+                              //     icon: Icon(Icons.face)),
                             ])),
                     Container(
                       constraints: BoxConstraints(
@@ -136,7 +176,7 @@ class EditingDialogState extends State<EditingDialog> {
                         },
                         // onSubmitted: onSubmitWapper,
                       ),
-                    )
+                    ),
                   ]))),
     );
   }

@@ -53,6 +53,10 @@ class MindMapView extends StatefulWidget {
     });
   }
 
+  void enableButtonToolBar(bool flag) {
+    state.enableButtonToolBar(flag);
+  }
+
   void repaint() {
     Log.e("MindMapView repaint1 " + state.toString());
     if (state != null && state.mounted) {
@@ -87,6 +91,7 @@ class MindMapViewState extends State<MindMapView> {
   BottomToolBar bottomToolBar;
   bool touch_enabled = true;
   bool force_touch_disabled = false;
+  bool node_selected = false;
   final double drag_edge_width = 20.0;
 
   MindMapViewState() {
@@ -98,6 +103,16 @@ class MindMapViewState extends State<MindMapView> {
     super.initState();
     if (Utils().isAndroid) {
       SystemChrome.setEnabledSystemUIOverlays([]);
+    }
+  }
+
+  void enableButtonToolBar(bool flag) {
+    if (node_selected != flag) {
+      node_selected = flag;
+      bottomToolBar.SetEnabled(flag);
+      setState(() {
+        
+      });
     }
   }
 
@@ -212,6 +227,7 @@ class MindMapViewState extends State<MindMapView> {
           ),
           TopToolBar(),
           bottomToolBar,
+          Visibility(visible: node_selected, child:
           Container(
             padding: EdgeInsets.only(left: 20, bottom:50),
             alignment: Alignment.bottomLeft,
@@ -223,7 +239,8 @@ class MindMapViewState extends State<MindMapView> {
                 },
                 icon: Icon(Icons.art_track)
               );
-            })),
+            }))),
+          Visibility(visible: node_selected , child:
           Container(
             padding: EdgeInsets.only(right: 20, bottom:50),
             alignment: Alignment.bottomRight,
@@ -234,7 +251,7 @@ class MindMapViewState extends State<MindMapView> {
                 },
                 icon: Icon(Icons.view_headline),
               );
-            })),
+            }))),
             // image_data == null ? SizedBox() : Image(
             //     fit: BoxFit.fitHeight,
             //     image: Image.memory(image_data).image

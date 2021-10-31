@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:FlutterMind/Settings.dart';
 import 'package:FlutterMind/dialogs/EditingDialog.dart';
 import 'package:FlutterMind/layout/Layout.dart';
+import 'package:FlutterMind/third_party/auto_size_text/auto_size_text.dart';
 import 'package:FlutterMind/widgets/NodeWidget.dart';
 import 'package:FlutterMind/widgets/NodeWidgetBase.dart';
 import 'package:FlutterMind/utils/DragUtil.dart';
@@ -143,15 +144,23 @@ class RootNodeWidgetState extends State<RootNodeWidget> {
               width: widget.width,
               height: widget.height,
               padding: EdgeInsets.all(3),
-              child: Center(child:Text(
-                  widget.label == null ? "" : widget.label,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.black,
-                    shadows: [Shadow(color:Colors.black26, offset:Offset(1,1))],
-                    fontSize: 20,
-                  )))
+              child: Center(child:
+                // Text(
+                //   widget.label == null ? "" : widget.label,
+                //   textAlign: TextAlign.center,
+                //   overflow: TextOverflow.ellipsis,
+                //   style: TextStyle(
+                //     color: Colors.black,
+                //     shadows: [Shadow(color:Colors.black26, offset:Offset(1,1))],
+                //     fontSize: 20,
+                //   ))
+
+                  AutoSizeText(
+                        "fffffffffffffff",
+                        style: TextStyle(fontSize: 30),
+                        maxLines: 2,
+                      )
+                  )
             ),
             onDoubleTap: () {
               Offset screen_pos = widget.posInScreen(Offset(widget.x, widget.y));

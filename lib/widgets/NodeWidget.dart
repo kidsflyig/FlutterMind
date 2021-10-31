@@ -278,19 +278,13 @@ class NodeWidgetState extends State<NodeWidget> {
                     borderType: BorderType.RRect,
                     radius: Radius.circular(20),
                     child: Column(children: [
-                      // Row(
-                      //   children: [
-                      //     widget.icons
-                      //     Image(
-                      //       width:15,
-                      //       height:15,
-                      //       image: Image.asset("assets/icons/num1.png").image),
-                      //     Image(
-                      //       width:15,
-                      //       height:15,
-                      //       image: Image.asset("assets/icons/num1.png").image),
-                      //   ]
-                      // ),
+                      Visibility(
+                        visible: widget.icons.length > 0,
+                        child: 
+                          Row(
+                            children: widget.icons
+                          ),
+                      ),
                       Container(
                         padding: EdgeInsets.all(10),
                         child: Text(

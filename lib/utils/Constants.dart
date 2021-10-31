@@ -1,5 +1,9 @@
 class C {
 
+static final String icon_root = "assets/icons/";
+static final String tag_root = "assets/icons/tag/";
+static final String img_root = "assets/images/";
+
 // string
 static final int font_size = 0;
 static final int template = 1;
